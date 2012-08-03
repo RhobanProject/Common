@@ -1,1 +1,1 @@
-COMMON_SUBDIRS = communication
+COMMON_SUBDIRS = communication config
