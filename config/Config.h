@@ -12,7 +12,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "XMLTools.h"
+#include <xml/XMLTools.h>
 
 #define CLL_CAUTION_MSG(msg) cout << msg << endl;
 #define CLL_MSG(msg) cout << msg << endl;

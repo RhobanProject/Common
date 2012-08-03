@@ -14,8 +14,10 @@
 #include <cstdio>
 #include <map>
 #include <ctime>
-#include <rhoban/types.h>
+
+#include <communication/types.h>
 #include <threading/Condition.h>
+
 #include "Message.h"
 
 using namespace std;

@@ -12,12 +12,12 @@
 
 #include <vector>
 
-#include "config.h"
+#include <timing/TickMachine.h>
 
+#include "config.h"
 #include "communicationCommon.h"
 #include "ServerComponent.h"
 #include "ThreadedClient.h"
-#include "TickMachine.h"
 
 using namespace std;
 using namespace Rhoban;

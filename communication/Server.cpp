@@ -15,8 +15,9 @@
 #include <string.h>
 #include <set>
 
-#include "util.h"
-#include "XMLTools.h"
+#include <xml/XMLTools.h>
+#include <util.h>
+
 #include "rhobanProtocol.h"
 #include "Server.h"
 #include "Message.h"

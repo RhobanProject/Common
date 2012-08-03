@@ -13,8 +13,9 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <xml/XMLTools.h>
+
 #include "names.h"
-#include "XMLTools.h"
 #include "Config.h"
 
 using namespace std;

@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <main/Command.h>
 #include <tests/TestCase.h>
-#include <rhoban/communication/Message.h>
+#include <communication/Message.h>
 
 using namespace Rhoban;
 

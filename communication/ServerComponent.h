@@ -20,8 +20,8 @@
 #include <string>
 #include <map>
 
-#include "Thread.h"
-#include "Mutex.h"
+#include <threading/Thread.h>
+#include <threading/Mutex.h>
 
 #include "Message.h"
 

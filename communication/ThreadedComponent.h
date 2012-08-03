@@ -10,8 +10,9 @@
 #ifndef THREADEDCOMPONENT_H
 #define THREADEDCOMPONENT_H
 
+#include <threading/Thread.h>
+
 #include "ServerComponent.h"
-#include "Thread.h"
 
 namespace Rhoban
 {

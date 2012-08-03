@@ -17,8 +17,9 @@
 #ifndef SENSORSCONFIG_HPP_
 #define SENSORSCONFIG_HPP_
 
+#include <xml/XMLTools.h>
+
 #include "Config.h"
-#include "XMLTools.h"
 #include "util.h"
 
 class MoveSchedulerSensorsConfig : public Config

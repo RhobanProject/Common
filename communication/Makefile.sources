@@ -6,5 +6,6 @@ SOURCES := $(COMMON_COMM_SRC) \
     CommandsStore.cpp \
     Connection.cpp \
     Mailbox.cpp \
-    MailboxEntry.cpp
+    MailboxEntry.cpp \
+    MessageBuilder.cpp
 
