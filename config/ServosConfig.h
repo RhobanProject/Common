@@ -20,6 +20,10 @@
 #include "Config.h"
 #include "util.h"
 
+#ifdef NO_ALGEBRA
+typedef double scalar;
+#endif
+
 class ServoConfig : public Config
 {
     public:

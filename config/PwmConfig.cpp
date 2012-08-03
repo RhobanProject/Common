@@ -7,6 +7,8 @@
  * Licence Creative Commons *CC BY-NC-SA
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
+#include <sstream>
+
 #include "PwmConfig.h"
 
 string PwmConfig::to_xml() const

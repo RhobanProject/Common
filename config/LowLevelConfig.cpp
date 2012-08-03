@@ -14,7 +14,7 @@
  *      Author: Hugo Gimbert and Olivier Ly
  */
 
-#include "XMLTools.h"
+#include <xml/XMLTools.h>
 #include "LowLevelConfig.h"
 
 LowLevelConfig::LowLevelConfig()

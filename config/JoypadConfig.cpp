@@ -7,6 +7,8 @@
  * Licence Creative Commons *CC BY-NC-SA
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
+#include <sstream>
+
 #include "JoypadConfig.h"
 
 void JoypadConfig::from_xml(TiXmlNode * node)
@@ -72,6 +74,7 @@ void JoypadSensorParameter::from_xml(TiXmlNode * node)
 {
     name = XMLTools::get_string_element(node,"name");
 
+#ifndef NO_ALGEBRA
     Matrix bound;
 
     bound = XMLTools::extract_double_array(node,"min");
@@ -88,7 +91,7 @@ void JoypadSensorParameter::from_xml(TiXmlNode * node)
 
     for(uint i = 0; (i< JOYPAD_AXIS_NB) && (i< bound.size()); i++)
         norm_coef[i] = 2.0 / (max[i] - min[i]);
-
+#endif
 }
 
 string JoypadSensorParameter::to_xml() const
