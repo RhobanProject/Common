@@ -131,7 +131,7 @@ namespace Rhoban
     friend Message & operator<< (Message & msg , vector<double> &val);
     friend Message & operator<< (Message & msg , vector<float> &val);
     friend Message & operator<< (Message & msg , vector<int> &val);
-    friend Message & operator<< (Message & msg , vector<uint> &val);
+    friend Message & operator<< (Message & msg , vector<unsigned int> &val);
 
     /**
      * Il est possible d'ajouter des éléments de type vector<TYPE>, ou

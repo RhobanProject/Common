@@ -17,6 +17,8 @@
 #define CLL_CAUTION_MSG(msg) cout << msg << endl;
 #define CLL_MSG(msg) cout << msg << endl;
 
+typedef unsigned int uint;
+
 using namespace std;
 
 class Config : public Serializable

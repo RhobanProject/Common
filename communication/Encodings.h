@@ -22,6 +22,8 @@
 
 using namespace std;
 
+typedef unsigned int uint;
+
 namespace Rhoban{
   class Encodings{
   public:

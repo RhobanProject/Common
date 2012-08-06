@@ -48,7 +48,7 @@ namespace Rhoban
 
     void Message::append(const string &value)
     {
-        append((uint) value.size());
+        append((unsigned int) value.size());
         append_to_buffer(value.c_str(),value.size());
     }
 
@@ -101,7 +101,7 @@ namespace Rhoban
     Message & operator<< (Message & msg , vector<double> & val ) { msg.append(val); return msg; }
     Message & operator<< (Message & msg , vector<float> & val ) { msg.append(val); return msg; }
     Message & operator<< (Message & msg , vector<int> & val ) { msg.append(val); return msg; }
-    Message & operator<< (Message & msg , vector<uint> & val ) { msg.append(val); return msg; }
+    Message & operator<< (Message & msg , vector<unsigned int> & val ) { msg.append(val); return msg; }
 
 #define _APPEND_VECTOR(TYPE) \
     void Message::append(vector< TYPE > &values) \
