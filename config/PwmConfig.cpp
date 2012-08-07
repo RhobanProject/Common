@@ -16,8 +16,8 @@ string PwmConfig::to_xml() const
     string result;
     for(uint i =0; i< pwms.size(); i++)
     {
-        const PwmDeviceParameter pdp = pwms[i];
-        result += "<" + pdp.class_name()+ ">" + pdp.to_xml() + "</" + pdp.class_name()+ ">";
+        const PwmDeviceParameter *pdp = pwms[i];
+        result += "<" + pdp->class_name()+ ">" + pdp->to_xml() + "</" + pdp->class_name()+ ">";
     }
     return result;
 }
@@ -33,10 +33,10 @@ void PwmConfig::from_xml(TiXmlNode * node)
         }
 }
 
-PwmDeviceParameter PwmConfig::create_parameter(TiXmlNode *node)
+PwmDeviceParameter *PwmConfig::create_parameter(TiXmlNode *node)
 { 
-    PwmDeviceParameter pdp;
-    pdp.from_xml(node);
+    PwmDeviceParameter *pdp = new PwmDeviceParameter();
+    pdp->from_xml(node);
     return pdp;
 }
 

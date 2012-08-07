@@ -23,14 +23,14 @@ class KinectSensorParameter;
 class KinectConfig : public Config
 {
     public:
-        vector<KinectSensorParameter> kinects;
+        vector<KinectSensorParameter*> kinects;
 
         void from_xml(TiXmlNode *node);
         string to_xml() const;
 
-        KinectSensorParameter create_parameter(TiXmlNode *node);
+        virtual KinectSensorParameter *create_parameter(TiXmlNode *node);
 
-        KinectSensorParameter * find_kinect_parameter(string sensor_name);
+        KinectSensorParameter *find_kinect_parameter(string sensor_name);
 
         string class_name() const;
 };

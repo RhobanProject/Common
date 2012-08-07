@@ -19,7 +19,6 @@ void DynamixelConfig::from_xml(TiXmlNode * node)
     usart_id = XMLTools::get_int_element(node,"usart_id");
 }
 
-
 string DynamixelConfig::to_xml() const
 {
     ostringstream result;

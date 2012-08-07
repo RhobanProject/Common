@@ -31,16 +31,19 @@ using namespace std;
 class LowLevelConfig : public Config
 {
     public:
-        AnalogicSensorConfig sensor_config;
-        DynamixelConfig dynamixel_config;
-        PwmConfig pwm_config;
-        PinsConfig pins_config;
-        JoypadConfig joypad_config;
-        KinectConfig kinect_config;
+        AnalogicSensorConfig *sensor_config;
+        DynamixelConfig *dynamixel_config;
+        PwmConfig *pwm_config;
+        PinsConfig *pins_config;
+        JoypadConfig *joypad_config;
+        KinectConfig *kinect_config;
 
         bool initialized;
 
         LowLevelConfig();
+		~LowLevelConfig();
+		
+		virtual void instantiate();
 
         //load configuration
         void from_xml(TiXmlNode *node);

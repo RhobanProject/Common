@@ -22,8 +22,8 @@ string PinsConfig::to_xml() const
     result += "<pins>";
     for(uint i =0; i< pins.size(); i++)
     {
-        const PinDeviceParameter pdp = pins[i];
-        result += "<" + pdp.class_name()+ ">" + pdp.to_xml() + "</" + pdp.class_name()+ ">";
+        const PinDeviceParameter *pdp = pins[i];
+        result += "<" + pdp->class_name()+ ">" + pdp->to_xml() + "</" + pdp->class_name()+ ">";
     }
     result += "</pins>";
     return result;
@@ -40,10 +40,10 @@ void PinsConfig::from_xml(TiXmlNode * node)
         }
 }
 
-PinDeviceParameter PinsConfig::create_parameter(TiXmlNode *node)
+PinDeviceParameter *PinsConfig::create_parameter(TiXmlNode *node)
 {
-    PinDeviceParameter pdp;
-    pdp.from_xml(node);
+    PinDeviceParameter *pdp = new PinDeviceParameter();
+    pdp->from_xml(node);
     return pdp;
 }
 
@@ -51,7 +51,7 @@ PinDeviceParameter * PinsConfig::find_pindevice_parameter(string pin_name)
 {
     for(uint i = 0; i< pins.size(); i++)
     {
-        PinDeviceParameter * asp = &(pins[i]);
+        PinDeviceParameter * asp = pins[i];
         if(asp->name == pin_name)
             return asp;
     }

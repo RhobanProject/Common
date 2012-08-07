@@ -23,14 +23,14 @@ class JoypadSensorParameter;
 class JoypadConfig : public Config
 {
     public:
-        vector<JoypadSensorParameter> joypads;
+        vector<JoypadSensorParameter*> joypads;
 
         void from_xml(TiXmlNode *node);
         string to_xml() const;
 
-        JoypadSensorParameter create_parameter(TiXmlNode *node);
+        virtual JoypadSensorParameter *create_parameter(TiXmlNode *node);
 
-        JoypadSensorParameter * find_joypad_parameter(string sensor_name);
+        JoypadSensorParameter *find_joypad_parameter(string sensor_name);
 
         string class_name() const;
 };

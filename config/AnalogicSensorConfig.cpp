@@ -22,10 +22,10 @@ void AnalogicSensorConfig::from_xml(TiXmlNode * node)
         }
 }
         
-AnalogicSensorParameter AnalogicSensorConfig::create_parameter(TiXmlNode *node)
+AnalogicSensorParameter *AnalogicSensorConfig::create_parameter(TiXmlNode *node)
 {
-    AnalogicSensorParameter asp;
-    asp.from_xml(node);
+    AnalogicSensorParameter *asp = new AnalogicSensorParameter();
+    asp->from_xml(node);
     return asp;
 }
 
@@ -36,7 +36,7 @@ string AnalogicSensorConfig::to_xml() const
 
     for (uint i = 0; i <sensors.size(); i++)
     {
-        const AnalogicSensorParameter * asp = &(sensors[i]);
+        const AnalogicSensorParameter * asp = sensors[i];
         result += "<" + asp->class_name()+ ">" + asp->to_xml() + "</" + asp->class_name()+ ">";
     }
 
@@ -53,7 +53,7 @@ AnalogicSensorParameter * AnalogicSensorConfig::find_sensor_parameter(string sen
 {
     for(uint i = 0; i< sensors.size(); i++)
     {
-        AnalogicSensorParameter * asp = &(sensors[i]);
+        AnalogicSensorParameter * asp = sensors[i];
         if(asp->name == sensor_name)
             return asp;
     }

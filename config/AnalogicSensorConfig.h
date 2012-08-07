@@ -25,12 +25,12 @@ class AnalogicSensorParameter;
 class AnalogicSensorConfig : public Config
 {
     public:
-        vector<AnalogicSensorParameter> sensors;
+        vector<AnalogicSensorParameter*> sensors;
 
         void from_xml(TiXmlNode *node);
         string to_xml() const;
 
-        AnalogicSensorParameter create_parameter(TiXmlNode *node);
+        virtual AnalogicSensorParameter *create_parameter(TiXmlNode *node);
 
         AnalogicSensorParameter *find_sensor_parameter(string sensor_name);
 

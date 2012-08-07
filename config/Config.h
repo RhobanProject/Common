@@ -42,7 +42,7 @@ class Config : public Serializable
         /**
          * Loads the configuration
          */
-        void load_config();
+        virtual void load_config();
 };
 
 #endif // CONFIG_H_

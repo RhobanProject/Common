@@ -21,14 +21,14 @@ class PinDeviceParameter;
 class PinsConfig : public Config
 {
     public:
-        vector<PinDeviceParameter> pins;
+        vector<PinDeviceParameter*> pins;
 
         void from_xml(TiXmlNode *node);
         string to_xml() const;
 
         string class_name() const;
 
-        PinDeviceParameter create_parameter(TiXmlNode *node);
+        virtual PinDeviceParameter *create_parameter(TiXmlNode *node);
 
         PinDeviceParameter *find_pindevice_parameter(string pin_name);
 };

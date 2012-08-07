@@ -25,10 +25,10 @@ void KinectConfig::from_xml(TiXmlNode * node)
         CLL_CAUTION_MSG("No node with name kinects");
 }
         
-KinectSensorParameter KinectConfig::create_parameter(TiXmlNode *node)
+KinectSensorParameter *KinectConfig::create_parameter(TiXmlNode *node)
 {
-    KinectSensorParameter ksp;
-    ksp.from_xml(node);
+    KinectSensorParameter *ksp = new KinectSensorParameter();
+    ksp->from_xml(node);
     return ksp;
 }
 
@@ -38,7 +38,7 @@ string KinectConfig::to_xml() const
     result += "<kinects>";
     for(uint i =0; i< kinects.size(); i++)
     {
-        const KinectSensorParameter * ksp = &(kinects[i]);
+        const KinectSensorParameter * ksp = kinects[i];
         result += "<" + ksp->class_name() + ">" + ksp->to_xml() + "</" + ksp->class_name() + ">";
     }
     result += "</kinects>";
@@ -55,7 +55,7 @@ KinectSensorParameter * KinectConfig::find_kinect_parameter(string sensor_name)
 {
     for(uint i = 0; i< kinects.size(); i++)
     {
-        KinectSensorParameter * ksp = &(kinects[i]);
+        KinectSensorParameter * ksp = kinects[i];
         if(ksp->name == sensor_name )
         {
             CLL_MSG("Found kinect parameters with name " << sensor_name);

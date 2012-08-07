@@ -23,10 +23,10 @@ void JoypadConfig::from_xml(TiXmlNode * node)
         }
 }
 
-JoypadSensorParameter JoypadConfig::create_parameter(TiXmlNode *node)
+JoypadSensorParameter *JoypadConfig::create_parameter(TiXmlNode *node)
 {
-    JoypadSensorParameter jsp;
-    jsp.from_xml(node);
+    JoypadSensorParameter *jsp = new JoypadSensorParameter();
+    jsp->from_xml(node);
     return jsp;
 }
 
@@ -36,7 +36,7 @@ string JoypadConfig::to_xml() const
     result += "<joypads>";
     for(uint i =0; i< joypads.size(); i++)
     {
-        const JoypadSensorParameter * jsp = &(joypads[i]);
+        const JoypadSensorParameter * jsp = joypads[i];
         result += "<" + jsp->class_name() + ">" + jsp->to_xml() + "</" + jsp->class_name() + ">";
     }
     result +="</joypads>";
@@ -52,7 +52,7 @@ JoypadSensorParameter * JoypadConfig::find_joypad_parameter(string sensor_name)
 {
 	for(uint i = 0; i< joypads.size(); i++)
 	{
-		JoypadSensorParameter * jsp = &(joypads[i]);
+		JoypadSensorParameter * jsp = joypads[i];
 		if(jsp->name == sensor_name)
 			return jsp;
 	}

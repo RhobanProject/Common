@@ -23,9 +23,9 @@ class PwmDeviceParameter;
 class PwmConfig : public Config
 {
     public:
-        vector<PwmDeviceParameter> pwms;
+        vector<PwmDeviceParameter*> pwms;
 
-        PwmDeviceParameter create_parameter(TiXmlNode *node);
+        virtual PwmDeviceParameter *create_parameter(TiXmlNode *node);
 
         void from_xml(TiXmlNode *node);
         string to_xml() const;
