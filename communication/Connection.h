@@ -12,7 +12,6 @@
 
 namespace Rhoban{
   class Connection;
-  class Mailbox;
 }
 
 #include <cstdlib>
