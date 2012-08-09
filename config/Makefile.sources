@@ -10,5 +10,3 @@ COMMON_CONFIGS_SRC := AnalogicSensorConfig.cpp \
     PwmConfig.cpp \
     ServosConfig.cpp 
 
-SOURCES := $(COMMON_CONFIGS_SRC)
-
