@@ -1,0 +1,60 @@
+cmake_minimum_required (VERSION 2.6)
+project (RhobanCommon)
+
+# Options
+set(UTILS_DIRECTORY "utils" CACHE STRING "Utils directory")
+
+option(NO_ALGEBRA
+    "Disable algebra support" ON)
+
+if(NO_ALGEBRA)
+    add_definitions(-DNO_ALGEBRA)
+endif(NO_ALGEBRA)
+
+option(SDK
+    "Compiles the SDK" OFF)
+
+# Adding dependency with RhobanUtils
+include_directories("${UTILS_DIRECTORY}")
+
+# Communication
+set(COM_SOURCES
+    communication/Buffer.cpp
+    communication/Client.cpp
+    communication/Connection.cpp
+    communication/Encodings.cpp
+    communication/Header.cpp
+    communication/Mailbox.cpp
+    communication/MailboxEntry.cpp
+    communication/Message.cpp
+    communication/ServerComponent.cpp
+    communication/Server.cpp
+    communication/ThreadedClient.cpp
+    communication/ThreadedComponent.cpp
+    )
+
+if(SDK)
+    set(COM_SOURCES ${COM_SOURCES}
+        communication/CommandsStore.cpp
+        communication/MessageBuilder.cpp
+        )
+endif(SDK)
+
+# Config
+set(CONFIG_SOURCES
+    config/AnalogicSensorConfig.cpp
+    config/Config.cpp
+    config/DynamixelConfig.cpp
+    config/JoypadConfig.cpp
+    config/KinectConfig.cpp
+    config/LowLevelConfig.cpp
+    config/MoveSchedulerConfig.cpp
+    config/MoveSchedulerSensorsConfig.cpp
+    config/PinsConfig.cpp
+    config/PwmConfig.cpp
+    config/ServosConfig.cpp
+    )
+
+include_directories("${PROJECT_SOURCE_DIR}")
+set(ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
+add_library(RhobanCommon ${ALL_SOURCES})
