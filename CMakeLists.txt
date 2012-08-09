@@ -36,8 +36,18 @@ set(COM_SOURCES
 if(SDK)
     set(COM_SOURCES ${COM_SOURCES}
         communication/CommandsStore.cpp
-        communication/MessageBuilder.cpp
+        ${PROJECT_BINARY_DIR}/MessageBuilder.cpp
         )
+
+    # Generator for MessageBuilder
+    set(MESSAGE_BUILDER "${PROJECT_BINARY_DIR}/MessageBuilder.h"
+        "${PROJECT_BINARY_DIR}/MessageBuilder.cpp")
+
+    add_custom_command (
+      OUTPUT ${MESSAGE_BUILDER}
+      COMMAND ${GENERATE_PY} ${MESSAGE_BUILDER}
+      DEPENDS ${COMMAND_STORE}
+    )
 endif(SDK)
 
 # Config
@@ -56,5 +66,6 @@ set(CONFIG_SOURCES
     )
 
 include_directories("${PROJECT_SOURCE_DIR}")
+include_directories("${PROJECT_BINARY_DIR}")
 set(ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
 add_library(RhobanCommon ${ALL_SOURCES})
