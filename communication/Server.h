@@ -15,7 +15,6 @@
 #include <timing/TickMachine.h>
 
 #include "log.h"
-#include "config.h"
 #include "communicationCommon.h"
 #include "ServerComponent.h"
 #include "ThreadedClient.h"
