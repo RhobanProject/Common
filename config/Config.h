@@ -13,9 +13,19 @@
 #include <cstdlib>
 #include <iostream>
 #include <xml/XMLTools.h>
+#include <log.h>
 
-#define CLL_CAUTION_MSG(msg) cout << msg << endl;
-#define CLL_MSG(msg) cout << msg << endl;
+/**
+ * Log level
+ * 1: Caution
+ * 2: Message
+ * 3: Debug
+ */
+#define CONFIG_LOG_LEVEL 2
+
+#define CONFIG_CAUTION(...)     LOG_CPP(1 <= CONFIG_LOG_LEVEL, "config:caution", __VA_ARGS__)
+#define CONFIG_MSG(...)         LOG_CPP(2 <= CONFIG_LOG_LEVEL, "config", __VA_ARGS__)
+#define CONFIG_DEBUG(...)       LOG_CPP(3 <= CONFIG_LOG_LEVEL, "config:debug", __VA_ARGS__)
 
 typedef unsigned int uint;
 

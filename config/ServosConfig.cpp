@@ -89,7 +89,6 @@ void ServoConfig::from_xml(TiXmlNode * node)
 	MinAngle = XMLTools::get_double_element(node,"MinAngle");
 	MaxAngle = XMLTools::get_double_element(node,"MaxAngle");
 	MaxSpeed = XMLTools::get_int_element(node,"MaxSpeed");
-	cout << "MaxSpeed "<< MaxSpeed << endl;
 	MaxTorque = XMLTools::get_int_element(node,"MaxTorque");
 	Bounce = XMLTools::get_int_element(node,"Bounce");
 	Punch = XMLTools::get_int_element(node,"Punch");
@@ -116,7 +115,7 @@ ServoConfig ServosConfig::find_servo(string servo_name)
 {
 	for(uint i = 0 ; i< servos.size() ; i++)
 	{
-		cout << "Compare " << servo_name << " with " << servos[i].Name << endl;
+		CONFIG_DEBUG("Compare " << servo_name << " with " << servos[i].Name);
 		if(servos[i].Name == servo_name)
 			return servos[i];
 	}

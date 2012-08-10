@@ -80,12 +80,12 @@ namespace Rhoban
 
         if(res == 0)
         {
-            SERVER_DEBUG_MSG("Client " << this << " waited " << timeout_ms <<"ms without receiving any message",1);
+            SERVER_DEBUG("Client " << this << " waited " << timeout_ms <<"ms without receiving any message");
             return NULL;
         }
         else if( res == -1)
         {
-            SERVER_CAUTION_MSG("Select error");
+            SERVER_CAUTION("Select error");
             connected = false;
 #ifdef _WIN32
             int err = WSAGetLastError();
@@ -103,20 +103,20 @@ namespace Rhoban
         int received = 0;
         int size = MSG_HEADER_SIZE;
         char * p = header_buffer.buffer;
-        SERVER_DEBUG_MSG("Client trying to read one message from socket "<< sock,2);
+        SERVER_DEBUG("Client trying to read one message from socket "<< sock);
         do
         {
             received = recv(sock, p, size, 0);
             if(!received)
             {
                 string msg = "Client socket closed (waiting for header but received 0 byte)";
-                SERVER_DEBUG_MSG(msg,1);
+                SERVER_DEBUG(msg);
                 throw msg;
             }
             if(received == -1)
             {
                 string msg = "Client socket closed (Rcv failure while waiting for headers)";
-                SERVER_DEBUG_MSG(msg,1);
+                SERVER_DEBUG(msg);
                 throw msg;
             }
             p += received;
@@ -212,7 +212,7 @@ namespace Rhoban
         msg->length = msg->getSize() - MSG_HEADER_SIZE;
         msg->write_header(msg->buffer);
 
-        SERVER_DEBUG_MSG("Client --> message l" << msg->length << " d"<< msg->destination << " c"<< msg->command << "("<<msg->uid  <<" --> remote "<<sock,3);
+        SERVER_DEBUG("Client --> message l" << msg->length << " d"<< msg->destination << " c"<< msg->command << "("<<msg->uid  <<" --> remote "<<sock);
         char * p = msg->buffer;
         int size = msg->getSize();
         int ret=0;
@@ -238,7 +238,7 @@ namespace Rhoban
         if(connected)
         {
             connected = false;
-            SERVER_DEBUG_MSG("Client shutting down itself "<< (intptr_t) this,1);
+            SERVER_DEBUG("Client shutting down itself "<< (intptr_t) this);
             close(sock);
             sock = 0;
         }
@@ -246,6 +246,6 @@ namespace Rhoban
 
     void Client::log_error(string str)
     {
-        SERVER_CAUTION_MSG(str);
+        SERVER_CAUTION(str);
     }
 }

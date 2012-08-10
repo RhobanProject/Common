@@ -85,7 +85,7 @@ namespace Rhoban
                 perror("socket()\n");
                 throw string("Failed to create socket.");
             }
-        SERVER_DEBUG_MSG("Created socket",1);
+        SERVER_DEBUG("Created socket");
 
         /* ignore "socket already in use" errors */
 #ifdef _WIN32
@@ -97,14 +97,14 @@ namespace Rhoban
         if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
             throw string("Failed to set socket options.");
 #endif
-        SERVER_DEBUG_MSG("Set socket options",1);
+        SERVER_DEBUG("Set socket options");
 
         if (bind(sock, (SOCKADDR*) &sinserv, sizeof(sinserv)))
         {
             perror("bind()\n");
             throw string("Failed to bind socket.");
         }
-        SERVER_DEBUG_MSG("Binded socket",1);
+        SERVER_DEBUG("Binded socket");
 
         //wait for incoming connection
         if (listen(sock, MAX_CLIENT) == SOCKET_ERROR)
@@ -112,7 +112,7 @@ namespace Rhoban
             perror("listen()\n");
             throw string("Failed to listen incoming connections.");
         }
-        SERVER_DEBUG_MSG("Listening incoming connections",1);
+        SERVER_DEBUG("Listening incoming connections");
 
         sinsize = sizeof(sinserv);
         connected = true;
@@ -131,7 +131,7 @@ namespace Rhoban
         clients.clear();
         run = 1;
         connected = false;
-        SERVER_DEBUG_MSG("Start server port " << port,1);
+        SERVER_DEBUG("Start server port " << port);
 
         this->port = port;
 
@@ -147,19 +147,19 @@ namespace Rhoban
                     create_listen_socket();
                 } catch (string exc)
                 {
-                    SERVER_CAUTION_MSG("Server failed to create listen socket " << exc);
+                    SERVER_CAUTION("Server failed to create listen socket " << exc);
                 }
             }
             if (connected)
             {
-                SERVER_DEBUG_MSG("Server waiting client.",1);
+                SERVER_DEBUG("Server waiting client.");
 #ifdef _WIN32
                 SOCKET sock_wait_client = accept(sock,(SOCKADDR*)&sinserv, &sinsize);
 #else
                 SOCKET sock_wait_client = accept(sock, (SOCKADDR*)&sinserv,
                         (socklen_t*) &sinsize);
 #endif
-                SERVER_DEBUG_MSG("Server accepted connection.",1);
+                SERVER_DEBUG("Server accepted connection.");
                 if (sock_wait_client != INVALID_SOCKET)
                 {
                     try
@@ -172,10 +172,10 @@ namespace Rhoban
                         SERVER_MSG("New client " << (long) client);
                     } catch (string exc)
                     {
-                        SERVER_CAUTION_MSG("Error while running client: ");
+                        SERVER_CAUTION("Error while running client: ");
                     } catch (...)
                     {
-                        SERVER_CAUTION_MSG("Error while running client, disconnecting.");
+                        SERVER_CAUTION("Error while running client, disconnecting.");
                     }
                 } else
                 {
@@ -223,11 +223,11 @@ namespace Rhoban
             while (clients.size() > 0)
             {
                 ServerInternalClient * client = clients.back();
-                cout << "Shutting down client " << (long) client << "..." << endl;
+                SERVER_MSG("Shutting down client " << (long) client << "...");
                 client->shutdown();
                 delete client;
                 clients.pop_back();
-                cout << " done" << endl;
+                SERVER_MSG(" done");
             }
 #ifdef _WIN32
             WSACleanup();
@@ -266,8 +266,8 @@ namespace Rhoban
                     {
                         string filename = msg_in->read_string();
                         string stream = msg_in->read_string();
-                        cout << "Server writing stream " << endl << stream << endl
-                            << " to file " << filename << endl;
+                        SERVER_MSG("Server writing stream " << endl << stream << endl
+                            << " to file " << filename);
                         XMLTools::stream_to_file(filename, stream);
                         msg->append(string("Xml stream wrote to file ") + filename);
                         break;
@@ -294,7 +294,7 @@ namespace Rhoban
         launcher = launcher_;
         sock = sock_;
 
-        SERVER_DEBUG_MSG("Threaded client "<< (intptr_t) this << " created ",1);
+        SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
 
     void ServerInternalClient::process_message(Message * msg)
@@ -308,26 +308,26 @@ namespace Rhoban
         msg_out->destination = msg->destination;
         msg_out->command = msg->command;
 
-        SERVER_DEBUG_MSG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote "<< sock,3);
+        SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote "<< sock);
 
         try
         {
-            SERVER_DEBUG_MSG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> Component ",3);
+            SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> Component ");
             Message * answer = launcher->call(msg, msg_out);
-            SERVER_DEBUG_MSG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- Component ",3);
+            SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- Component ");
             if (answer)
             {
-                SERVER_DEBUG_MSG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> remote "<<sock,3);
+                SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> remote "<<sock);
                 send_msg(answer);
             } else
-                SERVER_DEBUG_MSG("No answer from client",2);
+                SERVER_DEBUG("No answer from client");
         } catch (string exc)
         {
             ostringstream smsg;
             //smsg << "Exception with message destination "<<msg->destination<<" command "<<msg->command<<" length "<<msg->length<<" uid "<<msg->uid<<":'";
             //smsg << exc<<"'.";
             smsg << "Failed to process message " << msg->uid << ": " << exc;
-            SERVER_DEBUG_MSG(smsg.str(),1);
+            SERVER_DEBUG(smsg.str());
 
             msg_out->destination = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
@@ -339,7 +339,7 @@ namespace Rhoban
             smsg << "Exception with message destination " << msg->destination << " command "
                 << msg->command << " length " << msg->length << " uid "
                 << msg->uid << ".";
-            SERVER_DEBUG_MSG(smsg.str(),1);
+            SERVER_DEBUG(smsg.str());
 
             msg_out->destination = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
@@ -365,10 +365,10 @@ namespace Rhoban
             }
         } catch (string exc)
         {
-            SERVER_CAUTION_MSG("ServerInternalclient " << this << " exception "<< exc);
+            SERVER_CAUTION("ServerInternalclient " << this << " exception "<< exc);
         } catch (...)
         {
-            SERVER_CAUTION_MSG("ServerInternalclient " << this << " exception");
+            SERVER_CAUTION("ServerInternalclient " << this << " exception");
         }
         shutdown();
     }
@@ -420,7 +420,7 @@ namespace Rhoban
 
         if (!components.count(comp_nb))
         {
-            SERVER_DEBUG_MSG("Creating component "<< comp_nb,2);
+            SERVER_DEBUG("Creating component "<< comp_nb);
             try
             {
                 comp = create_component(comp_nb);
@@ -428,7 +428,7 @@ namespace Rhoban
             } catch (const string & exc)
             {
                 string msg = "Could not create component : " + exc;
-                SERVER_CAUTION_MSG(msg);
+                SERVER_CAUTION(msg);
                 components[comp_nb] = 0;
                 msg_out->append(msg);
                 return msg_out;

@@ -21,7 +21,5 @@ string Config::to_xml() const
 
 void Config::load_config()
 {
-    cout << "Config: load_config() is not implemented" << endl;
-	__asm__("int3");
-	exit(1);
+    CONFIG_CAUTION("Config: load_config() is not implemented");
 }

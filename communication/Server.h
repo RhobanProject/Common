@@ -14,6 +14,7 @@
 
 #include <timing/TickMachine.h>
 
+#include "log.h"
 #include "config.h"
 #include "communicationCommon.h"
 #include "ServerComponent.h"
@@ -24,12 +25,17 @@ using namespace Rhoban;
 
 #define MAX_CLIENT 32
 
-/****************************************************************************/
-#define SERVER_MSG(msg) { cout << "Server Message: " << msg << endl; }
-#define SERVER_CAUTION_MSG(msg) { cout << "Server CAUTION: " << msg << endl; }
-#define SERVER_VERBOSITY 0
-#define SERVER_DEBUG_MSG(msg,p) { if(p<=SERVER_VERBOSITY) cout << "Server Debug: " << msg << endl; }
-/****************************************************************************/
+/**
+ * Server log level
+ * 1: Caution
+ * 2: Messages
+ * 3: Debug
+ */
+#define SERVER_LOG_LEVEL 2
+
+#define SERVER_CAUTION(...)     LOG_CPP(1 <= SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
+#define SERVER_MSG(...)         LOG_CPP(2 <= SERVER_LOG_LEVEL, "server", __VA_ARGS__)
+#define SERVER_DEBUG(...)       LOG_CPP(3 <= SERVER_LOG_LEVEL, "server:debug", __VA_ARGS__)
 
 namespace Rhoban
 {
