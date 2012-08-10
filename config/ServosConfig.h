@@ -20,8 +20,10 @@
 #include "Config.h"
 #include "util.h"
 
-#ifdef NO_ALGEBRA
+#ifdef NO_RHOBANMATH
 typedef double scalar;
+#else
+#include "linear_algebra.h"
 #endif
 
 class ServoConfig : public Config

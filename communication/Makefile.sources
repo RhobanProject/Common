@@ -1,11 +1,3 @@
 COMMON_COMM_SRC = Encodings.cpp Message.cpp Buffer.cpp Header.cpp \
 		  ThreadedClient.cpp Server.cpp ServerComponent.cpp \
 		  ThreadedComponent.cpp Client.cpp
-
-SOURCES := $(COMMON_COMM_SRC) \
-    CommandsStore.cpp \
-    Connection.cpp \
-    Mailbox.cpp \
-    MailboxEntry.cpp \
-    MessageBuilder.cpp
-
