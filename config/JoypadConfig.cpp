@@ -74,7 +74,7 @@ void JoypadSensorParameter::from_xml(TiXmlNode * node)
 {
     name = XMLTools::get_string_element(node,"name");
 
-#ifndef NO_ALGEBRA
+#ifndef NO_RHOBANMATH
     Matrix bound;
 
     bound = XMLTools::extract_double_array(node,"min");

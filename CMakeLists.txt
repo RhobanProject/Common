@@ -4,12 +4,12 @@ project (RhobanCommon)
 # Options
 set(UTILS_DIRECTORY "utils" CACHE STRING "Utils directory")
 
-option(NO_ALGEBRA
-    "Disable algebra support" ON)
+option(RHOBANMATH
+    "Enables RhobanMath support" OFF)
 
-if(NO_ALGEBRA)
-    add_definitions(-DNO_ALGEBRA)
-endif(NO_ALGEBRA)
+if(NOT RHOBANMATH)
+    add_definitions(-DNO_RHOBANMATH)
+endif(NOT RHOBANMATH)
 
 option(SDK
     "Compiles the SDK" OFF)
