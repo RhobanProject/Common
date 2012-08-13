@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <xml/XMLTools.h>
-#include <log.h>
+#include <logging/log.h>
 
 /**
  * Log level

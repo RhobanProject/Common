@@ -13,8 +13,8 @@
 #include <vector>
 
 #include <timing/TickMachine.h>
+#include <logging/log.h>
 
-#include "log.h"
 #include "communicationCommon.h"
 #include "ServerComponent.h"
 #include "ThreadedClient.h"
