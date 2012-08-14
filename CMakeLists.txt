@@ -1,21 +1,34 @@
 cmake_minimum_required (VERSION 2.6)
 project (RhobanCommon)
 
+set (BASE "../")
+
 # Options
-set(RHOBAN_UTILS_DIRECTORY "utils" CACHE STRING "Utils directory")
+set(RHOBAN_UTILS_DIRECTORY 
+    "${BASE}/Utils"
+    CACHE STRING "RhobanUtils directory")
 
 option(RHOBANMATH
     "Enables RhobanMath support" OFF)
 
-if(NOT RHOBANMATH)
+if (NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
-endif(NOT RHOBANMATH)
+endif (NOT RHOBANMATH)
+
+if (RHOBANMATH)
+    set(RHOBAN_MATH_DIRECTORY "${BASE}/Math"
+        CACHE STRING "RhobanMath directory")
+
+    include_directories ("${RHOBAN_MATH_DIRECTORY}")
+    set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
+endif (RHOBANMATH)
 
 option(SDK
     "Compiles the SDK" OFF)
 
 # Adding dependency with RhobanUtils
-include_directories("${RHOBAN_UTILS_DIRECTORY}")
+include_directories ("${RHOBAN_UTILS_DIRECTORY}")
+set (EXTRA_LIBS ${EXTRA_LIBS} RhobanUtils)
 
 # Communication
 set(COM_SOURCES
@@ -63,7 +76,7 @@ if(SDK)
 endif(SDK)
 
 # Config
-set(CONFIG_SOURCES
+set (CONFIG_SOURCES
     config/AnalogicSensorConfig.cpp
     config/Config.cpp
     config/DynamixelConfig.cpp
@@ -77,6 +90,7 @@ set(CONFIG_SOURCES
     config/ServosConfig.cpp
     )
 
-include_directories("${PROJECT_SOURCE_DIR}")
-set(ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
-add_library(RhobanCommon ${ALL_SOURCES})
+include_directories ("${PROJECT_SOURCE_DIR}")
+set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
+add_library (RhobanCommon ${ALL_SOURCES})
+target_link_libraries (RhobanCommon ${EXTRA_LIBS})
