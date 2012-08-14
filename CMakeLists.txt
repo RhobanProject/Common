@@ -23,7 +23,6 @@ set(COM_SOURCES
     communication/Client.cpp
     communication/Encodings.cpp
     communication/Header.cpp
-    communication/Mailbox.cpp
     communication/MailboxEntry.cpp
     communication/Message.cpp
     communication/ServerComponent.cpp
@@ -40,6 +39,7 @@ if(SDK)
     set(COM_SOURCES ${COM_SOURCES}
         communication/BaseConnection.cpp
         communication/CommandsStore.cpp
+        communication/Mailbox.cpp
         communication/tests/allTests.cpp
         "${GENERATE_DIR}/MessageBuilder.cpp"
         "${GENERATE_DIR}/Connection.cpp"
