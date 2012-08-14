@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanCommon)
 
 # Options
-set(UTILS_DIRECTORY "utils" CACHE STRING "Utils directory")
+set(RHOBAN_UTILS_DIRECTORY "utils" CACHE STRING "Utils directory")
 
 option(RHOBANMATH
     "Enables RhobanMath support" OFF)
@@ -15,7 +15,7 @@ option(SDK
     "Compiles the SDK" OFF)
 
 # Adding dependency with RhobanUtils
-include_directories("${UTILS_DIRECTORY}")
+include_directories("${RHOBAN_UTILS_DIRECTORY}")
 
 # Communication
 set(COM_SOURCES
