@@ -36,6 +36,7 @@ set(COM_SOURCES
 if(SDK)
     set(COM_SOURCES ${COM_SOURCES}
         communication/CommandsStore.cpp
+	communication/tests/allTests.cpp
         ${PROJECT_BINARY_DIR}/MessageBuilder.cpp
         )
 
