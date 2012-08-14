@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
-#include "MessageBuilder.h"
+#include <communication/MessageBuilder.h>
 
 using namespace std;
 

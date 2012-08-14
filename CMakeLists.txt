@@ -21,7 +21,6 @@ include_directories("${UTILS_DIRECTORY}")
 set(COM_SOURCES
     communication/Buffer.cpp
     communication/Client.cpp
-    communication/Connection.cpp
     communication/Encodings.cpp
     communication/Header.cpp
     communication/Mailbox.cpp
@@ -34,21 +33,33 @@ set(COM_SOURCES
     )
 
 if(SDK)
+    set(GENERATE_DIR "${PROJECT_BINARY_DIR}/communication")
+
+    make_directory("${GENERATE_DIR}")
+
     set(COM_SOURCES ${COM_SOURCES}
+        communication/BaseConnection.cpp
         communication/CommandsStore.cpp
-	communication/tests/allTests.cpp
-        ${PROJECT_BINARY_DIR}/MessageBuilder.cpp
+        communication/tests/allTests.cpp
+        "${GENERATE_DIR}/MessageBuilder.cpp"
+        "${GENERATE_DIR}/Connection.cpp"
         )
 
     # Generator for MessageBuilder
-    set(MESSAGE_BUILDER "${PROJECT_BINARY_DIR}/MessageBuilder.h"
-        "${PROJECT_BINARY_DIR}/MessageBuilder.cpp")
+    set (GENERATE_FILES
+        "${GENERATE_DIR}/MessageBuilder.h"
+        "${GENERATE_DIR}/MessageBuilder.cpp"
+        "${GENERATE_DIR}/Connection.h"
+        "${GENERATE_DIR}/Connection.cpp"
+        )
 
     add_custom_command (
-      OUTPUT ${MESSAGE_BUILDER}
-      COMMAND ${GENERATE_PY} ${MESSAGE_BUILDER}
-      DEPENDS ${COMMAND_STORE}
-    )
+        OUTPUT ${GENERATE_FILES}
+        COMMAND "${GENERATE_PY}" "${GENERATE_DIR}"
+        DEPENDS "${COMMAND_STORE}" "${GENERATE_PY}"
+        )
+
+    include_directories("${PROJECT_BINARY_DIR}")
 endif(SDK)
 
 # Config
@@ -67,6 +78,5 @@ set(CONFIG_SOURCES
     )
 
 include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${PROJECT_BINARY_DIR}")
 set(ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
 add_library(RhobanCommon ${ALL_SOURCES})

@@ -12,8 +12,10 @@
 #include <string>
 #include <map>
 #include <vector>
+
+#include <communication/MessageBuilder.h>
+
 #include "CommandsStore.h"
-#include "MessageBuilder.h"
 
 using namespace std;
 
