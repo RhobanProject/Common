@@ -126,6 +126,7 @@ namespace Rhoban
         WSADATA wsa;
         WSAStartup(MAKEWORD(2,0),&wsa);
 #endif
+        signal(SIGPIPE, SIG_IGN);
 
         launcher = launcher_;
         clients.clear();
@@ -267,7 +268,7 @@ namespace Rhoban
                         string filename = msg_in->read_string();
                         string stream = msg_in->read_string();
                         SERVER_MSG("Server writing stream " << endl << stream << endl
-                            << " to file " << filename);
+                                << " to file " << filename);
                         XMLTools::stream_to_file(filename, stream);
                         msg->append(string("Xml stream wrote to file ") + filename);
                         break;
