@@ -19,7 +19,7 @@ string Config::to_xml() const
     throw string("Config: to_xml() is not implemented");
 }
 
-void Config::load_config()
+void Config::load_config(AdapterLowLevel *adapter)
 {
     CONFIG_CAUTION("Config: load_config() is not implemented");
 }

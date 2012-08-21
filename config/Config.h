@@ -15,6 +15,8 @@
 #include <xml/XMLTools.h>
 #include <logging/log.h>
 
+class AdapterLowLevel;
+
 /**
  * Log level
  * 1: Caution
@@ -52,7 +54,7 @@ class Config : public Serializable
         /**
          * Loads the configuration
          */
-        virtual void load_config();
+        virtual void load_config(AdapterLowLevel *);
 };
 
 #endif // CONFIG_H_
