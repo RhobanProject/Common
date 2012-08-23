@@ -32,9 +32,9 @@ using namespace Rhoban;
  */
 #define SERVER_LOG_LEVEL 2
 
-#define SERVER_CAUTION(...)     LOG_CPP(1 <= SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
-#define SERVER_MSG(...)         LOG_CPP(2 <= SERVER_LOG_LEVEL, "server", __VA_ARGS__)
-#define SERVER_DEBUG(...)       LOG_CPP(3 <= SERVER_LOG_LEVEL, "server:debug", __VA_ARGS__)
+#define SERVER_CAUTION(...)     LOG_CPP(1, SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
+#define SERVER_MSG(...)         LOG_CPP(2, SERVER_LOG_LEVEL, "server", __VA_ARGS__)
+#define SERVER_DEBUG(...)       LOG_CPP(3, SERVER_LOG_LEVEL, "server:debug", __VA_ARGS__)
 
 namespace Rhoban
 {
