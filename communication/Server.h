@@ -44,30 +44,21 @@ namespace Rhoban
     class Server: public ServerComponent
     {
         public:
-
-            static void launch_server(ServerComponentInterface *launcher, int port);
-
-            static void shutdown_server(void);
-
-            static Server * get_server();
-
             //used to handle incoming messages whose target is the server
             //itself
-            Message * call(Message * msg_in, Message * msg_out);
+            Message *call(Message * msg_in, Message * msg_out);
+            
+            Server();
+            virtual ~Server();
+            void launch(ServerComponentInterface * launcher_, int port);
+            void shutdown();
 
         protected:
 
-            static Server * the_server;
-
             //creates a server that will run the corrresponding interface
-            Server();
-            virtual ~Server();
 
-            void internal_launch_server(ServerComponentInterface * launcher_,
-                    int port);
             void create_listen_socket();
             void close_listen_socket();
-            void internal_shutdown_server(void);
 
             //the list of internal clients talking to external clients
             list<ServerInternalClient *> clients;
@@ -127,6 +118,7 @@ namespace Rhoban
     class ServerComponentInterface
     {
         public:
+            Server *server;
 
             //creates the component interface
             ServerComponentInterface(bool thread_safe = true);

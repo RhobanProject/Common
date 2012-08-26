@@ -24,34 +24,8 @@
 
 namespace Rhoban
 {
-    Server * Server::the_server = 0;
-
     Server::Server()
     {
-        the_server = this;
-    }
-
-    void Server::launch_server(ServerComponentInterface * launcher, int port)
-    {
-        if (!launcher)
-        {
-            throw string("Cannot create server with null interface");
-        }
-
-        the_server = new Server();
-
-        the_server->internal_launch_server(launcher, port);
-    }
-
-    Server * Server::get_server()
-    {
-        if (the_server)
-        {
-            return the_server;
-        } else
-        {
-            throw string("Server not launched");
-        }
     }
 
     SOCKADDR_IN sinserv; //parametres pour server
@@ -118,9 +92,13 @@ namespace Rhoban
         connected = true;
     }
 
-    void Server::internal_launch_server(ServerComponentInterface * launcher_,
-            int port)
+    void Server::launch(ServerComponentInterface * launcher_, int port)
     {
+        if (launcher_ == NULL) {
+            throw string("Null interface");
+        }
+
+        launcher_->server = this;
 
 #ifdef _WIN32
         WSADATA wsa;
@@ -202,20 +180,10 @@ namespace Rhoban
             }
         }
 
-        internal_shutdown_server();
+        shutdown();
     }
 
-    void Server::shutdown_server()
-    {
-        if (the_server)
-        {
-            the_server->internal_shutdown_server();
-            delete the_server;
-            the_server = 0;
-        }
-    }
-
-    void Server::internal_shutdown_server(void)
+    void Server::shutdown()
     {
         if (run)
         {
