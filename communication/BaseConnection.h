@@ -26,7 +26,7 @@ using namespace std;
     
 namespace Rhoban
 {  
-    typedef void sendCallback(Message *);
+    //typedef void sendCallback(Message *, void *);
 
     class BaseConnection : public TCPClient
     {
@@ -35,7 +35,7 @@ namespace Rhoban
 
             void sendMessage(Message *message);
             Message *sendMessageRecieve(Message *message, int timeout=100);
-            void sendMessageCallback(Message *message, sendCallback *callback);
+            void sendMessageCallback(Message *message, sendCallback *callback, void *data=NULL);
             void startMailbox();
             Message *getMessage();
             Message *getMessage(Message *message);

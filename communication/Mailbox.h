@@ -23,7 +23,7 @@ using namespace std;
 
 namespace Rhoban
 {
-    typedef void sendCallback(Message *);
+    //typedef void sendCallback(Message *, void *);
 
     class Mailbox : public Thread
     {
