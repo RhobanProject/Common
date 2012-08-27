@@ -17,6 +17,8 @@
 #ifndef ROBOTCONFIG_H_
 #define ROBOTCONFIG_H_
 
+#include <string>
+
 #include "Config.h"
 #include "util.h"
 
@@ -36,18 +38,19 @@ class MoveSchedulerConfig : public Config
 {
 public:
 
-	ServosConfig servos_config;
-	MoveSchedulerSensorsConfig sensors_config;
+  ServosConfig servos_config;
+  MoveSchedulerSensorsConfig sensors_config;
 
-	MoveSchedulerConfig();
-	virtual ~MoveSchedulerConfig(){};
+  MoveSchedulerConfig();
+  MoveSchedulerConfig(string config);
+  virtual ~MoveSchedulerConfig(){};
 
-	void from_xml(TiXmlNode *node);
-	string to_xml() const;
+  void from_xml(TiXmlNode *node);
+  string to_xml() const;
 
-	string class_name() const;
+  string class_name() const;
 
-	bool config_loaded;
+  bool config_loaded;
 };
 
 

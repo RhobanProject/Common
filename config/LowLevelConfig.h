@@ -17,6 +17,7 @@
 #ifndef LOW_LEVEL_CONFIG_H_
 #define LOW_LEVEL_CONFIG_H_
 
+#include <string>
 #include "names.h"
 #include "Config.h"
 #include "AnalogicSensorConfig.h"
@@ -30,26 +31,27 @@ using namespace std;
 
 class LowLevelConfig : public Config
 {
-    public:
-        AnalogicSensorConfig *sensor_config;
-        DynamixelConfig *dynamixel_config;
-        PwmConfig *pwm_config;
-        PinsConfig *pins_config;
-        JoypadConfig *joypad_config;
-        KinectConfig *kinect_config;
+public:
+  AnalogicSensorConfig *sensor_config;
+  DynamixelConfig *dynamixel_config;
+  PwmConfig *pwm_config;
+  PinsConfig *pins_config;
+  JoypadConfig *joypad_config;
+  KinectConfig *kinect_config;
 
-        bool initialized;
+  bool initialized;
 
-        LowLevelConfig();
-		~LowLevelConfig();
+  LowLevelConfig();
+  LowLevelConfig(string config);
+  ~LowLevelConfig();
 		
-		virtual void instantiate();
+  virtual void instantiate();
 
-        //load configuration
-        void from_xml(TiXmlNode *node);
-        string to_xml() const;
+  //load configuration
+  void from_xml(TiXmlNode *node);
+  string to_xml() const;
 
-        string class_name() const;
+  string class_name() const;
 
 };
 

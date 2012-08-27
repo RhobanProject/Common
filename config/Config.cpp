@@ -7,19 +7,38 @@
  * Licence Creative Commons *CC BY-NC-SA
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
+#include <string>
+#include <xml/XMLTools.h>
 #include "Config.h"
+
+void Config::from_xmlfile(string path)
+{
+  TiXmlDocument *doc = XMLTools::file_to_node(path);
+  from_xml(doc);
+}
+
 
 void Config::from_xml(TiXmlNode * node)
 {
-    throw string("Config: from_xml() is not implemented");
+  throw string("Config: from_xml() is not implemented");
 }
 
 string Config::to_xml() const
 {
-    throw string("Config: to_xml() is not implemented");
+  throw string("Config: to_xml() is not implemented");
 }
 
 void Config::load_config(AdapterLowLevel *adapter)
 {
-    CONFIG_CAUTION("Config: load_config() is not implemented");
+  CONFIG_CAUTION("Config: load_config() is not implemented");
+}
+
+void Config::setConfig(string config)
+{
+  this->config = config;
+}
+
+string Config::getConfig()
+{
+  return config;
 }
