@@ -13,9 +13,11 @@
  *  Created on: 4 oct. 2011
  *      Author: hugo
  */
-#include "MoveSchedulerConfig.h"
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <file_mngt.h>
+#include "MoveSchedulerConfig.h"
 
 MoveSchedulerConfig mpconfig;
 
@@ -25,41 +27,49 @@ MoveSchedulerConfig mpconfig;
  */
 MoveSchedulerConfig::MoveSchedulerConfig()
 {
-    config_loaded = false;
+  config_loaded = false;
+}
+
+MoveSchedulerConfig::MoveSchedulerConfig(string config)
+{
+  config_loaded = false;
+
+  this->config = file_to_string(config);
+  from_xmlfile(config);
 }
 
 
 string MoveSchedulerConfig::class_name() const
 {
-    return "MoveSchedulerConfig";
+  return "MoveSchedulerConfig";
 }
 
 
 void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 {
-    TiXmlNode * sub_node = node->FirstChild("ServosConfig");
+  TiXmlNode * sub_node = node->FirstChild("ServosConfig");
 
-    if(!sub_node)
-        throw string("No ServosConfig node in moveschedulerconfig stream");
-    servos_config.from_xml(sub_node);
+  if(!sub_node)
+    throw string("No ServosConfig node in moveschedulerconfig stream");
+  servos_config.from_xml(sub_node);
 
-    sub_node = node->FirstChild("SensorsConfig");
+  sub_node = node->FirstChild("SensorsConfig");
 
-    if(!sub_node)
-        throw string("No SensorsConfig node in moveschedulerconfig stream");
-    sensors_config.from_xml(sub_node);
+  if(!sub_node)
+    throw string("No SensorsConfig node in moveschedulerconfig stream");
+  sensors_config.from_xml(sub_node);
 
-    sub_node = node->FirstChild("PinsConfig");
+  sub_node = node->FirstChild("PinsConfig");
 
-    config_loaded = true;
+  config_loaded = true;
 
 
 }
 
 string MoveSchedulerConfig::to_xml() const
 {
-    stringstream result;
-    result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
-    result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
-    return result.str();
+  stringstream result;
+  result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
+  result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
+  return result.str();
 }

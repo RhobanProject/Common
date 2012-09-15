@@ -32,9 +32,9 @@ using namespace Rhoban;
  */
 #define SERVER_LOG_LEVEL 2
 
-#define SERVER_CAUTION(...)     LOG_CPP(1 <= SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
-#define SERVER_MSG(...)         LOG_CPP(2 <= SERVER_LOG_LEVEL, "server", __VA_ARGS__)
-#define SERVER_DEBUG(...)       LOG_CPP(3 <= SERVER_LOG_LEVEL, "server:debug", __VA_ARGS__)
+#define SERVER_CAUTION(...)     LOG_CPP(1, SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
+#define SERVER_MSG(...)         LOG_CPP(2, SERVER_LOG_LEVEL, "server", __VA_ARGS__)
+#define SERVER_DEBUG(...)       LOG_CPP(3, SERVER_LOG_LEVEL, "server:debug", __VA_ARGS__)
 
 namespace Rhoban
 {
@@ -44,30 +44,21 @@ namespace Rhoban
     class Server: public ServerComponent
     {
         public:
-
-            static void launch_server(ServerComponentInterface *launcher, int port);
-
-            static void shutdown_server(void);
-
-            static Server * get_server();
-
             //used to handle incoming messages whose target is the server
             //itself
-            Message * call(Message * msg_in, Message * msg_out);
+            Message *call(Message * msg_in, Message * msg_out);
+            
+            Server();
+            virtual ~Server();
+            void launch(ServerComponentInterface * launcher_, int port);
+            void shutdown();
 
         protected:
 
-            static Server * the_server;
-
             //creates a server that will run the corrresponding interface
-            Server();
-            virtual ~Server();
 
-            void internal_launch_server(ServerComponentInterface * launcher_,
-                    int port);
             void create_listen_socket();
             void close_listen_socket();
-            void internal_shutdown_server(void);
 
             //the list of internal clients talking to external clients
             list<ServerInternalClient *> clients;
@@ -127,6 +118,7 @@ namespace Rhoban
     class ServerComponentInterface
     {
         public:
+            Server *server;
 
             //creates the component interface
             ServerComponentInterface(bool thread_safe = true);

@@ -24,13 +24,13 @@ using namespace std;
 
 namespace Rhoban
 {
-  typedef void sendCallback(Message *);
+  typedef void sendCallback(Message *, void *);
 
   class MailboxEntry
   {
   public:
     MailboxEntry(ui32 uid, Condition *condition);
-    MailboxEntry(ui32 uid, sendCallback *callback);
+    MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
     ~MailboxEntry();
     void wait(int timeout, Mutex *mutex);
     int isWaiting();
@@ -47,6 +47,7 @@ namespace Rhoban
     sendCallback* callback;
     ui32 uid;
     time_t creationDate;
+	void *data;
   };
 }
 

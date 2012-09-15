@@ -82,9 +82,9 @@ namespace Rhoban
         return retval;
     }
 
-    void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback)
+    void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback, void *data)
     {
-        MailboxEntry *entry = new MailboxEntry(message->getUid(), callback);
+        MailboxEntry *entry = new MailboxEntry(message->getUid(), callback, data);
         mailbox.addEntry(entry);
         sendMessage(message);
         delete(entry);

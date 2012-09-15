@@ -23,16 +23,18 @@ namespace Rhoban
     waiting = condition;
     response = NULL;
     callback = NULL;
-    creationDate = time(NULL);    
+    creationDate = time(NULL);   
+	data = NULL; 
   }
 
-  MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback)
+  MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
   {
     this->uid = uid;
     waiting = NULL;
     response = NULL;
     this->callback = callback;
-    creationDate = time(NULL);    
+    creationDate = time(NULL);
+	this->data = data;    
   }
 
   MailboxEntry::~MailboxEntry()
@@ -58,7 +60,7 @@ namespace Rhoban
   
   void MailboxEntry::executeCallback(Message *message)
   {
-    callback(message);
+    callback(message, data);
   }
 
   ui32 MailboxEntry::getUid()
