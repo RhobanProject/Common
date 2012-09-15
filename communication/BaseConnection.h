@@ -34,11 +34,12 @@ namespace Rhoban
             BaseConnection(CommandsStore *commandsStore_);
 
             void sendMessage(Message *message);
-            Message *sendMessageRecieve(Message *message, int timeout=100);
+            Message *sendMessageRecieve(Message *message, int timeout=1000);
             void sendMessageCallback(Message *message, sendCallback *callback);
             void startMailbox();
             Message *getMessage();
             Message *getMessage(Message *message);
+            void connectTo(const char *address, int port);
         protected:
             CommandsStore *commandsStore;
             Mailbox mailbox;

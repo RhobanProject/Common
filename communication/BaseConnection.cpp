@@ -22,6 +22,15 @@ namespace Rhoban
     {
         commandsStore = commandsStore_;
     }
+            
+    void BaseConnection::connectTo(const char *address, int port)
+    {
+        TCPClient::connectTo(address, port);
+
+        if (isConnected()) {
+            startMailbox();
+        }
+    }
 
     void BaseConnection::sendMessage(Message *message)
     {
