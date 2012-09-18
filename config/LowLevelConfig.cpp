@@ -29,9 +29,8 @@ LowLevelConfig::LowLevelConfig(string configfile)
 {
   initialized = false;
   instantiate();
-
-  this->config = file_to_string(configfile);
-  from_xmlfile(this->config);
+  
+  load_file(configfile);
 }
 
 void LowLevelConfig::instantiate()

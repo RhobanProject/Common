@@ -34,9 +34,7 @@ MoveSchedulerConfig::MoveSchedulerConfig(string configfile)
 {
   config_loaded = false;
 		
-  this->config = file_to_string(configfile);
-
-  from_xmlfile(this->config);
+  load_file(configfile);
 }
 
 
@@ -52,7 +50,7 @@ void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 
   if(!sub_node)
     throw string("No ServosConfig node in moveschedulerconfig stream");
-	cout << "FEZUOIFEZUH" << endl;
+
   servos_config.from_xml(sub_node);
 
   sub_node = node->FirstChild("SensorsConfig");

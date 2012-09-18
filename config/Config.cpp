@@ -11,16 +11,8 @@
 #include <xml/XMLTools.h>
 #include "Config.h"
 
-void Config::from_xmlfile(string filecontents)
-{
-  TiXmlDocument *doc = XMLTools::file_to_node(filecontents);
-  from_xml(doc);
-}
-
-
 void Config::from_xml(TiXmlNode * node)
 {
-	cout << "TROLOLO" << endl;
   throw string("Config: from_xml() is not implemented");
 }
 
