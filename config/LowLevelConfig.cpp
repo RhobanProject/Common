@@ -29,7 +29,7 @@ LowLevelConfig::LowLevelConfig(string configfile)
 {
   initialized = false;
   instantiate();
-  
+
   load_file(configfile);
 }
 

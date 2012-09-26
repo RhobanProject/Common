@@ -38,11 +38,6 @@ class Config : public Serializable
 {
 public:
   /**
-   * Loads the configuration from path to xml file
-   */
-  void from_xmlfile(string path);
-
-  /**
    * Loads the configuration
    */
   void from_xml(TiXmlNode *node);
@@ -61,21 +56,6 @@ public:
    * Loads the configuration
    */
   virtual void load_config(AdapterLowLevel *);
-
-  /**
-   * Set config
-   */
-  void setConfig(string config);
-
-  /**
-   * Get config
-   */
-  string getConfig();
-protected:
-  /**
-   * Serialization of configuration file
-   */
-  string config;
 };
 
 #endif // CONFIG_H_
