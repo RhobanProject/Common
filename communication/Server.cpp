@@ -103,8 +103,9 @@ namespace Rhoban
 #ifdef _WIN32
         WSADATA wsa;
         WSAStartup(MAKEWORD(2,0),&wsa);
-#endif
+#else
         signal(SIGPIPE, SIG_IGN);
+#endif
 
         launcher = launcher_;
         clients.clear();
