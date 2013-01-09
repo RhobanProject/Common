@@ -8,7 +8,6 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <cstdio>
-#include <main/Command.h>
 #include <tests/TestCase.h>
 #include <communication/Encodings.h>
 
