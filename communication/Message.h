@@ -88,7 +88,9 @@ namespace Rhoban
 
 #define READ_ARRAY_HEADER(TYPE, FUNCTION)			\
     _READ_ARRAY_HEADER(TYPE, FUNCTION )				\
-    _READ_ARRAY_HEADER(vector< TYPE >, FUNCTION ## _array )
+    _READ_ARRAY_HEADER(vector< TYPE >, FUNCTION ## _array ) \
+    _READ_ARRAY_HEADER(vector< vector< TYPE > >, FUNCTION ## _array_array )
+
 
     READ_ARRAY_HEADER(string, read_string);
     READ_ARRAY_HEADER(ui32, read_uint);
@@ -143,7 +145,8 @@ namespace Rhoban
 #define APPEND_VECTOR_HEADER(TYPE)			\
     _APPEND_VECTOR_HEADER(TYPE)				\
     _APPEND_VECTOR_HEADER(vector< TYPE >)		\
-    _APPEND_VECTOR_HEADER(vector< vector< TYPE > >)
+    _APPEND_VECTOR_HEADER(vector< vector< TYPE > >) \
+    _APPEND_VECTOR_HEADER(vector < vector< vector< TYPE > > >)
 
     APPEND_VECTOR_HEADER(ui8);
     APPEND_VECTOR_HEADER(string);

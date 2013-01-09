@@ -116,7 +116,9 @@ namespace Rhoban
 #define APPEND_VECTOR(TYPE) \
     _APPEND_VECTOR(TYPE) \
     _APPEND_VECTOR(vector< TYPE >) \
-    _APPEND_VECTOR(vector< vector< TYPE > >)
+    _APPEND_VECTOR(vector< vector< TYPE > >) \
+    _APPEND_VECTOR(vector< vector< vector < TYPE > > >)
+
 
     APPEND_VECTOR(ui8);
     APPEND_VECTOR(string);
@@ -175,7 +177,8 @@ namespace Rhoban
 
 #define READ_ARRAY(TYPE, FUNCTION) \
     _READ_ARRAY(TYPE, FUNCTION ) \
-    _READ_ARRAY(vector< TYPE >, FUNCTION ## _array)
+    _READ_ARRAY(vector< TYPE >, FUNCTION ## _array) \
+    _READ_ARRAY(vector< vector< TYPE > >, FUNCTION ## _array_array)
 
     READ_ARRAY(string, read_string);
     READ_ARRAY(ui32, read_uint);
