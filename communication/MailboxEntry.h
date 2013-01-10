@@ -32,7 +32,7 @@ namespace Rhoban
     MailboxEntry(ui32 uid, Condition *condition);
     MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
     ~MailboxEntry();
-    void wait(int timeout, Mutex *mutex);
+    void wait(int timeout);
     int isWaiting();
     int isCallback();
     void executeCallback(Message *message);

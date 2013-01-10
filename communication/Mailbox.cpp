@@ -41,7 +41,6 @@ namespace Rhoban
         {
             Message *message = connection->getMessage();
 
-            process.lock();
             if(entries.count(message->getUid()))
             {
                 if(entries[message->getUid()]->isWaiting())
@@ -58,7 +57,6 @@ namespace Rhoban
             }
             else
                 delete(message);
-            process.unlock();
         }
     }
 
@@ -69,8 +67,14 @@ namespace Rhoban
 
     void Mailbox::wait(ui32 uid, int timeout)
     {
-        entries[uid]->wait(timeout, &process);
-        process.unlock();
+    	try
+    	{
+    		entries[uid]->wait(timeout);
+    	}
+    	catch(string exc)
+    	{
+    		throw string("Mailbox failed to wait for message:\n\t") + exc;
+    	}
     }
 
     void Mailbox::setResponse(ui32 uid, Message * message)
