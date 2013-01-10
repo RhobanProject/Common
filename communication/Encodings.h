@@ -40,8 +40,8 @@ namespace Rhoban{
      * this one wont be properly decoded on every architecture
      */
 
-    static ui32 decode_uint(const char * buf);
-    static int decode_int(const char * buf);
+    static ui32 decode_uint(const char * buf){ return (ui32) buf[3] | ((ui32) buf[2] << 8) | ((ui32) buf[1] << 16) | ((ui32) buf[0] << 24) ; }
+    static int decode_int(const char * buf){ return (int) ( (ui32) buf[3] | ((ui32) buf[2] << 8) | ((ui32) buf[1] << 16) | ((ui32) buf[0] << 24));}
     static float decode_float(const char * buf);
     static double decode_double(const char * buf);
   };

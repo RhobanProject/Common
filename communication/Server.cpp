@@ -225,13 +225,24 @@ namespace Rhoban
                     }
                 case MSG_SERVER_ECHO:
                     {
+                    	try
+                    	{
+                    	cout << "Echoing message of size " << msg_in->length  << endl;
                         msg->destination = MSG_TYPE_SERVER;
                         msg->command = MSG_SERVER_ECHO;
                         msg->append(msg_in->read_string());
+                        msg->append(msg_in->read_string());
+                    	}
+                    	catch(string exc)
+                    	{
+                    		cout << "Exception when echoing " << exc << endl;
+                    		msg->append(exc);
+                    		msg->append("");
+                    	}
+
                         return msg;
                         break;
                     }
-
                 case MSG_SERVER_XML_TO_FILE:
                     {
                         string filename = msg_in->read_string();
