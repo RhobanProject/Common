@@ -68,7 +68,7 @@ if(SDK)
 
     add_custom_command (
         OUTPUT ${GENERATE_FILES}
-        COMMAND "${GENERATE_PY}" "${GENERATE_DIR}"
+        COMMAND python3 "${GENERATE_PY}" "${GENERATE_DIR}"
         DEPENDS "${COMMAND_STORE}" "${GENERATE_PY}"
         )
 
@@ -90,7 +90,12 @@ set (CONFIG_SOURCES
     config/ServosConfig.cpp
     )
 
+# Motion
+set (MOTION_SOURCES
+    motion/LinearSpline.cpp
+    )
+
 include_directories ("${PROJECT_SOURCE_DIR}")
-set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
+set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES})
 add_library (RhobanCommon ${ALL_SOURCES})
 target_link_libraries (RhobanCommon ${EXTRA_LIBS})
