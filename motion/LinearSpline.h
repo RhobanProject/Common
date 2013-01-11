@@ -16,7 +16,7 @@ namespace Rhoban
 {
 
 
-class LinearSplineSequence : public Serializable
+class LinearSplineSequence
 {
 
 public:
@@ -24,8 +24,6 @@ public:
 	 * The name of the sequence
 	 */
 	string name;
-
-	string class_name() const { return "SplineSequence";}
 
 	/* The type of a spline:
 	 * 0 : piecewise linear
@@ -53,12 +51,6 @@ public:
 	 */
 	int bounded;
 
-	/*
-	 * Whether the spline sequence is recordable
-	 */
-	bool Recordable;
-
-
 	class SplinePoint {
 	public:
 		float x;                     // the time position of the point
@@ -77,15 +69,13 @@ public:
 
 	void add_point(float x, float y);
 
-	LinearSplineSequence();
+	LinearSplineSequence(): type(0), cyclic(0), bounded(1), name(""){};
 	LinearSplineSequence(TiXmlNode * sequencenode);
-	virtual ~LinearSplineSequence();
+	virtual ~LinearSplineSequence(){};
 
 	string to_xml(bool only_header = false);
 	void to_raw_data(vector<float> & result, bool use_tangents = false) const;
 	void set_raw_data(vector<float> raw_data, bool use_tangents = false);
-
-	void sort_sequence();
 };
 
 /**
@@ -96,9 +86,6 @@ public:
 class LinearSpline : public Serializable {
 
 public:
-
-	LinearSpline() : name(""), shift(0), speed_factor(1){};
-
 	/* The name of the spline */
 	string name;
 
@@ -122,9 +109,9 @@ public:
 
 
 	/* The way he spline is updated */
-	//O means entry is real time
-	//1 means it is first entry
-	//2 means it is multientry
+	//time_entry means that x is the time since the spline is played
+	//first_entry means that x is the first entry of the spline block
+	//multi_entry means that x of sequence number n is value of input link number n
 	typedef enum
 	{
 		time_entry,
@@ -133,29 +120,25 @@ public:
 	} SplineUpdateType;
 	SplineUpdateType update_type;
 
-
-
-
-	/* The list of all sequences of the sequence*/
+	/* The list of all sequences of the spline*/
 	vector<LinearSplineSequence> sequences;
 
 	/*
 	 * (de)serialization
 	 */
 	virtual void from_xml(TiXmlNode * node);
-	virtual void self_check();
 	string to_xml(bool only_header = false);
 	void to_raw_data(vector < vector<float> > &) const;
 	void set_raw_data(vector < vector<float> >);
-
-	/* clears all points of every sequence */
-	void clear();
 
 	/* adds a new sequence */
 	void add_sequence(string);
 
 	/* dont modify */
 	string class_name() const { return "Spline";}
+
+	LinearSpline() : name(""), shift(0), speed_factor(1), update_type(time_entry) {};
+	virtual ~LinearSpline(){};
 
 };
 }

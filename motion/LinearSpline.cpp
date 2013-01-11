@@ -14,6 +14,11 @@
 namespace Rhoban
 {
 
+bool my_sort(LinearSplineSequence::SplinePoint a, LinearSplineSequence::SplinePoint b)
+{
+    return a.x < b.x;
+}
+
 void LinearSplineSequence::set_raw_data(vector<float> raw_data, bool use_tangents)
 {
     points.resize(raw_data.size() / (use_tangents ? 4 : 2) );
@@ -29,7 +34,7 @@ void LinearSplineSequence::set_raw_data(vector<float> raw_data, bool use_tangent
             point->right_tangent = raw_data[ind++];
         }
     }
-    sort_sequence();
+    sort( points.begin() , points.end(), my_sort);
 }
 
 void LinearSplineSequence::to_raw_data(	vector<float> & result, bool use_tangents) const
@@ -81,15 +86,6 @@ string LinearSplineSequence::SplinePoint::to_xml()
     return oss.str();
 }
 
-bool my_sort(LinearSplineSequence::SplinePoint a, LinearSplineSequence::SplinePoint b)
-{
-    return a.x < b.x;
-}
-
-void LinearSplineSequence::sort_sequence()
-{
-    sort( points.begin() , points.end(), my_sort);
-}
 
 string LinearSpline::to_xml(bool only_header)
 {
@@ -117,7 +113,7 @@ string LinearSplineSequence::to_xml(bool only_header)
     oss << "<type>" << type << "</type>";
     oss << "<cyclic>" << cyclic << "</cyclic>";
     oss << "<bounded>" << bounded << "</bounded>";
-    oss << "<Recordable>" << (Recordable ? "true" : "false") << "</Recordable>";
+    oss << "<Recordable>true</Recordable>";
     oss << "<Points>";
     oss << "<Points>";
     if(!only_header)
@@ -128,6 +124,69 @@ string LinearSplineSequence::to_xml(bool only_header)
     oss << "</SplineSequence>";
     return oss.str();
 }
+
+void LinearSpline::from_xml(TiXmlNode* node)
+{
+    name = XMLTools::get_string_element(node,"name");
+
+    //length = XMLTools::get_double_element(node,"length");
+    shift = XMLTools::get_double_element(node,"shift");
+    speed_factor = XMLTools::get_double_element(node,"speed_factor");
+
+    int entrytype = XMLTools::get_int_element(node,"entrytype");
+    update_type = (entrytype == 0) ?  time_entry : ( (entrytype == 1) ? first_entry : multi_entry );
+
+    for ( TiXmlNode* child = node->FirstChild();
+            child != 0;
+            child = child->NextSibling())
+    {
+        if (!strcmp(child->Value(),"sequences")) {
+            for ( TiXmlNode* sequencenode = child->FirstChild();
+                    sequencenode != 0;
+                    sequencenode = sequencenode->NextSibling())
+            {
+                if (!strcmp(sequencenode->Value(),"SplineSequence"))
+                {
+                    LinearSplineSequence seq(sequencenode);
+                    sequences.push_back(seq);
+                }
+            }
+        }
+    }
+
+    if(sequences.size()==0)
+        xml_parse_error("Spline defined with no sequence!")
+
+}
+
+
+LinearSplineSequence::LinearSplineSequence(TiXmlNode * sequencenode)
+{
+    TiXmlNode * pointsnode = sequencenode->FirstChild();
+
+    name = XMLTools::get_string_element(sequencenode,"name");
+    type = XMLTools::get_int_element(sequencenode,"type");
+    cyclic = XMLTools::get_int_element(sequencenode,"cyclic");
+    bounded = XMLTools::get_int_element(sequencenode,"bounded");
+
+    if(pointsnode)
+    {
+        for ( TiXmlNode* pointnode = pointsnode->FirstChild();
+                pointnode != 0;
+                pointnode = pointnode->NextSibling())
+        {
+            if (!strcmp(pointnode->Value(),"SplinePoint"))
+            {
+                SplinePoint p(XMLTools::get_float_element(pointnode, "x"),
+                        XMLTools::get_float_element(pointnode, "y"),
+                        XMLTools::get_float_element(pointnode, "left_tangent"),
+                        XMLTools::get_float_element(pointnode, "right_tangent"));
+                points.push_back(p);
+            }
+        }
+    }
+}
+
 
 }
 
