@@ -81,7 +81,10 @@ namespace Rhoban
 
         mailbox.deleteEntry(uid);
 
-        return retval;
+        if(retval->command == MSG_ERROR_COMMAND)
+        	throw string("Error message:\n\t") + retval->read_string();
+        else
+        	return retval;
     }
 
     void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback, void *data)
