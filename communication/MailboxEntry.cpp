@@ -17,74 +17,90 @@ using namespace std;
 
 namespace Rhoban
 {
-  MailboxEntry::MailboxEntry(ui32 uid, Condition *condition)
-  {
-    this->uid = uid;
-    waiting = condition;
-    response = NULL;
-    callback = NULL;
-    creationDate = time(NULL);   
+MailboxEntry::MailboxEntry(ui32 uid, Condition *condition)
+{
+	this->uid = uid;
+	waiting = condition;
+	response = NULL;
+	callback = NULL;
+	creationDate = time(NULL);
 	data = NULL; 
-  }
+}
 
-  MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
-  {
-    this->uid = uid;
-    waiting = NULL;
-    response = NULL;
-    this->callback = callback;
-    creationDate = time(NULL);
+MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
+{
+	this->uid = uid;
+	waiting = NULL;
+	response = NULL;
+	this->callback = callback;
+	creationDate = time(NULL);
 	this->data = data;    
-  }
+}
 
-  MailboxEntry::~MailboxEntry()
-  {
-    delete response;
-    delete waiting;
-  }
+MailboxEntry::~MailboxEntry()
+{
+	delete response;
+	delete waiting;
+}
 
-  void MailboxEntry::wait(int timeout, Mutex *mutex)
-  {
-    waiting->wait(mutex, timeout);
-  }
+void MailboxEntry::wait(int timeout)
+{
+	try
+	{
+		waiting->wait(timeout);
+	}
+	catch(string exc)
+	{
+		throw string("Mailbox entry failed to wait condition:\n\t");
+	}
+}
 
-  int MailboxEntry::isWaiting()
-  {
-    return(waiting != NULL);
-  }
+int MailboxEntry::isWaiting()
+{
+	return(waiting != NULL);
+}
 
-  int MailboxEntry::isCallback()
-  {
-    return(callback != NULL);
-  }
-  
-  void MailboxEntry::executeCallback(Message *message)
-  {
-    callback(message, data);
-  }
+int MailboxEntry::isCallback()
+{
+	return(callback != NULL);
+}
 
-  ui32 MailboxEntry::getUid()
-  {
-    return uid;
-  }
-  
-  time_t MailboxEntry::getCreationDate()
-  {
-    return creationDate;
-  }
+void MailboxEntry::executeCallback(Message *message)
+{
+	callback(message, data);
+}
 
-  Message * MailboxEntry::getResponse()
-  {
-    return response;
-  }
+ui32 MailboxEntry::getUid()
+{
+	return uid;
+}
 
-  void MailboxEntry::setResponse(Message * message)
-  {
-    response=message;
-  }
+time_t MailboxEntry::getCreationDate()
+{
+	return creationDate;
+}
 
-  void MailboxEntry::broadcast()
-  {
-    waiting->broadcast();
-  }
+Message * MailboxEntry::getResponse()
+{
+	return response;
+}
+
+void MailboxEntry::setResponse(Message * message)
+{
+	response=message;
+}
+
+void MailboxEntry::broadcast()
+{
+	try
+	{
+	waiting->lock();
+	waiting->broadcast();
+	waiting->unlock();
+	}
+	catch(...)
+	{
+		cout << "Failed to broadcast" << endl;
+	}
+}
 }

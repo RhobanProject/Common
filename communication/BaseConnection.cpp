@@ -75,9 +75,10 @@ namespace Rhoban
 
         mailbox.addEntry(new MailboxEntry(uid, &condition));
 
-        mailbox.lock();
+        condition.lock();
         sendMessage(message);
         mailbox.wait(uid, timeout);
+        condition.unlock();
         retval = mailbox.getResponse(uid);
         return retval;
     }

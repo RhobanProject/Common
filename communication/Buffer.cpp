@@ -22,6 +22,9 @@
 #include "Encodings.h"
 #include "Message.h"
 
+#include "util.h"
+
+
 namespace Rhoban
 {
   Buffer::Buffer(): buffer(0), size(0), buffer_size(0), owned(1)
@@ -135,7 +138,7 @@ namespace Rhoban
     if(offset+siz<= size)
       return string(buffer + offset,siz);
     else
-      throw string("Buffer too small to read such a string");
+      throw string("Buffer too small ") + my_itoa(size) + " " + string("to read such a string of size ") + my_itoa(siz) + string("offfset ") + my_itoa(offset);
   }
 
   vector<ui8> Buffer::read_array(ui32 siz, ui32 offset)
