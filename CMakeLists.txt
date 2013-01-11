@@ -68,7 +68,7 @@ if(SDK)
 
     add_custom_command (
         OUTPUT ${GENERATE_FILES}
-        COMMAND "${GENERATE_PY}" "${GENERATE_DIR}"
+        COMMAND python3 "${GENERATE_PY}" "${GENERATE_DIR}"
         DEPENDS "${COMMAND_STORE}" "${GENERATE_PY}"
         )
 
