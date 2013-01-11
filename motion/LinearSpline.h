@@ -60,7 +60,6 @@ public:
 		SplinePoint(float x, float y, float left_tangent, float right_tangent):
 			x(x), y(y), left_tangent(left_tangent), right_tangent(right_tangent) {};
 		SplinePoint() : x(0.0), y(0.0), left_tangent(0.0), right_tangent(0.0) {};
-		string to_xml();
 	};
 
 	/* The list of all the points of the sequence sorted according to X values. X value must be
@@ -73,9 +72,15 @@ public:
 	LinearSplineSequence(TiXmlNode * sequencenode);
 	virtual ~LinearSplineSequence(){};
 
-	string to_xml(bool only_header = false);
-	void to_raw_data(vector<float> & result, bool use_tangents = false) const;
-	void set_raw_data(vector<float> raw_data, bool use_tangents = false);
+	/*
+	 * Extract vector of float from the sequence
+	 */
+	void exportToRawData(vector<float> & result, bool use_tangents = false) const;
+
+	/*
+	 * Set content of the sequence to be the vector of float
+	 */
+	void importRawData(vector<float> raw_data, bool use_tangents = false);
 };
 
 /**
@@ -107,19 +112,6 @@ public:
 	 */
 	double speed_factor;
 
-
-	/* The way he spline is updated */
-	//time_entry means that x is the time since the spline is played
-	//first_entry means that x is the first entry of the spline block
-	//multi_entry means that x of sequence number n is value of input link number n
-	typedef enum
-	{
-		time_entry,
-		first_entry,
-		multi_entry
-	} SplineUpdateType;
-	SplineUpdateType update_type;
-
 	/* The list of all sequences of the spline*/
 	vector<LinearSplineSequence> sequences;
 
@@ -127,9 +119,8 @@ public:
 	 * (de)serialization
 	 */
 	virtual void from_xml(TiXmlNode * node);
-	string to_xml(bool only_header = false);
-	void to_raw_data(vector < vector<float> > &) const;
-	void set_raw_data(vector < vector<float> >);
+	void exportToRawData(vector < vector<float> > &) const;
+	void importRawData(vector < vector<float> >);
 
 	/* adds a new sequence */
 	void add_sequence(string);
@@ -137,7 +128,7 @@ public:
 	/* dont modify */
 	string class_name() const { return "Spline";}
 
-	LinearSpline() : name(""), shift(0), speed_factor(1), update_type(time_entry) {};
+	LinearSpline() : name(""), shift(0), speed_factor(1) {};
 	virtual ~LinearSpline(){};
 
 };
