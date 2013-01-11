@@ -31,17 +31,17 @@ namespace Rhoban
             Mailbox(BaseConnection *connection);
             ~Mailbox();
 
-            void execute();
-
             MailboxEntry * addEntry(ui32 uid);
             MailboxEntry * addEntry(ui32 uid, sendCallback *callback, void *data=NULL);
-
             void deleteEntry(ui32 uid);
 
-            int entryIsWaiting(ui32 uid);
-            int entryIsCallback(ui32 uid);
-            void garbageCollector();
         protected:
+
+            void execute();
+            void processIncomingMessage(Message *);
+            void processErrorMessage(Message *);
+            void garbageCollector();
+
             Mutex process;
             BaseConnection *connection;
             map<ui32, MailboxEntry *> entries;
