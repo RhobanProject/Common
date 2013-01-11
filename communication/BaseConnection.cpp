@@ -14,6 +14,8 @@
 #include "BaseConnection.h"
 #include "MailboxEntry.h"
 
+#include "rhobanProtocol.h"
+
 using namespace std;
 
 namespace Rhoban

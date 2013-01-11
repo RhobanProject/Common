@@ -16,6 +16,8 @@
 #include "Mailbox.h"
 #include "MailboxEntry.h"
 
+#include "rhobanProtocol.h"
+
 #define GARBAGETIMER 300
 #define GARBAGECHECKRATE 100
 
