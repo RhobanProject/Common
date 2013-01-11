@@ -23,99 +23,97 @@ using namespace std;
 
 namespace Rhoban
 {
-    Mailbox::Mailbox(BaseConnection* connection) 
-    {
-        this->connection = connection;
-        garbageCounter = 0;
-    }
+Mailbox::Mailbox(BaseConnection* connection)
+{
+	this->connection = connection;
+	garbageCounter = 0;
+}
 
-    Mailbox::~Mailbox()
-    {
-        this->thread_state=Dead;
-        entries.clear();
-    }
+Mailbox::~Mailbox()
+{
+	this->thread_state=Dead;
+	BEGIN_SAFE(process)
+	entries.clear();
+	END_SAFE(process)
+}
 
-    void Mailbox::execute()
-    {
-        while(connection->isConnected())
-        {
-            Message *message = connection->getMessage();
+void Mailbox::execute()
+{
+	while(connection->isConnected())
+	{
+		Message *message = connection->getMessage();
+		ui32 uid = message->getUid();
 
-            if(entries.count(message->getUid()))
-            {
-                if(entries[message->getUid()]->isWaiting())
-                {
-                    setResponse(message->getUid(), message);
-                    broadcastCondition(message->getUid());
-                }
-                else if(entries[message->getUid()]->isCallback())
-                {
-                    entries[message->getUid()]->executeCallback(message);
-                    deleteEntry(message->getUid());
-                    delete(message);
-                }
-            }
-            else
-                delete(message);
-        }
-    }
+		BEGIN_SAFE(process)
+		map<ui32, MailboxEntry *>::iterator it = entries.find(uid);
+		if(it != entries.end())
+		{
+			MailboxEntry * entry = it->second;
+			if(entry->isWaiting())
+			{
+				entry->setResponse(message);
+				entry->broadcast();
+			}
+			else if(entry->isCallback())
+			{
+				entry->executeCallback(message);
+				entries.erase(uid);
+				delete(message);
+			}
+		}
+		else
+			delete(message);
+		END_SAFE(process)
+	}
+}
 
-    void Mailbox::deleteEntry(ui32 uid)
-    {
-        entries.erase(uid);
-    }
+void Mailbox::deleteEntry(ui32 uid)
+{
+	BEGIN_SAFE(process)
+	MailboxEntry * entry = entries[uid];
+	entries.erase(uid);
+	delete entry;
+	END_SAFE(process)
+}
 
-    void Mailbox::wait(ui32 uid, int timeout)
-    {
-    	try
-    	{
-    		entries[uid]->wait(timeout);
-    	}
-    	catch(string exc)
-    	{
-    		throw string("Mailbox failed to wait for message:\n\t") + exc;
-    	}
-    }
+void Mailbox::addEntry(MailboxEntry * entry)
+{
+	BEGIN_SAFE(process)
+	entries[entry->getUid()]= entry;
+	garbageCounter++;
+	if(garbageCounter >= GARBAGECHECKRATE)
+	{
+		garbageCounter = 0;
+		garbageCollector();
+	}
+	END_SAFE(process)
+}
 
-    void Mailbox::setResponse(ui32 uid, Message * message)
-    {
-        entries[uid]->setResponse(message);
-    }
+MailboxEntry * Mailbox::addEntry(ui32 uid)
+{
+	MailboxEntry * entry = new MailboxEntry(uid);
+	addEntry(entry);
+	return entry;
+}
 
-    Message * Mailbox::getResponse(ui32 uid)
-    {
-        return(entries[uid]->getResponse());
-    }
+MailboxEntry * Mailbox::addEntry(ui32 uid, sendCallback *callback, void *data)
+{
+	MailboxEntry * entry = new MailboxEntry(uid, callback, data);
+	addEntry(entry);
+	return entry;
+}
 
-    void Mailbox::lock()
-    {
-        process.lock();
-    }
 
-    void Mailbox::broadcastCondition(ui32 uid)
-    {
-        entries[uid]->broadcast();
-    }
-
-    void Mailbox::addEntry(MailboxEntry *entry)
-    {
-        entries[entry->getUid()]=entry;
-        garbageCounter++;
-        if(garbageCounter >= GARBAGECHECKRATE)
-        {
-            garbageCounter = 0;
-            garbageCollector();
-        }
-    }
-
-    void Mailbox::garbageCollector()
-    {
-        map<ui32, MailboxEntry *>::iterator it;
-        for(it=entries.begin(); it!=entries.end(); ++it)
-        {
-            if(time(NULL) - it->second->getCreationDate() > GARBAGETIMER)
-                deleteEntry(it->second->getUid());
-        }
-    }
+void Mailbox::garbageCollector()
+{
+	map<ui32, MailboxEntry *>::iterator it;
+	BEGIN_SAFE(process)
+	for(it=entries.begin(); it!=entries.end(); ++it)
+	{
+		if(time(NULL) - it->second->getCreationDate() > GARBAGETIMER)
+			deleteEntry(it->second->getUid());
+	}
+	END_SAFE(process)
+}
 
 }
