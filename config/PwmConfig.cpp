@@ -26,11 +26,12 @@ void PwmConfig::from_xml(TiXmlNode * node)
 {
     pwms.clear();
     TiXmlNode * pwms_node = node->FirstChild( "pwms" );
-    if(pwms_node)
+    if(pwms_node) {
         for ( TiXmlNode* child = pwms_node->FirstChild(); child != 0; child = child->NextSibling())
         {
             pwms.push_back(create_parameter(child));
         }
+    }
 }
 
 PwmDeviceParameter *PwmConfig::create_parameter(TiXmlNode *node)

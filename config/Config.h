@@ -24,7 +24,7 @@ class AdapterLowLevel;
  * 2: Message
  * 3: Debug
  */
-#define CONFIG_LOG_LEVEL 2
+#define CONFIG_LOG_LEVEL 1
 
 #define CONFIG_CAUTION(...)     LOG_CPP(1, CONFIG_LOG_LEVEL, "config:caution", __VA_ARGS__)
 #define CONFIG_MSG(...)         LOG_CPP(2, CONFIG_LOG_LEVEL, "config", __VA_ARGS__)
