@@ -134,14 +134,15 @@ MailboxEntry * Mailbox::addEntry(ui32 uid, sendCallback *callback, void *data)
 
 void Mailbox::garbageCollector()
 {
-	map<ui32, MailboxEntry *>::iterator it;
-	BEGIN_SAFE(process)
-	for(it=entries.begin(); it!=entries.end(); ++it)
+	for(map<ui32, MailboxEntry *>::iterator it=entries.begin(); it!=entries.end(); ++it)
 	{
-		if(time(NULL) - it->second->getCreationDate() > GARBAGETIMER)
-			deleteEntry(it->second->getUid());
+		MailboxEntry * entry = it->second;
+		if(time(NULL) - entry->getCreationDate() > GARBAGETIMER)
+		{
+			entries.erase(entry->getUid());
+			delete entry;
+		}
 	}
-	END_SAFE(process)
 }
 
 }
