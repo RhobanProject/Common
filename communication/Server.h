@@ -92,8 +92,8 @@ namespace Rhoban
             ServerComponentInterface * launcher;
 
             //the map associates subcommands to behaviours
-            //it is initialized by init_cals
-            //it avids to use of switches
+            //a component is created the first time a message for that component is sent
+            //todo: component may be distant
             map<ui32, ComponentBehaviour> calls;
             void init_calls();
 
