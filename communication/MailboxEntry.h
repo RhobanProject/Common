@@ -26,10 +26,10 @@ namespace Rhoban
 {
   typedef void sendCallback(Message *, void *);
 
-  class MailboxEntry
+  class MailboxEntry : public Condition
   {
   public:
-    MailboxEntry(ui32 uid, Condition *condition);
+    MailboxEntry(ui32 uid);
     MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
     ~MailboxEntry();
     void wait(int timeout);
@@ -43,11 +43,12 @@ namespace Rhoban
     void broadcast();
   protected:
     Message * response;
-    Condition * waiting;
     sendCallback* callback;
     ui32 uid;
     time_t creationDate;
 	void *data;
+
+	bool waiting;
   };
 }
 

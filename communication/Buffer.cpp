@@ -90,7 +90,7 @@ namespace Rhoban
     if(offset + sizeof(ui32) <= size)
       return Encodings::decode_uint((const char *) buffer+offset);
     else
-      throw string("buffer too small to read int at this offset");
+      throw string("buffer too small to read uint at this offset");
   }
 
   int Buffer::read_int(ui32 offset)
@@ -106,7 +106,7 @@ namespace Rhoban
     if(offset + sizeof(int) <=size)
       return Encodings::decode_float(buffer+offset);
     else
-      throw string("buffer too small to read int at this offset");
+      throw string("buffer too small to read float at this offset");
   }
 
   void Buffer::write(const char * data, ui32 siz)

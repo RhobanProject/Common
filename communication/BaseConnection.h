@@ -34,7 +34,7 @@ namespace Rhoban
             BaseConnection(CommandsStore *commandsStore_);
 
             void sendMessage(Message *message);
-            Message *sendMessageRecieve(Message *message, int timeout=1000);
+            Message *sendMessageReceive(Message *message, int timeout=1000);
             void sendMessageCallback(Message *message, sendCallback *callback, void *data=NULL);
             void startMailbox();
             Message *getMessage();

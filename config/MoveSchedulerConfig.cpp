@@ -59,8 +59,6 @@ void MoveSchedulerConfig::from_xml(TiXmlNode * node)
     throw string("No SensorsConfig node in moveschedulerconfig stream");
   sensors_config.from_xml(sub_node);
 
-  sub_node = node->FirstChild("PinsConfig");
-
   config_loaded = true;
 
 

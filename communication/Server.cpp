@@ -27,9 +27,9 @@ namespace Rhoban
     /**
      * Messages addressed to the server should be forwarded to the Core component
      */
-    Server::Server()
+    Server::Server(ServerHub *launcher_) : launcher(launcher_), nextClientId(1000)
     {
-        registerComponent(MSG_TYPE_SERVER, new CoreServerComponent());
+        launcher->registerComponent(new CoreServerComponent());
     }
 
     /**
@@ -37,33 +37,13 @@ namespace Rhoban
      */
     ServerInternalClient *Server::createClient()
     {
-        return new ServerInternalClient(this);
-    }
-
-    /**
-     * Registering a new internal component
-     */
-    void Server::registerComponent(int type, ServerComponent *component)
-    {
-        components[type] = component;
-    }
-
-    /**
-     * Retreive a component
-     */
-    ServerComponent *Server::getComponent(int type)
-    {
-        if (components.find(type) != components.end()) {
-            return components[type];
-        }
-
-        return NULL;
+        return new ServerInternalClient(launcher, nextClientId++);
     }
 
     /**
      * Core server call
      */
-    Message * CoreServerComponent::call(Message * msg_in, Message * msg)
+    Message * CoreServerComponent::process(Message * msg_in, Message * msg)
     {
         try
         {
@@ -124,7 +104,7 @@ namespace Rhoban
     /**
      * Creating a server client
      */
-    ServerInternalClient::ServerInternalClient(Server *server_) : server(server_)
+    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : hub(hub_), clientId(clientId_)
     {
         SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
@@ -146,30 +126,17 @@ namespace Rhoban
         Message * msg_out = outMessages[msg->destination];
         msg_out->clear();
         msg_out->uid = msg->uid;
+        msg_out->source = clientId;
         msg_out->destination = msg->destination;
         msg_out->command = msg->command;
 
-        // Lookup for the server component
-        ServerComponent *component = server->getComponent(msg->destination);
-
-        if (!component) {
-            ostringstream smsg;
-            smsg << "The component " << msg->destination << " could not be found on the seerver";
-            SERVER_DEBUG(smsg.str());
-
-            msg_out->destination = msg->destination;
-            msg_out->command = MSG_ERROR_COMMAND;
-            msg_out->append(smsg.str());
-            sendMessage(msg_out);
-            return;
-        }
 
         // Calling the component on the given message
         SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote ");
         
         try
         {
-            Message *answer = component->call(msg, msg_out);
+            Message *answer = hub->call(msg, msg_out);
 
             // If the component answered
             if (answer) {
@@ -221,5 +188,77 @@ namespace Rhoban
         {
             SERVER_CAUTION("ServerInternalclient " << this << " exception");
         }
+    }
+
+    ServerHub::ServerHub(bool thread_safe) : thread_safe(thread_safe)
+    {
+    }
+
+    /*
+       void ServerComponentInterface::set_component(int comp_nb, ServerComponent * comp)
+       {
+       components[comp_nb] = comp;
+       }*/
+
+    ServerHub::~ServerHub()
+    {
+    	BEGIN_SAFE(mutex)
+    	for(map<ui16, Callable *>::iterator it = components.begin(); it != components.end(); it++)
+    		if(it->first != MSG_TYPE_SERVER && it->second)
+    		{
+    			delete it->second;
+    			it->second = 0;
+    		}
+    	END_SAFE(mutex)
+    }
+
+    Message* ServerHub::call(Message* msg_in, Message * msg_out)
+    {
+        ui16 comp_nb = msg_in->destination;
+
+        Callable * comp = 0;
+
+    	BEGIN_SAFE(mutex);
+
+        map<ui16, Callable *>::iterator it = components.find(comp_nb);
+
+        if (it == components.end() || it->second == NULL)
+        {
+            SERVER_CAUTION("Unable to find the component " << comp_nb);
+        } else {
+            comp = it->second;
+        }
+
+    	END_SAFE(mutex);
+
+    	if(!comp)
+    	{
+    		cout << endl << "Null component " << comp_nb << endl;
+    		exit(0);
+    	}
+
+    	Message * answer = 0;
+    	if(thread_safe)
+    	{
+    		Mutex * mut = mutexes[comp_nb];
+       		BEGIN_SAFE((*mut))
+    		answer= comp->call(msg_in, msg_out);
+    		END_SAFE((*mut))
+    	}
+    	else
+    	{
+    		answer = comp->call(msg_in, msg_out);
+    	}
+    	return answer;
+    }
+    
+    /**
+     * Registering a new internal component
+     */
+    void ServerHub::registerComponent(ServerComponent *component)
+    {
+        components[component->DestinationID()] = component;
+        mutexes[component->DestinationID()] = new Mutex();
+        component->setHub(this);
     }
 }

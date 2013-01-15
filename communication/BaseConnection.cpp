@@ -14,6 +14,8 @@
 #include "BaseConnection.h"
 #include "MailboxEntry.h"
 
+#include "rhobanProtocol.h"
+
 using namespace std;
 
 namespace Rhoban
@@ -35,7 +37,6 @@ namespace Rhoban
     void BaseConnection::sendMessage(Message *message)
     {
         transmit(message->getRaw(), message->getSize());
-        delete(message);
     }
 
     Message* BaseConnection::getMessage() 
@@ -66,29 +67,32 @@ namespace Rhoban
         return message;
     }
 
-    Message *BaseConnection::sendMessageRecieve(Message *message, int timeout)
+    Message *BaseConnection::sendMessageReceive(Message *message, int timeout)
     {
-        Message * retval;
         ui32 uid = message->getUid();
 
-        Condition condition;
+        //preparing message and condition
+        MailboxEntry * entry = mailbox.addEntry(uid);
 
-        mailbox.addEntry(new MailboxEntry(uid, &condition));
-
-        condition.lock();
+        entry->lock();
         sendMessage(message);
-        mailbox.wait(uid, timeout);
-        condition.unlock();
-        retval = mailbox.getResponse(uid);
-        return retval;
+        entry->wait(timeout);
+        entry->unlock();
+
+        Message * retval = entry->getResponse();
+
+        mailbox.deleteEntry(uid);
+
+        if(retval->command == MSG_ERROR_COMMAND)
+        	throw string("Error message:\n\t") + retval->read_string();
+        else
+        	return retval;
     }
 
     void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback, void *data)
     {
-        MailboxEntry *entry = new MailboxEntry(message->getUid(), callback, data);
-        mailbox.addEntry(entry);
+        mailbox.addEntry(message->getUid(), callback, data);
         sendMessage(message);
-        delete(entry);
     }
 
     void BaseConnection::startMailbox()

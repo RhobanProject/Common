@@ -43,9 +43,14 @@ namespace Rhoban
     ui32 uid;
             
     /**
+      * Source du message
+      */
+     ui16 source;
+
+     /**
      * Destination du message (composant cible)
      */
-    ui32 destination;
+    ui16 destination;
 
     /**
      * Commande du message
@@ -77,7 +82,7 @@ namespace Rhoban
     ui32 getLength();
 
     void setUid(ui32 uid);
-    void setDestination(ui32 destination);
+    void setDestination(ui16 destination);
     void setCommand(ui32 command);
     void setLength(ui32 length);
 
@@ -85,7 +90,8 @@ namespace Rhoban
      * Offset des éléments à l'intérieur d'un message
      */
     static const ui32 uid_offset         = 0;
-    static const ui32 destination_offset = 4;
+    static const ui32 source_offset 	 = 4;
+    static const ui32 destination_offset = 6;
     static const ui32 command_offset     = 8;
     static const ui32 length_offset      = 12;
 

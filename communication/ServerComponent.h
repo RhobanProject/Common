@@ -18,12 +18,8 @@
 #define COMPONENT_H_
 
 #include <string>
-#include <map>
 
-#include <threading/Thread.h>
-#include <threading/Mutex.h>
-
-#include "Message.h"
+#include "Callable.h"
 
 using namespace Rhoban;
 
@@ -35,26 +31,34 @@ using namespace Rhoban;
  */
 namespace Rhoban
 {
-    class ServerComponent
+    /*
+     * A server component is callable.
+     * It encapsulates a hub to connect to other components.
+     */
+    class ServerComponent : public Callable
     {
+
         public:
-            ServerComponent();
+            ServerComponent() : hub(0){};
+            virtual ~ServerComponent(){};
 
-            virtual ~ServerComponent();
+            /* The destination id of this component */
+            const ui16 virtual DestinationID() const = 0;
 
-            Message * call(Message * msg_in);
+            /* IF the message can be processed by this component then process is used */
+            /* otherwise the message is routed to the hub */
+            Message * call(Message * msg_in, Message * msg_out);
 
-            virtual Message * call(Message * msg_in, Message * msg_out)=0;
+            /* sets the hub used to connect to other components */
+            void setHub(Callable * hub){this->hub = hub; };
 
-            Message *safe_call(Message *msg_in, Message *msg_out);
+        protected:
+            /* Connection to other components */
+            Callable * hub;
 
-        private:
-            Mutex _access;
-            void lock(){_access.lock();}
-            void unlock(){_access.unlock();}
+            virtual Message * process(Message * msg_in, Message * msg_out)=0;
 
     };
 }
-
 
 #endif /* COMPONENT_H_ */

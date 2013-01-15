@@ -17,10 +17,10 @@ using namespace std;
 
 namespace Rhoban
 {
-MailboxEntry::MailboxEntry(ui32 uid, Condition *condition)
+MailboxEntry::MailboxEntry(ui32 uid)
 {
 	this->uid = uid;
-	waiting = condition;
+	waiting = false;
 	response = NULL;
 	callback = NULL;
 	creationDate = time(NULL);
@@ -30,7 +30,7 @@ MailboxEntry::MailboxEntry(ui32 uid, Condition *condition)
 MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
 {
 	this->uid = uid;
-	waiting = NULL;
+	waiting = false;
 	response = NULL;
 	this->callback = callback;
 	creationDate = time(NULL);
@@ -39,25 +39,31 @@ MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
 
 MailboxEntry::~MailboxEntry()
 {
-	delete response;
-	delete waiting;
+	//The response was not create by this object and should not be detsroyed by this object as well
+	//delete response;
+	//response = 0;
+	//same thing
+	//delete waiting;
 }
 
 void MailboxEntry::wait(int timeout)
 {
 	try
 	{
-		waiting->wait(timeout);
+		waiting = true;
+		Condition::wait(timeout);
+		waiting = false;
 	}
 	catch(string exc)
 	{
+		waiting = false;
 		throw string("Mailbox entry failed to wait condition:\n\t");
 	}
 }
 
 int MailboxEntry::isWaiting()
 {
-	return(waiting != NULL);
+	return waiting;
 }
 
 int MailboxEntry::isCallback()
@@ -94,9 +100,9 @@ void MailboxEntry::broadcast()
 {
 	try
 	{
-	waiting->lock();
-	waiting->broadcast();
-	waiting->unlock();
+	lock();
+	Condition::broadcast();
+	unlock();
 	}
 	catch(...)
 	{

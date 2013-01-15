@@ -32,6 +32,7 @@ namespace Rhoban{
      */
     static void encode_int(int value, char * buf);
     static void encode_uint(ui32 value, char * buf);
+    static void encode_ushort(ui16 value, char * buf);
     static void encode_float(float value, char * buf);
     static void encode_double(double value, char * buf);
 
@@ -41,6 +42,7 @@ namespace Rhoban{
      */
 
     static ui32 decode_uint(const char * buf){ return (ui32) (unsigned char) buf[3] | ((ui32) (unsigned char) buf[2] << 8) | ((ui32) (unsigned char) buf[1] << 16) | ((ui32) (unsigned char) buf[0] << 24) ; }
+    static ui16 decode_ushort(const char * buf){ return (ui16) (unsigned char) buf[1] | ((ui16) (unsigned char) buf[0] << 8) ; }
     static int decode_int(const char * buf){ return (int) ( (ui32) (unsigned char) buf[3] | ((ui32) (unsigned char) buf[2] << 8) | ((ui32) (unsigned char) buf[1] << 16) | ((ui32) (unsigned char) buf[0] << 24));}
     static float decode_float(const char * buf);
     static double decode_double(const char * buf);

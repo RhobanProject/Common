@@ -40,8 +40,6 @@ set(COM_SOURCES
     communication/Message.cpp
     communication/ServerComponent.cpp
     communication/Server.cpp
-    communication/ThreadedClient.cpp
-    communication/ThreadedComponent.cpp
     )
 
 if(SDK)
@@ -90,7 +88,12 @@ set (CONFIG_SOURCES
     config/ServosConfig.cpp
     )
 
+# Motion
+set (MOTION_SOURCES
+    motion/LinearSpline.cpp
+    )
+
 include_directories ("${PROJECT_SOURCE_DIR}")
-set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES})
+set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES})
 add_library (RhobanCommon ${ALL_SOURCES})
 target_link_libraries (RhobanCommon ${EXTRA_LIBS})

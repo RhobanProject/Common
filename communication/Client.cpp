@@ -97,7 +97,7 @@ namespace Rhoban
         }
 
         // Reading the destination
-        ui32 type = Encodings::decode_uint(headerBuffer.buffer + Header::destination_offset);
+        ui32 type = Encodings::decode_ushort(headerBuffer.buffer + Header::destination_offset); // Destination
 
         // Reads the message
         Message *in_msg = inMessages[type];

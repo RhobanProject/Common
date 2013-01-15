@@ -1,23 +1,36 @@
 /*************************************************
-* Publicly released by Rhoban System, August 2012
-* www.rhoban-system.fr
-*
-* Freely usable for non-commercial purposes
-*
-* Licence Creative Commons *CC BY-NC-SA
-* http://creativecommons.org/licenses/by-nc-sa/3.0
-*************************************************/
+ * Publicly released by Rhoban System, August 2012
+ * www.rhoban-system.fr
+ *
+ * Freely usable for non-commercial purposes
+ *
+ * Licence Creative Commons *CC BY-NC-SA
+ * http://creativecommons.org/licenses/by-nc-sa/3.0
+ *************************************************/
 
 #ifndef MSG_PROT_H
 #define MSG_PROT_H
-    
+
 #define RHOBAN_PROTOCOL_VERSION "2"
+
+#define RHOBAN_MESSAGE_DESTINATIONS_NB 8
+static const char * RHOBAN_MESSAGE_DESTINATIONS[RHOBAN_MESSAGE_DESTINATIONS_NB] =
+{
+		"Error",\
+		"Server",\
+		"System",\
+		"LowLevel",\
+		"Scheduler",\
+		"Vision",\
+		"Localisation",\
+		"StateMachine"
+};
 
 #define MSG_TYPE_ERROR 0
 
 // This is the error command available for all destinations
 #define MSG_ERROR_COMMAND 1
-    
+
 #define MSG_TYPE_SERVER 1
 #define MSG_SERVER_GET_VERSION 0
 #define MSG_SERVER_ECHO 2
@@ -27,7 +40,7 @@
 #define MSG_TYPE_SYSTEM 2
 #define MSG_SYSTEM_BASH 4
 #define MSG_SYSTEM_STAT 5
-    
+
 #define MSG_TYPE_LOW_LEVEL 3
 
 #define MSG_LL_ERROR MSG_ERROR_COMMAND
@@ -90,8 +103,8 @@
 #define MSG_LL_GET_CONFIG 70
 #define MSG_LL_CONFIG_IS_LOADED 71
 /**************************************
-* MOVE SCHEDULER
-*/
+ * MOVE SCHEDULER
+ */
 
 #define MSG_TYPE_MOVE_SCHEDULER 4
 #define SCHEDULER_LOAD_CONFIG 40
@@ -138,6 +151,8 @@
 #define VISION_GET_PARAMETERS 18
 #define VISION_SET_PARAMETERS 19
 #define VISION_RESET_CAMERA 16
+#define VISION_GET_BALL_COORDINATES 21
+#define VISION_GET_GOAL_COORDINATES 22
 
 #define MSG_TYPE_LOCALISATION 6
 #define LOCALISATION_ERROR MSG_ERROR_COMMAND

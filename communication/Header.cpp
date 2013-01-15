@@ -33,7 +33,8 @@ namespace Rhoban
   void Header::read_header(const char * raw_header)
   {
     uid = Encodings::decode_uint(raw_header + uid_offset); // Unique message id
-    destination = Encodings::decode_uint(raw_header + destination_offset);; // Destination of message
+    source = Encodings::decode_ushort(raw_header + destination_offset);; // Destination of message
+    destination = Encodings::decode_ushort(raw_header + destination_offset);; // Destination of message
     command = Encodings::decode_uint(raw_header + command_offset); // Command of message
     length = Encodings::decode_uint(raw_header + length_offset); // Content length of the message
   }
@@ -41,7 +42,8 @@ namespace Rhoban
   void Header::write_header(char * raw_header)
   {
     Encodings::encode_uint(uid, (char*) raw_header + uid_offset);
-    Encodings::encode_uint(destination, (char*) raw_header + destination_offset);
+    Encodings::encode_ushort(source, (char*) raw_header + source_offset);
+    Encodings::encode_ushort(destination, (char*) raw_header + destination_offset);
     Encodings::encode_uint(command, (char*) raw_header + command_offset);
     Encodings::encode_uint(length, (char*) raw_header + length_offset);
   }
@@ -74,7 +76,7 @@ namespace Rhoban
   {
     this->uid = uid;
   }
-  void Header::setDestination(ui32 destination)
+  void Header::setDestination(ui16 destination)
   {
     this->destination = destination;
   }
