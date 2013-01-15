@@ -88,7 +88,6 @@ namespace Rhoban
     class ServerInternalClient : public TCPServerClient, public Client
     {
         protected:
-            int clientId;
 
             //this is how the internal client process an incoming message
             //the message is forwarded to the corresponding component

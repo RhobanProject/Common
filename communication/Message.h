@@ -56,6 +56,7 @@ namespace Rhoban
      * Initialise le message
      */
     void init();
+    void init_cursor();
 
     /**
      * Lis un entier signé ou non signé

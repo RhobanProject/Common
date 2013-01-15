@@ -52,6 +52,9 @@ namespace Rhoban
                 case MSG_SERVER_GET_VERSION:
                     {
                         //TODO get a real version number
+                        msg->source = MSG_TYPE_SERVER;
+                        msg->destination = msg_in->source;
+                        msg->command = MSG_SERVER_GET_VERSION;
                         msg->append(1);
                         break;
                     }
@@ -60,7 +63,8 @@ namespace Rhoban
                         try
                         {
                             cout << "Echoing message of size " << msg_in->length  << endl;
-                            msg->destination = MSG_TYPE_SERVER;
+                            msg->source = MSG_TYPE_SERVER;
+                            msg->destination = msg_in->source;
                             msg->command = MSG_SERVER_ECHO;
                             msg->append(msg_in->read_string());
                             msg->append(msg_in->read_string());
@@ -104,7 +108,7 @@ namespace Rhoban
     /**
      * Creating a server client
      */
-    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : hub(hub_), clientId(clientId_)
+    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : hub(hub_)
     {
         SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
@@ -126,8 +130,8 @@ namespace Rhoban
         Message * msg_out = outMessages[msg->destination];
         msg_out->clear();
         msg_out->uid = msg->uid;
-        msg_out->source = clientId;
-        msg_out->destination = msg->destination;
+        msg_out->source = msg->destination;
+        msg_out->destination = msg->source;
         msg_out->command = msg->command;
 
 
@@ -225,17 +229,13 @@ namespace Rhoban
         if (it == components.end() || it->second == NULL)
         {
             SERVER_CAUTION("Unable to find the component " << comp_nb);
+    		throw string("Null component for destination: ") + my_itoa(comp_nb);
         } else {
             comp = it->second;
         }
 
     	END_SAFE(mutex);
 
-    	if(!comp)
-    	{
-    		cout << endl << "Null component " << comp_nb << endl;
-    		exit(0);
-    	}
 
     	Message * answer = 0;
     	if(thread_safe)

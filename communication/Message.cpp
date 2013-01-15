@@ -204,6 +204,11 @@ namespace Rhoban
         cursor = MSG_HEADER_SIZE;
     }
 
+    void Message::init_cursor()
+    {
+        cursor = MSG_HEADER_SIZE;
+    }
+
     void Message::clear()
     {
         Header::clear();
