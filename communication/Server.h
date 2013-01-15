@@ -117,7 +117,6 @@ namespace Rhoban
     class ServerHub : public Callable
     {
         public:
-            Server *server;
 
             //creates the component interface
             //thread safety guarantees that two clients wont access the same component at the same time,
@@ -132,6 +131,8 @@ namespace Rhoban
 
             Message * call(Message * msg_in, Message * msg_out);
 
+            void setServer(Server * server);
+
         protected:
 
             //creates components dynamically
@@ -140,7 +141,7 @@ namespace Rhoban
 
             //components created by the server
             map<ui16, Callable *> components;
-            map<ui16, Mutex> mutexes;
+            map<ui16, Mutex *> mutexes;
 
             bool thread_safe;
             Mutex mutex;

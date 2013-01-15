@@ -95,7 +95,7 @@ namespace Rhoban
             throw string("Null interface");
         }
 
-        launcher_->server = this;
+        launcher_->setServer(this);
 
 #ifdef _WIN32
         WSADATA wsa;
@@ -280,6 +280,7 @@ namespace Rhoban
         Message * msg_out = out_msgs[msg->destination];
         msg_out->clear();
         msg_out->uid = msg->uid;
+        msg_out->source = (short) ThreadId();
         msg_out->destination = msg->destination;
         msg_out->command = msg->command;
 
@@ -370,6 +371,12 @@ namespace Rhoban
     	END_SAFE(mutex)
     }
 
+    void ServerHub::setServer(Server * server)
+    {
+    	components[server->DestinationID()] = server;
+    	mutexes[server->DestinationID()] = new Mutex();
+    }
+
     Message* ServerHub::call(Message* msg_in, Message * msg_out)
     {
         ui16 comp_nb = msg_in->destination;
@@ -382,12 +389,14 @@ namespace Rhoban
 
         if ( it == components.end() || it->second == NULL)
         {
-            SERVER_DEBUG("Creating component "<< comp_nb);
+            SERVER_MSG("Creating component "<< comp_nb);
             try
             {
-            	ServerComponent * comp = create_component(comp_nb);
-                comp->setHub(this);
-                components[comp_nb] = comp;
+            	ServerComponent * new_comp = create_component(comp_nb);
+                new_comp->setHub(this);
+                components[comp_nb] = new_comp;
+                mutexes[comp_nb] = new Mutex();
+                comp= new_comp;
             }
             catch (const string & exc)
             {
@@ -399,16 +408,24 @@ namespace Rhoban
 
     	END_SAFE(mutex);
 
+    	if(!comp)
+    	{
+    		cout << endl << "Null component " << comp_nb << endl;
+    		exit(0);
+    	}
+
+    	Message * answer = 0;
     	if(thread_safe)
     	{
-    		Mutex & mut = mutexes[comp_nb];
-       		BEGIN_SAFE(mut)
-    		comp->call(msg_in, msg_out);
-    		END_SAFE(mut)
+    		Mutex * mut = mutexes[comp_nb];
+       		BEGIN_SAFE((*mut))
+    		answer= comp->call(msg_in, msg_out);
+    		END_SAFE((*mut))
     	}
     	else
     	{
-    		comp->call(msg_in, msg_out);
+    		answer = comp->call(msg_in, msg_out);
     	}
+    	return answer;
     }
 }

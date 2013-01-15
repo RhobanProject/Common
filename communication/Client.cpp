@@ -126,7 +126,7 @@ namespace Rhoban
         if(size>0)
             throw string("Failed to receive entire header, "+ my_itoa(size)+" bytes missing");
 
-        ui32 type = Encodings::decode_uint(header_buffer.buffer + Header::destination_offset); // Destination
+        ui32 type = Encodings::decode_ushort(header_buffer.buffer + Header::destination_offset); // Destination
 
         if(type>MSG_TYPE_MAX_NB)
             throw string("Msgs type too large "+my_itoa(type));

@@ -22,9 +22,9 @@
 Message * ServerComponent::call(Message * msg_in, Message *msg_out)
 {
 	if(msg_in->destination == DestinationID())
-		return process(msg_in,new Message());
+		return process(msg_in,msg_out);
 	else if(hub)
-		return hub->call(msg_in);
+		return hub->call(msg_in,msg_out);
 	else
 		throw string("Cannot route message to destination ") + my_itoa(msg_in->destination);
 };
