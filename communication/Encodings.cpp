@@ -42,6 +42,12 @@ namespace Rhoban
     	buf[3] = (value & 0x000000FF) >> 0;
     }
 
+    void Encodings::encode_ushort(ui16 value, char * buf)
+    {
+    	buf[0] = (value & 0xFF00) >> 8;
+    	buf[1] = (value & 0x00FF) >> 0;
+    }
+
     void Encodings::encode_float(float value, char * buf)
     {
         encode_uint(*(int *)&value, buf);

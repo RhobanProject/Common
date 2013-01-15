@@ -40,8 +40,6 @@ set(COM_SOURCES
     communication/Message.cpp
     communication/ServerComponent.cpp
     communication/Server.cpp
-    communication/ThreadedClient.cpp
-    communication/ThreadedComponent.cpp
     )
 
 if(SDK)

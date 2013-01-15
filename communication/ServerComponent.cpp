@@ -19,26 +19,14 @@
 
 #include "ServerComponent.h"
 
-Message * ServerComponent::call(Message * msg_in)
+Message * ServerComponent::call(Message * msg_in, Message *msg_out)
 {
-    return call(msg_in,new Message());
+	if(msg_in->destination == DestinationID())
+		return process(msg_in,new Message());
+	else if(hub)
+		return hub->call(msg_in);
+	else
+		throw string("Cannot route message to destination ") + my_itoa(msg_in->destination);
 };
 
 
-Message *ServerComponent::safe_call(Message *msg_in, Message *msg_out)
-{
-    BEGIN_THREAD_SAFE
-        Message *msg = call(msg_in, msg_out);
-        unlock();
-        return msg;
-        END_THREAD_SAFE
-}
-
-
-ServerComponent::ServerComponent()
-{
-};
-
-ServerComponent::~ServerComponent()
-{
-};

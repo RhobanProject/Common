@@ -24,9 +24,6 @@
 
 namespace Rhoban
 {
-    Server::Server()
-    {
-    }
 
     SOCKADDR_IN sinserv; //parametres pour server
     int sinsize;
@@ -92,7 +89,7 @@ namespace Rhoban
         connected = true;
     }
 
-    void Server::launch(ServerComponentInterface * launcher_, int port)
+    void Server::launch(ServerHub * launcher_, int port)
     {
         if (launcher_ == NULL) {
             throw string("Null interface");
@@ -211,7 +208,7 @@ namespace Rhoban
             delete (launcher);
     }
 
-    Message * Server::call(Message * msg_in, Message * msg)
+    Message * Server::process(Message * msg_in, Message * msg)
     {
         try
         {
@@ -269,13 +266,10 @@ namespace Rhoban
         return msg;
     }
 
-    ServerInternalClient::ServerInternalClient(
-            ServerComponentInterface * launcher_, SOCKET sock_)
+    ServerInternalClient::ServerInternalClient(Callable * hub, SOCKET sock) : hub(hub)
     {
-        launcher = launcher_;
-        sock = sock_;
-
-        SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
+    	this->sock = sock;
+        SERVER_DEBUG("Threaded client "<< ThreadId() << " created ");
     }
 
     void ServerInternalClient::process_message(Message * msg)
@@ -294,7 +288,7 @@ namespace Rhoban
         try
         {
             SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> Component ");
-            Message * answer = launcher->call(msg, msg_out);
+            Message * answer = hub->call(msg, msg_out);
             SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- Component ");
             if (answer)
             {
@@ -354,10 +348,8 @@ namespace Rhoban
         shutdown();
     }
 
-    ServerComponentInterface::ServerComponentInterface(bool thread_safe)
+    ServerHub::ServerHub(bool thread_safe) : thread_safe(thread_safe)
     {
-        components.clear();
-        this->thread_safe = thread_safe;
     }
 
     /*
@@ -366,61 +358,57 @@ namespace Rhoban
        components[comp_nb] = comp;
        }*/
 
-    ServerComponentInterface::~ServerComponentInterface()
+    ServerHub::~ServerHub()
     {
-        set<ServerComponent *> comps;
-
-        for (int i = 0; i < MSG_TYPE_MAX_NB; i++)
-        {
-            // server is delete by the main !
-            //taking care of duplicates
-            if (components[i] && (i != MSG_TYPE_SERVER))
-            {
-                comps.insert(components[i]);
-                components[i] = 0;
-            }
-        }
-
-        for (set<ServerComponent *>::iterator comp = comps.begin(); comp
-                != comps.end(); comp++)
-            delete (*comp);
-    }
-    ;
-
-    //it is up to the caller to dispose of the return msg
-    Message* ServerComponentInterface::call(Message* msg_in)
-    {
-        return call(msg_in, new Message());
+    	BEGIN_SAFE(mutex)
+    	for(map<ui16, Callable *>::iterator it = components.begin(); it != components.end(); it++)
+    		if(it->first != MSG_TYPE_SERVER && it->second)
+    		{
+    			delete it->second;
+    			it->second = 0;
+    		}
+    	END_SAFE(mutex)
     }
 
-    Message* ServerComponentInterface::call(Message* msg_in, Message * msg_out)
+    Message* ServerHub::call(Message* msg_in, Message * msg_out)
     {
-        int comp_nb = msg_in->destination;
+        ui16 comp_nb = msg_in->destination;
 
-        ServerComponent * comp = 0;
+        Callable * comp = 0;
 
-        if (!components.count(comp_nb))
+    	BEGIN_SAFE(mutex);
+
+        map<ui16, Callable *>::iterator it = components.find(comp_nb);
+
+        if ( it == components.end() || it->second == NULL)
         {
             SERVER_DEBUG("Creating component "<< comp_nb);
             try
             {
-                comp = create_component(comp_nb);
+            	ServerComponent * comp = create_component(comp_nb);
+                comp->setHub(this);
                 components[comp_nb] = comp;
-            } catch (const string & exc)
+            }
+            catch (const string & exc)
             {
-                string msg = "Could not create component : " + exc;
-                SERVER_CAUTION(msg);
                 components[comp_nb] = 0;
-                msg_out->append(msg);
-                return msg_out;
+            	throw string("Failed to create component " + my_itoa(comp_nb)) + "\n\t" + exc;
             }
         } else
-            comp = components.find(comp_nb)->second;
+            comp = it->second;
 
-        if (comp)
-            return thread_safe ? comp->safe_call(msg_in, msg_out) : comp->call(
-                    msg_in, msg_out);
-        else
-            throw string("Failed to create component " + my_itoa(comp_nb));
+    	END_SAFE(mutex);
+
+    	if(thread_safe)
+    	{
+    		Mutex & mut = mutexes[comp_nb];
+       		BEGIN_SAFE(mut)
+    		comp->call(msg_in, msg_out);
+    		END_SAFE(mut)
+    	}
+    	else
+    	{
+    		comp->call(msg_in, msg_out);
+    	}
     }
 }
