@@ -11,9 +11,11 @@
 #define SERVER_H
 
 #include <vector>
+#include <map>
 
 #include <timing/TickMachine.h>
 #include <logging/log.h>
+#include <sockets/TCPServer.h>
 
 #include "communicationCommon.h"
 #include "ServerComponent.h"
@@ -38,127 +40,72 @@ using namespace Rhoban;
 
 namespace Rhoban
 {
+    class ServerComponent;
     class ServerInternalClient;
     class ServerComponentInterface;
 
-    class Server: public ServerComponent
+    class Server : public TCPServer<ServerInternalClient>
     {
         public:
-            //used to handle incoming messages whose target is the server
-            //itself
-            Message *call(Message * msg_in, Message * msg_out);
-            
             Server();
-            virtual ~Server();
-            void launch(ServerComponentInterface * launcher_, int port);
-            void shutdown();
+
+            /**
+             * Creating a client
+             */
+            ServerInternalClient *createClient();
+
+            /**
+             * Registering a component to the server
+             */
+            void registerComponent(int id, ServerComponent *component);
+
+            /**
+             * Gets the server component
+             */
+            ServerComponent *getComponent(int id);
 
         protected:
-
-            //creates a server that will run the corrresponding interface
-
-            void create_listen_socket();
-            void close_listen_socket();
-
-            //the list of internal clients talking to external clients
-            list<ServerInternalClient *> clients;
-
-            //contains the interface given to internal clients to
-            // handle requests upon message reception
-            ServerComponentInterface * launcher;
-
-            int port;
-            bool connected;
-
-#ifdef WIN32
-            SOCKET sock;
-#else
-            int sock;
-#endif
-            bool run;
+            /**
+             * Maps the components id to the server components
+             */
+            map<int, ServerComponent *> components;
     };
 
-    /*!
+    /**
+     * The core server component is the component used to talk with the server
+     * system
+     */
+    class CoreServerComponent: public ServerComponent
+    {
+        public:
+            /**
+             * Used to handle incoming messages whose target is the server
+             * itself
+             * */
+            Message *call(Message * msg_in, Message * msg_out);
+    };
+
+    /**
      * This is an internal client created by the server each time some external client is connecting
      */
-    typedef Message * (*ComponentBehaviour)(//
-            Message * msg_in,// the incoming message
-            Message * msg_out//a place to store the outgoing message
-            );
-
-    class ServerInternalClient: public ThreadedClient
+    class ServerInternalClient : public TCPServerClient, public Client
     {
         protected:
-            ServerComponentInterface * launcher;
+            /**
+             * The internal client process the message
+             */
+            void processMessage(Message * msg);
 
-            //the map associates subcommands to behaviours
-            //it is initialized by init_cals
-            //it avids to use of switches
-            map<ui32, ComponentBehaviour> calls;
-            void init_calls();
-
-            //this is how the internal client process an incoming message
-            //the message is forwarded to the corresponding component
-            //and the answer of the component is sent back to the client
-            void process_message(Message * msg);
-
-        public:
-            ServerInternalClient(ServerComponentInterface * launcher, SOCKET sock);
-
-        private:
-            void execute();
-    };
-
-    /*!
-     *  this is an interface given by the server to its internal clients
-     *  so they handle requests
-     *
-     *  Basically this is a collection of component behaviours
-     */
-    class ServerComponentInterface
-    {
-        public:
+            /**
+             * The clients main loop
+             */
+            void loop();
+            
             Server *server;
 
-            //creates the component interface
-            ServerComponentInterface(bool thread_safe = true);
-
-            //should be called after construction to set the server component
-            //void set_component(int comp_nb, ServerComponent * comp)
-
-            virtual ~ServerComponentInterface();
-
-            /*!
-             * threaded components can be called
-             * they eat a msg_in,
-             * do whatever they have to do
-             * and output an answer msg
-             */
-            Message * call(Message * msg_in);
-
-            /*!
-             * if a msg_out is given,
-             * they the component can use it
-             * to place the answer message
-             *
-             * this saves some ressources:
-             * memory allocation
-             * can be done once for all by the caller (the server),
-             * which is efficient in case of frequent and/or large messages
-             *
-             */
-            Message * call(Message * msg_in, Message * msg_out);
-
-        protected:
-
-            //creates components dynamically
-            //this should be instantiated by derived classes
-            virtual ServerComponent * create_component(int comp_type) = 0;
-
-            //components created by the server
-            map<ui32, ServerComponent*> components;
-
-            bool thread_safe;
+        public:
+            ServerInternalClient(Server * server_);
+            ServerInternalClient();
     };
 }
 

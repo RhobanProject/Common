@@ -37,7 +37,6 @@ namespace Rhoban
 {
     class ServerComponent
     {
-
         public:
             ServerComponent();
 

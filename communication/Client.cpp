@@ -28,223 +28,121 @@
 
 using namespace std;
 
-#define FD_ZERO2(p)     memset((p), 0, sizeof(*(p)))
-
 namespace Rhoban
 {
+    /**
+     * Creating a client
+     */
     Client::Client()
     {
-        sock = -1;
-        connected = 0;
-        header_buffer.alloc(MSG_HEADER_SIZE);
+        headerBuffer.alloc(MSG_HEADER_SIZE);
 
         for(int i =0;i < MSG_TYPE_MAX_NB; i++)
         {
-            in_msgs.push_back(new Message());
-            out_msgs.push_back(new Message());
+            inMessages.push_back(new Message());
+            outMessages.push_back(new Message());
         }
     }
 
+    /**
+     * Deleting a client
+     */
     Client::~Client()
     {
         for(int i =0;i < MSG_TYPE_MAX_NB; i++)
         {
-            if(in_msgs[i])
+            if(inMessages[i])
             {
-                delete(in_msgs[i]);
-                in_msgs[i] = 0;
+                delete(inMessages[i]);
+                inMessages[i] = 0;
             }
-            if(out_msgs[i])
+            if(outMessages[i])
             {
-                delete(out_msgs[i]);
-                out_msgs[i] = 0;
+                delete(outMessages[i]);
+                outMessages[i] = 0;
             }
         }
     }
-    Message * Client::read_one_msg(uint timeout_ms)
+
+    /**
+     * Reading one message from the client when the socket become available
+     */
+    Message * Client::readOneMessage(uint timeout_ms)
     {
-        fd_set rdfs;
-        struct timeval tv;
-        FD_ZERO2(&rdfs);
-        FD_SET(sock, &rdfs);
-
-        int res = 0;
-        if(timeout_ms)
-        {
-            tv.tv_sec = timeout_ms / 1000;
-            tv.tv_usec = 1000 * (timeout_ms % 1000);
-            res = select(sock + 1, &rdfs, NULL, NULL, &tv);
-        }
-        else
-            res = select(sock + 1, &rdfs, NULL, NULL, NULL);
-
-        if(res == 0)
-        {
-            SERVER_DEBUG("Client " << this << " waited " << timeout_ms <<"ms without receiving any message");
+        if (waitReady(timeout_ms)) {
+            return readOneMessageNow();
+        } else {
+            SERVER_CAUTION("Client waited " << timeout_ms << " without getting anything");
             return NULL;
         }
-        else if( res == -1)
-        {
-            SERVER_CAUTION("Select error");
-            connected = false;
-#ifdef _WIN32
-            int err = WSAGetLastError();
-            throw string("Client : select error (WSA error code "+my_itoa(err)+ ")");
-#else
-            throw string ("Client : select error");
-#endif
-        }
-        else
-            return  read_one_msg_now();
     }
 
-    Message * Client::read_one_msg_now()
+    /**
+     * Reading one message now
+     */
+    Message * Client::readOneMessageNow()
     {
         int received = 0;
         int size = MSG_HEADER_SIZE;
-        char * p = header_buffer.buffer;
-        SERVER_DEBUG("Client trying to read one message from socket "<< sock);
-        do
-        {
-            received = recv(sock, p, size, 0);
-            if(!received)
-            {
-                string msg = "Client socket closed (waiting for header but received 0 byte)";
-                SERVER_DEBUG(msg);
-                throw msg;
-            }
-            if(received == -1)
-            {
-                string msg = "Client socket closed (Rcv failure while waiting for headers)";
-                SERVER_DEBUG(msg);
-                throw msg;
-            }
-            p += received;
-            size -= received;
-        } while(received > 0 && size > 0);
+        char *p = headerBuffer.buffer;
 
-        if(size>0)
-            throw string("Failed to receive entire header, "+ my_itoa(size)+" bytes missing");
+        // Reading headers
+        SERVER_DEBUG("Client trying to read one message from socket");
+        try {
+            receiveAll(p, size);
+        } catch (string exc) {
+            string msg = "Client socket closed while reading headers ("+exc+")";
+            SERVER_DEBUG(msg);
+            throw msg;
+        }
 
-        ui32 type = Encodings::decode_uint(header_buffer.buffer + Header::destination_offset); // Destination
+        // Reading the destination
+        ui32 type = Encodings::decode_uint(headerBuffer.buffer + Header::destination_offset);
 
-        if(type>MSG_TYPE_MAX_NB)
-            throw string("Msgs type too large "+my_itoa(type));
-
-        Message * in_msg = in_msgs[type];
+        // Reads the message
+        Message *in_msg = inMessages[type];
         in_msg->clear();
-        in_msg->read_header(header_buffer.buffer);
-        size= in_msg->length;
+        in_msg->read_header(headerBuffer.buffer);
+        size = in_msg->length;
 
-        if(size)
-        {
+        if (size) {
             in_msg->alloc(size + MSG_HEADER_SIZE);
             in_msg->setSize(size + MSG_HEADER_SIZE);
-            char * p = in_msg->buffer + MSG_HEADER_SIZE;
+            char *p = in_msg->buffer + MSG_HEADER_SIZE;
 
-            do
-            {
-                received = recv(sock, p, size, 0);
-                p += received;
-                size -= received;
-            } while(received > 0 && size > 0);
-
-            if(received == -1)
-            {
-                //throw string("Rcv failure received header but socket error while receiving message");
-                throw string("Rcv failure (received header and still "+my_itoa(size-1)+"/"+my_itoa(in_msg->length)+" to receive).");
-                //return 0;
-            }
-            if(size>0)
-            {
-                //throw string("Failed to receive entire message.");
-                throw string("Failed to receive entire message, "+ my_itoa(size)+" bytes missing over "+my_itoa(in_msg->length)+" in total.");
-                //return 0;
+            try {
+                receiveAll(p, size);
+            } catch (string exc) {
+                throw string("Failed to receive the message ("+exc+")");
             }
         }
 
         return in_msg;
     }
 
-
-    void Client::init_connection(const char *address, int port)
+    /**
+     * Sends a message to the client
+     */
+    void Client::sendMessage(Message *msg)
     {
-        if(sock!=0) close(sock);
-        sock = socket(AF_INET, SOCK_STREAM, 0);
-        SOCKADDR_IN sin = { 0 };
-        struct hostent *hostinfo;
-
-        if(sock == INVALID_SOCKET)
-        {
-            connected = false;
-            throw string("Could not create socket");
+        if (!msg) {
+            return;
         }
-
-        hostinfo = gethostbyname(address);
-        if (hostinfo == NULL)
-        {
-            connected = false;
-            throw string("Unknown host " + string(address));
-        }
-
-        sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
-        sin.sin_port = htons(port);
-        sin.sin_family = AF_INET;
-
-        if(connect(sock,(SOCKADDR *) &sin, sizeof(SOCKADDR)) == SOCKET_ERROR)
-        {
-            connected = false;
-            throw string("Could not connect");
-        }
-        connected = true;
-    }
-
-    void Client::send_msg(Message *msg)
-    {
-        send_msg(msg, sock);
-    }
-
-
-    void Client::send_msg(Message *msg, SOCKET sock)
-    {
-        if(!msg) return ;
 
         msg->length = msg->getSize() - MSG_HEADER_SIZE;
         msg->write_header(msg->buffer);
 
-        SERVER_DEBUG("Client --> message l" << msg->length << " d"<< msg->destination << " c"<< msg->command << "("<<msg->uid  <<" --> remote "<<sock);
+        SERVER_DEBUG("Client --> message l" << msg->length << " d"<< msg->destination << " c"<< msg->command << "("<<msg->uid  <<" --> remote ");
         char * p = msg->buffer;
         int size = msg->getSize();
-        int ret=0;
-        do
-        {
-            ret = send(sock ,p ,size,0);
-            if(ret<=0) break;
-            size -=ret;
-            p+= ret;
-        } while(size > 0 && ret>0);
 
-        if(ret<=0 || size>0)
-            throw string("failed to send msg");
-        if(ret<0)
-            throw string("send error while sending message, "+ my_itoa(size)+" bytesmissing over "+my_itoa(msg->length)+" in total.");
-        if(size>0)
-            throw string("failed to send full message, "+ my_itoa(size)+" bytes missing over "+my_itoa(msg->length)+" in total.");
-
+        transmitAll(p, size);
     }
 
-    void Client::shutdown()
-    {
-        if(connected)
-        {
-            connected = false;
-            SERVER_DEBUG("Client shutting down itself "<< (intptr_t) this);
-            close(sock);
-            sock = 0;
-        }
-    }
-
-    void Client::log_error(string str)
+    /**
+     * Logs an error
+     */
+    void Client::logError(string str)
     {
         SERVER_CAUTION(str);
     }
