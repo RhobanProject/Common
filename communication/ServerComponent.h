@@ -31,36 +31,34 @@ using namespace Rhoban;
  */
 namespace Rhoban
 {
+    /*
+     * A server component is callable.
+     * It encapsulates a hub to connect to other components.
+     */
+    class ServerComponent : public Callable
+    {
 
-/*
- * A server component is callable.
- * It encapsulates a hub to connect to other components.
- */
-class ServerComponent : public Callable
-{
+        public:
+            ServerComponent() : hub(0){};
+            virtual ~ServerComponent(){};
 
-public:
-	ServerComponent() : hub(0){};
-	virtual ~ServerComponent(){};
+            /* The destination id of this component */
+            const ui16 virtual DestinationID() const = 0;
 
-	/* The destination id of this component */
-	const ui16 virtual DestinationID() const = 0;
+            /* IF the message can be processed by this component then process is used */
+            /* otherwise the message is routed to the hub */
+            Message * call(Message * msg_in, Message * msg_out);
 
-	/* IF the message can be processed by this component then process is used */
-	/* otherwise the message is routed to the hub */
-	Message * call(Message * msg_in, Message * msg_out);
+            /* sets the hub used to connect to other components */
+            void setHub(Callable * hub){this->hub = hub; };
 
-	/* sets the hub used to connect to other components */
-	void setHub(Callable * hub){this->hub = hub; };
+        protected:
+            /* Connection to other components */
+            Callable * hub;
 
-protected:
-	/* Connection to other components */
-	Callable * hub;
+            virtual Message * process(Message * msg_in, Message * msg_out)=0;
 
-	virtual Message * process(Message * msg_in, Message * msg_out)=0;
-
-};
+    };
 }
-
 
 #endif /* COMPONENT_H_ */

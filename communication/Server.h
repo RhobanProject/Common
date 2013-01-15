@@ -11,13 +11,16 @@
 #define SERVER_H
 
 #include <vector>
+#include <map>
 
 #include <timing/TickMachine.h>
 #include <logging/log.h>
+#include <sockets/TCPServer.h>
 
 #include "communicationCommon.h"
 #include "ServerComponent.h"
 #include "Client.h"
+#include "Callable.h"
 
 using namespace std;
 using namespace Rhoban;
@@ -38,76 +41,77 @@ using namespace Rhoban;
 
 namespace Rhoban
 {
+    class ServerComponent;
     class ServerInternalClient;
     class ServerHub;
 
-    class Server: public ServerComponent
+    class Server : public TCPServer<ServerInternalClient>
     {
         public:
-            //used to handle incoming messages whose target is the server
-            //itself
-            Message * process(Message * msg_in, Message * msg_out);
+            Server(ServerHub *launcher);
+            ~Server();
+
+            /**
+             * Creating a client
+             */
+            ServerInternalClient *createClient();
             
-        	/* The destination id of this component */
-        	const ui16 DestinationID() const { return MSG_TYPE_SERVER; }
-
-
-            Server(){};
-            virtual ~Server();
-            void launch(ServerHub * launcher_, int port);
-            void shutdown();
-
-        protected:
-
-            //creates a server that will run the corrresponding interface
-
-            void create_listen_socket();
-            void close_listen_socket();
-
-            //the list of internal clients talking to external clients
-            list<ServerInternalClient *> clients;
-
-            //contains the interface given to internal clients to
-            // handle requests upon message reception
+            /**
+             * Contains the interface given to the internal clients to handle
+             * the requests
+             */
             ServerHub * launcher;
 
-            int port;
-            bool connected;
-
-#ifdef WIN32
-            SOCKET sock;
-#else
-            int sock;
-#endif
-            bool run;
+        protected:
+            int nextClientId;
     };
 
-    /*!
+    /**
+     * The core server component is the component used to talk with the server
+     * system
+     */
+    class CoreServerComponent: public ServerComponent
+    {
+        public:
+            /**
+             * Used to handle incoming messages whose target is the server
+             * itself
+             * */
+            Message *process(Message * msg_in, Message * msg_out);
+            
+            const ui16 virtual DestinationID() const { return MSG_TYPE_SERVER; }
+    };
+
+    /**
      * This is an internal client created by the server each time some external client is connecting
      */
-
-    class ServerInternalClient: public Client, public Thread
+    class ServerInternalClient : public TCPServerClient, public Client
     {
         protected:
-    	/*
-    	 * This is used by the client to process messages
-    	 */
-            Callable * hub;
+            int clientId;
 
             //this is how the internal client process an incoming message
             //the message is forwarded to the corresponding component
             //and the answer of the component is sent back to the client
-            void process_message(Message * msg);
+            void processMessage(Message * msg);
+            
+            /**
+             * The clients main loop
+             */
+            void loop();
+            
+            Callable *hub;
 
         public:
-            ServerInternalClient(Callable * hub, SOCKET sock);
+            ServerInternalClient(Callable *hub, int clientId);
+            ServerInternalClient();
 
         private:
             void execute();
     };
 
-    /*!
-     *  The serverhub encapsulates all components of the server
+    /**
+     *  The ServerHub encapsulates all components of the server
      *  and routes requests to the right components,
      *  and create the component if needed
 	 *
@@ -117,29 +121,35 @@ namespace Rhoban
     class ServerHub : public Callable
     {
         public:
-
-            //creates the component interface
-            //thread safety guarantees that two clients wont access the same component at the same time,
-            //but they may access different components in parallel
+            /**
+             * Creates a thread save server
+             */
             ServerHub(bool thread_safe = true);
 
-            //should be called after construction to set the server component
-            //void set_component(int comp_nb, ServerComponent * comp)
-
+            /**
+             * Delete the server hub
+             */
             virtual ~ServerHub();
 
+            /**
+             * Registering a component to the server
+             */
+            void registerComponent(ServerComponent *component);
 
-            Message * call(Message * msg_in, Message * msg_out);
-
-            void setServer(Server * server);
+            /**
+             * Run a call
+             */
+            Message *call(Message * msg_in, Message * msg_out);
 
         protected:
+            /**
+             * The internal client process the message
+             */
+            void processMessage(Message * msg);
 
-            //creates components dynamically
-            //this should be instantiated by derived classes
-            virtual ServerComponent * create_component(int comp_type) = 0;
-
-            //components created by the server
+            /**
+             * Components
+             */
             map<ui16, Callable *> components;
             map<ui16, Mutex *> mutexes;
 
