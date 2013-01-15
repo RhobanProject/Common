@@ -77,6 +77,8 @@ namespace Rhoban
             ui32 read_uint(ui32 offset);
             int read_int(ui32 offset);
 
+            bool read_bool(ui32 offset);
+
             /**
               @brief read a float from the internal buffer with an offset
               */

@@ -101,6 +101,14 @@ namespace Rhoban
       throw string("buffer too small to read int at this offset");
   }
 
+  bool Buffer::read_bool(ui32 offset)
+  {
+	    if(offset + sizeof(char) <=size)
+	      return buffer[offset];
+	    else
+	      throw string("buffer too small to read bool at this offset");
+  }
+
   float Buffer::read_float(ui32 offset)
   {
     if(offset + sizeof(int) <=size)

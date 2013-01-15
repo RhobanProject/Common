@@ -59,6 +59,11 @@ namespace Rhoban
         size += sizeof(ui8);
     }
 
+    void Message::append(bool value)
+    {
+    	append((ui8) value);
+    }
+
     void Message::append(ui32 value)
     {
         alloc(size + sizeof(ui32));
@@ -155,6 +160,13 @@ namespace Rhoban
         ui32 length = read_uint();
         cursor += length;
         return Buffer::read_string(length,cursor-length);
+    }
+
+    bool Message::read_bool(void)
+    {
+    	//presumably 1
+        cursor += sizeof(char);
+        return Buffer::read_bool(cursor - sizeof(char));
     }
 
     vector<ui8> Message::read_array(void)
