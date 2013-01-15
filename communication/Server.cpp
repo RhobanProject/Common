@@ -151,8 +151,6 @@ namespace Rhoban
             ostringstream smsg;
             smsg << "Failed to process message " << msg->uid << ": " << exc;
             SERVER_DEBUG(smsg.str());
-
-            msg_out->destination = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
             sendMessage(msg_out);
@@ -163,8 +161,6 @@ namespace Rhoban
                 << msg->command << " length " << msg->length << " uid "
                 << msg->uid << ".";
             SERVER_DEBUG(smsg.str());
-
-            msg_out->destination = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
             sendMessage(msg_out);
