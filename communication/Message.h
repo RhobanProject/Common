@@ -56,12 +56,16 @@ namespace Rhoban
      * Initialise le message
      */
     void init();
+    void init_cursor();
 
     /**
      * Lis un entier signé ou non signé
      */
     ui32 read_uint();
     int read_int();
+
+    /* Lit un booléen */
+    bool read_bool();
 
     /**
      * Lis un nombre flottant depuis les données
@@ -102,6 +106,7 @@ namespace Rhoban
      * Ecris un entier
      */
     void append(ui8 value);
+    void append(bool value);
     void append(ui32 value);
     void append(int value);
 

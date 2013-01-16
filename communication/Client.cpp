@@ -159,10 +159,9 @@ namespace Rhoban
         Message * msg_out = outMessages[msg->destination];
         msg_out->clear();
         msg_out->uid = msg->uid;
-        msg_out->destination = clientId;
-        msg_out->source = msg->destination;
+        msg_out->destination = msg->destination;
+        msg_out->source = msg->source;
         msg_out->command = msg->command;
-        msg->source = clientId;
 
 
         // Calling the component on the given message
@@ -201,12 +200,11 @@ namespace Rhoban
         }
     }
 
-    void Client::loop()
+    void Client::readAndProcess()
     {
         try
         {
-            while (!dead)
-            {
+            while (true) {
                 Message *msg = readOneMessage(60000);
 
                 if (msg) {

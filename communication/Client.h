@@ -65,9 +65,9 @@ namespace Rhoban
             void processMessage(Message *msg);
 
             /**
-             * The client loop
+             * The client processing
              */
-            void loop();
+            void readAndProcess();
 
             //vectors of in and out msgs managed by the client
             //one msg per component type

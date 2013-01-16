@@ -66,6 +66,8 @@ namespace Rhoban
              * Gets a client by ID
              */
             ServerInternalClient *getClient(ui16 id);
+    
+            void cleanClient(ServerInternalClient *client);
 
         protected:
             int nextClientId;
@@ -78,6 +80,9 @@ namespace Rhoban
     class CoreServerComponent: public ServerComponent
     {
         public:
+            CoreServerComponent(Server *server_);
+            Server *server;
+
             /**
              * Used to handle incoming messages whose target is the server
              * itself
@@ -98,6 +103,8 @@ namespace Rhoban
         public:
             ServerInternalClient(Callable *hub, int clientId);
             ServerInternalClient();
+
+            void loop();
 
             /**
              * Implementation of ServerComponent
