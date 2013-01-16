@@ -21,7 +21,7 @@
 #include "rhobanProtocol.h"
 #include "util.h"
 #include "communicationCommon.h"
-#include "ServerComponent.h"
+#include "Callable.h"
 #include "Message.h"
 
 #define CLIENT_BUFFER_INITIAL_SIZE 32
@@ -33,11 +33,12 @@ using namespace Rhoban;
  */
 namespace Rhoban
 {
+    class ServerHub;
+
     class Client : public virtual TCPClientBase
     {
         protected:
-
-            Client();
+            Client(Callable *hub);
             virtual ~Client();
 
             void logError(string str);
@@ -58,10 +59,22 @@ namespace Rhoban
              */
             void sendMessage(Message *msg);
 
+            /**
+             * Process a message
+             */
+            void processMessage(Message *msg);
+
+            /**
+             * The client loop
+             */
+            void loop();
+
             //vectors of in and out msgs managed by the client
             //one msg per component type
             vector<Message *> inMessages;
             vector<Message *> outMessages;
+            
+            Callable *hub;
 
         private:
             Buffer headerBuffer;

@@ -62,6 +62,11 @@ namespace Rhoban
              */
             ServerHub * launcher;
 
+            /**
+             * Gets a client by ID
+             */
+            ServerInternalClient *getClient(ui16 id);
+
         protected:
             int nextClientId;
     };
@@ -85,26 +90,20 @@ namespace Rhoban
     /**
      * This is an internal client created by the server each time some external client is connecting
      */
-    class ServerInternalClient : public TCPServerClient, public Client
+    class ServerInternalClient : public TCPServerClient, public Client, public ServerComponent
     {
         protected:
             int clientId;
 
-            //this is how the internal client process an incoming message
-            //the message is forwarded to the corresponding component
-            //and the answer of the component is sent back to the client
-            void processMessage(Message * msg);
-            
-            /**
-             * The clients main loop
-             */
-            void loop();
-            
-            Callable *hub;
-
         public:
             ServerInternalClient(Callable *hub, int clientId);
             ServerInternalClient();
+
+            /**
+             * Implementation of ServerComponent
+             */
+            Message *process(Message * msg_in, Message * msg_out);
+            const ui16 virtual DestinationID() const { return clientId; }
 
         private:
             void execute();
@@ -137,9 +136,24 @@ namespace Rhoban
             void registerComponent(ServerComponent *component);
 
             /**
+             * Retreive a component
+             */
+            ServerComponent *getComponent(ui16 type);
+
+            /**
+             * Removes the component from the hub
+             */
+            void removeComponent(ui16 type);
+
+            /**
              * Run a call
              */
             Message *call(Message * msg_in, Message * msg_out);
+
+            /**
+             * Returns the components
+             */
+            vector<ServerComponent *> getComponents();
 
         protected:
             /**

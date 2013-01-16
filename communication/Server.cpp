@@ -33,11 +33,34 @@ namespace Rhoban
     }
 
     /**
+     * Get a client by id
+     */
+    ServerInternalClient *Server::getCient(ui6 id)
+    {
+        vector<ServerInternalClient *>::iterator it;
+
+        for (it = clients.begin(); it != clients.end(); it++) {
+            ServerInternalClient *client = (*it);
+
+            if (client->DestinationID() == id) {
+                return client;
+            }
+        }
+
+        return NULL;
+    }
+
+    /**
      * Called when a client should be created
      */
     ServerInternalClient *Server::createClient()
     {
-        return new ServerInternalClient(launcher, nextClientId++);
+        ServerInternalClient *client = new ServerInternalClient(launcher, nextClientId++);
+
+        // Registering the client as a component
+        launcher->registerComponent(client);
+
+        return client;
     }
 
     /**
@@ -86,6 +109,39 @@ namespace Rhoban
                         break;
                     }
 
+                case MSG_SERVER_REGISTER_COMPONENT:
+                    {
+                        ui16 type = msg_in->read_uint();
+                        ServerComponent *component = launcher->getComponent(type);
+                        ServerInternalClient *client = server->getClient(msg_in->source);
+
+                        if (!client) {
+                            string err = "Can't find the client " + msg_in->source;
+                            SERVER_CAUTION(err);
+                            throw err;
+                        }
+
+                        if (component != NULL) {
+                            ServerInternalClient *client = dynamic_cast<ServerInternalClient*>(component);
+
+                            if (!client) { // If the component is not a client, we can't remplace it
+                                string err = "Can't replace the component " + my_itoa(type);
+                                SERVER_CAUTION(err);
+                                throw err;
+                            } else { // Removing the client from the hub
+                                SERVER_MSG("Component " << type << " is already connected, removing it to replace by a new client");
+                                launcher->removeComponent(type);
+                                client->stop();
+                            }
+                        }
+
+                        // Registering a component 
+                        SERVER_MSG("Registering new component " << type);
+                        launcher->registerComponent(client);
+
+                        break;
+                    }
+
                 default:
                     {
                         break;
@@ -104,7 +160,7 @@ namespace Rhoban
     /**
      * Creating a server client
      */
-    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : hub(hub_), clientId(clientId_)
+    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : Client(hub_), clientId(clientId_)
     {
         SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
@@ -113,81 +169,14 @@ namespace Rhoban
     {
         SERVER_CAUTION("The internal client should ne be instanciated without parameters");
     }
-
+            
     /**
-     * Process a message
+     * Process the message when the client is registered as a component
      */
-    void ServerInternalClient::processMessage(Message * msg)
+    Message *ServerInternalClient::process(Message * msg_in, Message * msg_out)
     {
-        if (!msg) {
-            throw string("Cannot process null message");
-        }
-
-        Message * msg_out = outMessages[msg->destination];
-        msg_out->clear();
-        msg_out->uid = msg->uid;
-        msg_out->source = clientId;
-        msg_out->destination = msg->destination;
-        msg_out->command = msg->command;
-
-
-        // Calling the component on the given message
-        SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote ");
-        
-        try
-        {
-            Message *answer = hub->call(msg, msg_out);
-
-            // If the component answered
-            if (answer) {
-                    SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> remote ");
-                sendMessage(answer);
-            }
-        } catch (string exc) {
-            ostringstream smsg;
-            smsg << "Failed to process message " << msg->uid << ": " << exc;
-            SERVER_DEBUG(smsg.str());
-
-            msg_out->destination = msg->destination;
-            msg_out->command = MSG_ERROR_COMMAND;
-            msg_out->append(smsg.str());
-            sendMessage(msg_out);
-        } catch (...)
-        {
-            ostringstream smsg;
-            smsg << "Exception with message destination " << msg->destination << " command "
-                << msg->command << " length " << msg->length << " uid "
-                << msg->uid << ".";
-            SERVER_DEBUG(smsg.str());
-
-            msg_out->destination = msg->destination;
-            msg_out->command = MSG_ERROR_COMMAND;
-            msg_out->append(smsg.str());
-            sendMessage(msg_out);
-        }
-    }
-
-#define FD_ZERO2(p)     memset((p), 0, sizeof(*(p)))
-
-    void ServerInternalClient::loop()
-    {
-        try
-        {
-            while (!dead)
-            {
-                Message *msg = readOneMessage(60000);
-
-                if (msg) {
-                    processMessage(msg);
-                }
-            }
-        } catch (string exc)
-        {
-            SERVER_CAUTION("ServerInternalclient " << this << " exception "<< exc);
-        } catch (...)
-        {
-            SERVER_CAUTION("ServerInternalclient " << this << " exception");
-        }
+        sendMessage(msg_in);
+        return NULL;
     }
 
     ServerHub::ServerHub(bool thread_safe) : thread_safe(thread_safe)
@@ -219,46 +208,84 @@ namespace Rhoban
         Callable * comp = 0;
 
     	BEGIN_SAFE(mutex);
+        ServerComponent *component = getComponent(comp_nb);
 
-        map<ui16, Callable *>::iterator it = components.find(comp_nb);
-
-        if (it == components.end() || it->second == NULL)
-        {
+        if (!component) {
             SERVER_CAUTION("Unable to find the component " << comp_nb);
-        } else {
-            comp = it->second;
         }
-
     	END_SAFE(mutex);
 
-    	if(!comp)
-    	{
+    	if (!comp) {
     		cout << endl << "Null component " << comp_nb << endl;
     		exit(0);
     	}
 
     	Message * answer = 0;
-    	if(thread_safe)
-    	{
+    	if (thread_safe) {
     		Mutex * mut = mutexes[comp_nb];
        		BEGIN_SAFE((*mut))
     		answer= comp->call(msg_in, msg_out);
     		END_SAFE((*mut))
-    	}
-    	else
-    	{
+    	} else {
     		answer = comp->call(msg_in, msg_out);
     	}
+
     	return answer;
+    }
+    
+    /**
+     * Registering a new component
+     */
+    void ServerHub::registerComponent(ServerComponent *component)
+    {
+        BEGIN_SAFE(mutex);
+        components[component->DestinationID()] = component;
+        mutexes[component->DestinationID()] = new Mutex();
+        component->setHub(this);
+        END_SAFE(mutex);
     }
     
     /**
      * Registering a new internal component
      */
-    void ServerHub::registerComponent(ServerComponent *component)
+    ServerComponent *ServerHub::getComponent(ui16 type)
     {
-        components[component->DestinationID()] = component;
-        mutexes[component->DestinationID()] = new Mutex();
-        component->setHub(this);
+        map<ui16, Callable *>::iterator it = components.find(comp_nb);
+
+        if (it != components.end()) {
+            return it.second;
+        }
+
+        return NULL;
+    }
+    
+    /**
+     * Registering a new internal component
+     */
+    void ServerHub::removeComponent(ui16 type)
+    {
+        BEGIN_SAFE(mutex);
+        components.erase(type);
+        mutexes.erase(type);
+    	END_SAFE(mutex);
+    }
+    
+    /**
+     * Returns the registered components
+     */
+    vector<ServerComponent *> getComponents()
+    {
+        vector<ServerComponent *> componentsVector;
+        map<ui16, Callable *>::iterator it;
+
+        for (it = components.begin(); it != components.end(); it++) {
+            ServerComponent *component = dynamic_cast<ServerComponent *>(*it);
+
+            if (component) {
+                componentsVector.push_back(component);
+            }
+        }
+
+        return componentsVector;
     }
 }

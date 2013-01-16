@@ -33,7 +33,7 @@ namespace Rhoban
     /**
      * Creating a client
      */
-    Client::Client()
+    Client::Client(Callable *hub_) : hub(hub_)
     {
         headerBuffer.alloc(MSG_HEADER_SIZE);
 
@@ -145,5 +145,80 @@ namespace Rhoban
     void Client::logError(string str)
     {
         SERVER_CAUTION(str);
+    }
+
+    /**
+     * Process a message
+     */
+    void Client::processMessage(Message * msg)
+    {
+        if (!msg) {
+            throw string("Cannot process null message");
+        }
+
+        Message * msg_out = outMessages[msg->destination];
+        msg_out->clear();
+        msg_out->uid = msg->uid;
+        msg_out->destination = clientId;
+        msg_out->source = msg->destination;
+        msg_out->command = msg->command;
+        msg->source = clientId;
+
+
+        // Calling the component on the given message
+        SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote ");
+        
+        try
+        {
+            Message *answer = hub->call(msg, msg_out);
+
+            // If the component answered
+            if (answer) {
+                    SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << msg->length << " t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") --> remote ");
+                sendMessage(answer);
+            }
+        } catch (string exc) {
+            ostringstream smsg;
+            smsg << "Failed to process message " << msg->uid << ": " << exc;
+            SERVER_DEBUG(smsg.str());
+
+            msg_out->destination = msg->destination;
+            msg_out->command = MSG_ERROR_COMMAND;
+            msg_out->append(smsg.str());
+            sendMessage(msg_out);
+        } catch (...)
+        {
+            ostringstream smsg;
+            smsg << "Exception with message destination " << msg->destination << " command "
+                << msg->command << " length " << msg->length << " uid "
+                << msg->uid << ".";
+            SERVER_DEBUG(smsg.str());
+
+            msg_out->destination = msg->destination;
+            msg_out->command = MSG_ERROR_COMMAND;
+            msg_out->append(smsg.str());
+            sendMessage(msg_out);
+        }
+    }
+
+    void Client::loop()
+    {
+        try
+        {
+            while (!dead)
+            {
+                Message *msg = readOneMessage(60000);
+
+                if (msg) {
+                    processMessage(msg);
+                }
+            }
+        } catch (string exc)
+        {
+            SERVER_CAUTION("ServerInternalclient " << this << " exception "<< exc);
+        } catch (...)
+        {
+            SERVER_CAUTION("ServerInternalclient " << this << " exception");
+        }
     }
 }
