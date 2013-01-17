@@ -258,8 +258,8 @@ namespace Rhoban
     	END_SAFE(mutex);
 
     	if (!component) {
-            cout << endl << "Null component: " << comp_nb << endl;
-            exit(0);
+            SERVER_CAUTION("Null component: " << comp_nb);
+            return NULL;
     	}
 
     	Message * answer = 0;
