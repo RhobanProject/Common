@@ -16,7 +16,6 @@
 #include <threading/Condition.h>
 #include <threading/Mutex.h>
 #include <threading/Thread.h>
-#include "BaseConnection.h"
 #include "MailboxEntry.h"
 
 using namespace std;
@@ -25,25 +24,29 @@ namespace Rhoban
 {
     //typedef void sendCallback(Message *, void *);
 
-    class Mailbox : public Thread
+    class Mailbox : public virtual Thread
     {
         public :
-            Mailbox(BaseConnection *connection);
+            Mailbox();
             ~Mailbox();
 
             MailboxEntry * addEntry(ui32 uid);
             MailboxEntry * addEntry(ui32 uid, sendCallback *callback, void *data=NULL);
             void deleteEntry(ui32 uid);
 
+            virtual bool isConnected()=0;
+            virtual Message *getMessage()=0;
+
         protected:
 
             void execute();
             void processIncomingMessage(Message *);
+            virtual void processMailboxMessage(Message *);
+            virtual void processMailboxAnswer(Message *);
             void processErrorMessage(Message *);
             void garbageCollector();
 
             Mutex process;
-            BaseConnection *connection;
             map<ui32, MailboxEntry *> entries;
             int garbageCounter;
 

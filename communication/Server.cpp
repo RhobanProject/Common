@@ -82,7 +82,7 @@ namespace Rhoban
     /**
      * Core server call
      */
-    Message * CoreServerComponent::process(Message * msg_in, Message * msg)
+    Message * CoreServerComponent::process(Message * msg_in, Message * msg, bool sync, int timeout)
     {
         try
         {
@@ -157,6 +157,8 @@ namespace Rhoban
 
                         // Registering a component 
                         SERVER_MSG("Registering new component " << type);
+                        msg->destination = type;
+                        client->setId(type);
                         server->launcher->registerComponent(client);
 
                         break;
@@ -180,28 +182,43 @@ namespace Rhoban
     /**
      * Creating a server client
      */
-    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : Client(hub_), clientId(clientId_)
+    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : NetworkComponent(hub_), clientId(clientId_)
     {
         SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
 
-    ServerInternalClient::ServerInternalClient() : Client(NULL)
+    bool ServerInternalClient::isConnected()
+    {
+        return !dead;
+    }
+
+    ServerInternalClient::ServerInternalClient() : NetworkComponent(NULL)
     {
         SERVER_CAUTION("The internal client should ne be instanciated without parameters");
     }
-            
-    Message *ServerInternalClient::process(Message * msg_in, Message * msg_out)
+
+    void ServerInternalClient::processMailboxMessage(Message *msg)
     {
-        sendMessage(msg_in);
-        return NULL;
+        msg->source = clientId;
+        this->Client::processMessage(msg);
+    }
+            
+    void ServerInternalClient::setId(int id)
+    {
+        clientId = id;
+    }
+
+    void ServerInternalClient::execute()
+    {
+        this->TCPServerClient::execute();
     }
 
     void ServerInternalClient::loop()
     {
-        readAndProcess();
+        this->Mailbox::execute();
     }
 
-    ServerHub::ServerHub(bool thread_safe) : thread_safe(thread_safe)
+    ServerHub::ServerHub(bool thread_safe) : thread_safe(thread_safe), fallbackComponent(NULL)
     {
     }
 
@@ -219,6 +236,16 @@ namespace Rhoban
 
     Message* ServerHub::call(Message* msg_in, Message * msg_out)
     {
+        return doCall(msg_in, msg_out, false, 0);
+    }
+
+    Message* ServerHub::callSync(Message* msg_in, Message * msg_out, int timeout)
+    {
+        return doCall(msg_in, msg_out, true, timeout);
+    }
+
+    Message* ServerHub::doCall(Message* msg_in, Message * msg_out, bool sync, int timeout)
+    {
         ServerComponent *component;
         ui16 comp_nb = msg_in->destination;
 
@@ -231,18 +258,26 @@ namespace Rhoban
     	END_SAFE(mutex);
 
     	if (!component) {
-    		cout << endl << "Null component: " << comp_nb << endl;
-    		exit(0);
+            cout << endl << "Null component: " << comp_nb << endl;
+            exit(0);
     	}
 
     	Message * answer = 0;
     	if (thread_safe) {
     		Mutex * mut = mutexes[comp_nb];
        		BEGIN_SAFE((*mut))
-    		answer= component->call(msg_in, msg_out);
+                if (sync) {
+    		    answer= component->callSync(msg_in, msg_out, timeout);
+                } else {
+    		    answer= component->call(msg_in, msg_out);
+                }
     		END_SAFE((*mut))
     	} else {
-    		answer = component->call(msg_in, msg_out);
+                if (sync) {
+    		    answer= component->callSync(msg_in, msg_out, timeout);
+                } else {
+    		    answer= component->call(msg_in, msg_out);
+                }
     	}
 
     	return answer;
@@ -272,7 +307,7 @@ namespace Rhoban
             return dynamic_cast<ServerComponent *>((*it).second);
         }
 
-        return NULL;
+        return fallbackComponent;
     }
     
     /**

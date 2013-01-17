@@ -20,23 +20,27 @@ using namespace std;
 
 namespace Rhoban
 {
-    BaseConnection::BaseConnection(CommandsStore *commandsStore_) : mailbox(this)
+    BaseConnection::BaseConnection()
     {
-        commandsStore = commandsStore_;
     }
-            
-    void BaseConnection::connectTo(const char *address, int port)
+
+    void BaseConnection::connectTo(const char *address, int port, bool runThread)
     {
         TCPClient::connectTo(address, port);
 
-        if (isConnected()) {
+        if (isConnected() && runThread) {
             startMailbox();
         }
     }
 
+    void BaseConnection::execute()
+    {
+        this->Mailbox::execute();
+    }
+
     void BaseConnection::sendMessage(Message *message)
     {
-        transmit(message->getRaw(), message->getSize());
+        transmitAll(message->getRaw(), message->getSize());
     }
 
     Message* BaseConnection::getMessage() 
@@ -72,7 +76,7 @@ namespace Rhoban
         ui32 uid = message->getUid();
 
         //preparing message and condition
-        MailboxEntry * entry = mailbox.addEntry(uid);
+        MailboxEntry * entry = addEntry(uid);
 
         entry->lock();
         sendMessage(message);
@@ -81,22 +85,28 @@ namespace Rhoban
 
         Message * retval = entry->getResponse();
 
-        mailbox.deleteEntry(uid);
+        deleteEntry(uid);
 
-        if(retval->command == MSG_ERROR_COMMAND)
-        	throw string("Error message:\n\t") + retval->read_string();
-        else
-        	return retval;
+        if(retval->command == MSG_ERROR_COMMAND) {
+            throw string("Error message:\n\t") + retval->read_string();
+        } else {
+            return retval;
+        }
     }
 
     void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback, void *data)
     {
-        mailbox.addEntry(message->getUid(), callback, data);
+        addEntry(message->getUid(), callback, data);
         sendMessage(message);
     }
 
     void BaseConnection::startMailbox()
     {
-        mailbox.start(NULL);
+        start(NULL);
+    }
+
+    bool BaseConnection::isConnected()
+    {
+        return this->TCPClient::isConnected();
     }
 }

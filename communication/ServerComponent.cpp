@@ -19,26 +19,57 @@
 
 #include "ServerComponent.h"
 
-Message * ServerComponent::call(Message * msg_in, Message *msg_out)
+Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, int timeout)
 {
-    if (msg_in->destination == DestinationID()) {
-        if(!msg_out)
-            msg_out = new Message();
-        else
-            msg_out->clear();
-        msg_out->uid = msg_in->uid;
-        msg_out->destination = msg_in->source;
-        msg_out->source = msg_in->destination;
-        msg_out->command = msg_in->command;
-        Message * answer = process(msg_in,msg_out);
-        if(answer)
-            answer->write_header(answer->buffer);
-        return answer;
+    if (!DestinationID() || msg_in->destination == DestinationID()) {
+        if (msg_in->answer) {
+            processAnswer(msg_in);
+            return NULL;
+        } else {
+            if(!msg_out) {
+                msg_out = new Message();
+            } else {
+                msg_out->clear();
+            }
+            msg_out->uid = msg_in->uid;
+            msg_out->destination = msg_in->source;
+            msg_out->source = msg_in->destination;
+            msg_out->command = msg_in->command;
+            msg_out->answer = true;
+
+            Message * answer = process(msg_in, msg_out, sync, timeout);
+
+            if (answer) {
+                answer->write_header(answer->buffer);
+            }
+
+            return answer;
+        }
     } else if (hub) {
-        return hub->call(msg_in,msg_out);
+        if (sync) {
+            return hub->callSync(msg_in, msg_out, timeout);
+        } else {
+            return hub->call(msg_in, msg_out);
+        }
     } else {
         throw string("Cannot route message to destination ") + my_itoa(msg_in->destination);
     }
 };
 
+Message *ServerComponent::call(Message *msg_in, Message *msg_out)
+{
+    return doCall(msg_in, msg_out, false, 0);
+}
 
+Message *ServerComponent::callSync(Message *msg_in, Message *msg_out, int timeout)
+{
+    return doCall(msg_in, msg_out, true, timeout);
+}
+
+void ServerComponent::loadConfig(ConfigFile &config)
+{
+}
+
+void ServerComponent::processAnswer(Message *message)
+{
+}

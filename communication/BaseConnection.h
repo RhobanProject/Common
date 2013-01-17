@@ -18,7 +18,6 @@ namespace Rhoban{
 #include <cstdlib>
 #include <cstdio>
 #include <sockets/TCPClient.h>
-#include "CommandsStore.h"
 #include "Message.h"
 #include "Mailbox.h"
 
@@ -28,10 +27,10 @@ namespace Rhoban
 {  
     //typedef void sendCallback(Message *, void *);
 
-    class BaseConnection : public TCPClient
+    class BaseConnection : public virtual TCPClient, public virtual Mailbox
     {
         public:
-            BaseConnection(CommandsStore *commandsStore_);
+            BaseConnection();
 
             void sendMessage(Message *message);
             Message *sendMessageReceive(Message *message, int timeout=1000);
@@ -39,10 +38,10 @@ namespace Rhoban
             void startMailbox();
             Message *getMessage();
             Message *getMessage(Message *message);
-            void connectTo(const char *address, int port);
-        protected:
-            CommandsStore *commandsStore;
-            Mailbox mailbox;
+            void connectTo(const char *address, int port, bool runThread = true);
+            void execute();
+
+            bool isConnected();
     };
 }
 

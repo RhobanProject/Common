@@ -21,27 +21,30 @@ namespace  Rhoban
             virtual ~Callable(){};
 
             /*!
-             * a callable object process a message and outputs an answer
+             * A callable object process a message and outputs an answer
              * the caller is in charge of disposing the returned message
              */
-            virtual Message * call(Message * msg_in){ return call(msg_in, new Message()); };
-
+            virtual Message *call(Message *msg_in);
             /*!
-             * if a msg_out is given,
+             * If a msg_out is given,
              * they the component will use it
              * to place the answer message
              *
-             * in case large messages are output frequently,
+             * In case large messages are output frequently,
              * this can be used to save ressources:
              * memory allocation is done once for all by the caller
              * and the same msg out is used again and again
-             *
              */
 
-            virtual Message * call(Message * msg_in, Message * msg_out) = 0;
+            virtual Message *call(Message *msg_in, Message *msg_out) = 0;
+
+            /*!
+             * This method ensure that the result will be returned in msg_out
+             * within the timeout delay
+             */
+            virtual Message *callSync(Message *msg_in, Message *msg_out, int timeout = 1000) = 0;
     };
 
 }
-
 
 #endif /* CALLABLE_H_ */

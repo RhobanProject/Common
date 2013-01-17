@@ -19,6 +19,7 @@
 
 #include "communicationCommon.h"
 #include "ServerComponent.h"
+#include "NetworkComponent.h"
 #include "Client.h"
 #include "Callable.h"
 
@@ -33,7 +34,7 @@ using namespace Rhoban;
  * 2: Messages
  * 3: Debug
  */
-#define SERVER_LOG_LEVEL 2
+#define SERVER_LOG_LEVEL 3
 
 #define SERVER_CAUTION(...)     LOG_CPP(1, SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
 #define SERVER_MSG(...)         LOG_CPP(2, SERVER_LOG_LEVEL, "server", __VA_ARGS__)
@@ -49,7 +50,6 @@ namespace Rhoban
     {
         public:
             Server(ServerHub *launcher);
-            ~Server();
 
             /**
              * Creating a client
@@ -87,7 +87,7 @@ namespace Rhoban
              * Used to handle incoming messages whose target is the server
              * itself
              * */
-            Message *process(Message * msg_in, Message * msg_out);
+            Message *process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0);
             
             const ui16 virtual DestinationID() const { return MSG_TYPE_SERVER; }
     };
@@ -95,25 +95,28 @@ namespace Rhoban
     /**
      * This is an internal client created by the server each time some external client is connecting
      */
-    class ServerInternalClient : public TCPServerClient, public Client, public ServerComponent
+    class ServerInternalClient : public TCPServerClient, public NetworkComponent
     {
-        protected:
-            int clientId;
-
         public:
             ServerInternalClient(Callable *hub, int clientId);
             ServerInternalClient();
 
+            void execute();
             void loop();
+
+            void processMailboxMessage(Message *message);
 
             /**
              * Implementation of ServerComponent
              */
-            Message *process(Message * msg_in, Message * msg_out);
             const ui16 virtual DestinationID() const { return clientId; }
 
-        private:
-            void execute();
+            void setId(int id);
+
+            bool isConnected();
+
+        protected:
+            int clientId;
     };
 
     /**
@@ -155,12 +158,19 @@ namespace Rhoban
             /**
              * Run a call
              */
+            Message *doCall(Message *msg_in, Message *msg_out, bool sync, int timeout);
             Message *call(Message * msg_in, Message * msg_out);
+            Message *callSync(Message * msg_in, Message * msg_out, int timeout);
 
             /**
              * Returns the components
              */
             vector<ServerComponent *> getComponents();
+
+            /**
+             * Component to use when no other one exists
+             */
+            ServerComponent *fallbackComponent;
 
         protected:
             /**

@@ -27,7 +27,7 @@ option(SDK
     "Compiles the SDK" OFF)
 
 # Adding dependency with RhobanUtils
-include_directories ("${RHOBAN_UTILS_DIRECTORY}")
+include_directories ("${RHOBAN_UTILS_DIRECTORY}" "${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} RhobanUtils)
 
 # Communication
@@ -40,6 +40,11 @@ set(COM_SOURCES
     communication/Message.cpp
     communication/ServerComponent.cpp
     communication/Server.cpp
+    communication/RemoteClient.cpp
+    communication/NetworkComponent.cpp
+    communication/BaseConnection.cpp
+    communication/Mailbox.cpp
+    communication/Callable.cpp
     )
 
 if(SDK)
@@ -48,9 +53,7 @@ if(SDK)
     make_directory("${GENERATE_DIR}")
 
     set(COM_SOURCES ${COM_SOURCES}
-        communication/BaseConnection.cpp
         communication/CommandsStore.cpp
-        communication/Mailbox.cpp
         communication/tests/allTests.cpp
         "${GENERATE_DIR}/MessageBuilder.cpp"
         "${GENERATE_DIR}/Connection.cpp"
@@ -93,7 +96,12 @@ set (MOTION_SOURCES
     motion/LinearSpline.cpp
     )
 
+# App
+set (APP_SOURCES
+    app/App.cpp
+    )
+
 include_directories ("${PROJECT_SOURCE_DIR}")
-set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES})
+set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES} ${APP_SOURCES})
 add_library (RhobanCommon ${ALL_SOURCES})
 target_link_libraries (RhobanCommon ${EXTRA_LIBS})

@@ -62,6 +62,11 @@ namespace Rhoban
      */
     ui32 length;
 
+    /**
+     * Is the message an answer
+     */
+    bool answer;
+
     Header();
 
     void clear();

@@ -18,10 +18,24 @@
 #define COMPONENT_H_
 
 #include <string>
+#include <logging/log.h>
+#include <configfile/ConfigFile.h>
 
 #include "Callable.h"
 
 using namespace Rhoban;
+
+/**
+ * Component log level
+ * 1: Caution
+ * 2: Messages
+ * 3: Debug
+ */
+#define COMPONENT_LOG_LEVEL 3
+
+#define COMPONENT_CAUTION(...)     LOG_CPP(1, COMPONENT_LOG_LEVEL, "component:caution", __VA_ARGS__)
+#define COMPONENT_MSG(...)         LOG_CPP(2, COMPONENT_LOG_LEVEL, "component", __VA_ARGS__)
+#define COMPONENT_DEBUG(...)       LOG_CPP(3, COMPONENT_LOG_LEVEL, "component:debug", __VA_ARGS__)
 
 /*
  * A component can be called
@@ -45,18 +59,28 @@ namespace Rhoban
             /* The destination id of this component */
             const ui16 virtual DestinationID() const = 0;
 
+            Message *doCall(Message *msg_in, Message *msg_out, bool sync, int timeout);
+
             /* IF the message can be processed by this component then process is used */
             /* otherwise the message is routed to the hub */
-            Message * call(Message * msg_in, Message * msg_out);
+            Message *call(Message *msg_in, Message *msg_out);
+
+            Message *callSync(Message *msg_in, Message *msg_out, int timeout);
 
             /* sets the hub used to connect to other components */
             void setHub(Callable * hub){this->hub = hub; };
+
+            /**
+             * Reads the components config from the config file
+             */
+            virtual void loadConfig(ConfigFile &config);
 
         protected:
             /* Connection to other components */
             Callable * hub;
 
-            virtual Message * process(Message * msg_in, Message * msg_out)=0;
+            virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
+            virtual void processAnswer(Message * answer);
 
     };
 }
