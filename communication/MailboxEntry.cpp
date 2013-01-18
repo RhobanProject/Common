@@ -61,12 +61,12 @@ namespace Rhoban
         }
     }
 
-    int MailboxEntry::isWaiting()
+    bool MailboxEntry::isWaiting()
     {
         return waiting;
     }
 
-    int MailboxEntry::isCallback()
+    bool MailboxEntry::isCallback()
     {
         return(callback != NULL);
     }
@@ -96,17 +96,4 @@ namespace Rhoban
         response = message;
     }
 
-    void MailboxEntry::broadcast()
-    {
-        try
-        {
-            lock();
-            Condition::broadcast();
-            unlock();
-        }
-        catch(...)
-        {
-            cout << "Failed to broadcast" << endl;
-        }
-    }
 }

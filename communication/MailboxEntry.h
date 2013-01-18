@@ -33,14 +33,14 @@ namespace Rhoban
     MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
     ~MailboxEntry();
     void wait(int timeout);
-    int isWaiting();
-    int isCallback();
+    bool isWaiting();
+    bool isCallback();
     void executeCallback(Message *message);
     ui32 getUid();
     time_t getCreationDate();
     Message * getResponse();
     void setResponse(Message * message);
-    void broadcast();
+
   protected:
     Message * response;
     sendCallback* callback;
