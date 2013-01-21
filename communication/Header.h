@@ -63,9 +63,14 @@ namespace Rhoban
     ui32 length;
 
     /**
-     * Is the message an answer
+     * Is the message an answer ?
      */
     bool answer;
+
+    /**
+     * Is the message incoming ?
+     */
+    bool incoming;
 
     Header();
 

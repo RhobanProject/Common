@@ -31,6 +31,7 @@ namespace Rhoban
         clear();
         uid = _uid++;
         answer = false;
+        incoming = false;
     }
 
     void Header::read_header(const char * raw_header)

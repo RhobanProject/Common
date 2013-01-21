@@ -25,7 +25,7 @@ namespace Rhoban
         if (serverHub) {
             vector<ServerComponent *> components = serverHub->getComponents();
             vector<ServerComponent *>::iterator it;
-            
+
             for (it = components.begin(); it != components.end(); it++) {
                 ServerComponent *component = (*it);
                 message->clear();
@@ -37,6 +37,22 @@ namespace Rhoban
                 sendMessage(message);
                 SERVER_MSG("Registering remote component " << component->DestinationID());
             }
+        }
+    }
+
+    Message *RemoteClient::process(Message * msg_in, Message * msg_out, bool sync, int timeout)
+    {
+        if (!msg_in->incoming) {
+            return this->NetworkComponent::process(msg_in, msg_out, sync, timeout);
+        }
+
+        return NULL;
+    }
+            
+    void RemoteClient::processAnswer(Message *msg_in)
+    {
+        if (!msg_in->incoming) {
+            this->NetworkComponent::processAnswer(msg_in);
         }
     }
 }

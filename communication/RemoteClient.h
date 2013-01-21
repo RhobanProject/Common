@@ -19,6 +19,12 @@ namespace Rhoban
              * Register the components to remote server
              */
             void registerComponents();
+    
+            /**
+             * Process a message
+             */
+            Message *process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 1000);
+            void processAnswer(Message *msg_in);
     };
 }
 
