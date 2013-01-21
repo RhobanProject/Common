@@ -21,7 +21,7 @@
 
 Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, int timeout)
 {
-    if (!DestinationID() || msg_in->destination == DestinationID()) {
+    if (respondTo(msg_in->destination)) {
         if (msg_in->answer) {
             processAnswer(msg_in);
             return NULL;
@@ -55,6 +55,11 @@ Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, i
         throw string("Cannot route message to destination ") + my_itoa(msg_in->destination);
     }
 };
+
+bool ServerComponent::respondTo(ui16 id)
+{
+    return (id == DestinationID());
+}
 
 Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 {

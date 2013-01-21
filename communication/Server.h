@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
 #include <timing/TickMachine.h>
 #include <logging/log.h>
@@ -111,11 +112,15 @@ namespace Rhoban
              */
             const ui16 virtual DestinationID() const { return clientId; }
 
-            void setId(int id);
+            void addId(ui16 id);
+            void removeId(ui16 id);
 
             bool isConnected();
 
+            bool respondTo(ui16 type);
+
         protected:
+            set<ui16> ids;
             int clientId;
     };
 
@@ -144,6 +149,16 @@ namespace Rhoban
              * Registering a component to the server
              */
             void registerComponent(ServerComponent *component);
+
+            /**
+             * Registering a component by giving the id
+             */
+            void registerComponent(ui16 type, ServerComponent *component);
+
+            /**
+             * Removing a component
+             */
+            void removeComponent(ServerComponent *component);
 
             /**
              * Retreive a component
