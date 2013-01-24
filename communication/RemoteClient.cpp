@@ -55,4 +55,9 @@ namespace Rhoban
             this->NetworkComponent::processAnswer(msg_in);
         }
     }
+
+    bool RemoteClient::respondTo(ui16 id)
+    {
+        return true;
+    }
 }

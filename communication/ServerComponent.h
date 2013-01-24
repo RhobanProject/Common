@@ -75,6 +75,11 @@ namespace Rhoban
              */
             virtual void loadConfig(ConfigFile &config);
 
+            /**
+             * Does the server component responds to this id ?
+             */
+            virtual bool respondTo(ui16 id);
+
         protected:
             /* Connection to other components */
             Callable * hub;

@@ -25,6 +25,11 @@ namespace Rhoban
              */
             Message *process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 1000);
             void processAnswer(Message *msg_in);
+            
+            /**
+             * A remote client responds to all the requests by sending them over the network
+             */
+            bool respondTo(ui16 type);
     };
 }
 
