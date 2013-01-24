@@ -125,7 +125,8 @@ namespace Rhoban
             smsg << "Failed to process message " << msg->uid << ": " << exc;
             SERVER_DEBUG(smsg.str());
 
-            msg_out->destination = msg->destination;
+            msg_out->destination = msg->source;
+            msg_out->source = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
             sendMessage(msg_out);

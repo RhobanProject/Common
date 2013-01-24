@@ -125,6 +125,7 @@ namespace Rhoban
      * Ajoute une chaîne de caractère
      */
     void append(const string &value);
+    void append(const char *str);
 
     /**
      * Ajoute des données en utilisant l'opérateur de stream

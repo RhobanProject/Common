@@ -51,6 +51,11 @@ namespace Rhoban
         append((unsigned int) value.size());
         append_to_buffer(value.c_str(),value.size());
     }
+    
+    void Message::append(const char *str)
+    {
+        append(string(str));
+    }
 
     void Message::append(ui8 value)
     {
