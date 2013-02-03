@@ -152,11 +152,14 @@ namespace Rhoban
                         }
 
                         // Registering a component 
-                        SERVER_MSG("Registering new component " << type);
-                        msg->destination = type;
+                        //SERVER_MSG("Registering new component " << type);
 
                         client->addId(type);
                         server->launcher->registerComponent(type, client);
+
+                        msg->destination = type;
+                        msg->append(string("Registered component "));
+                        SERVER_MSG("Registered new component " << type);
 
                         break;
                     }
@@ -166,10 +169,12 @@ namespace Rhoban
                         break;
                     }
             }
-        } catch (string str)
+        }
+        catch (string str)
         {
             throw string("Failed to call server: " + str);
-        } catch (...)
+        }
+        catch (...)
         {
             throw string("failed to call server.");
         }
@@ -259,13 +264,18 @@ namespace Rhoban
     	BEGIN_SAFE(mutex);
         component = getComponent(comp_nb);
 
+        if(comp_nb == MSG_TYPE_STM)
+        {
+        	cout << "Calling strm component " << endl;
+        }
+
         if (!component) {
-            SERVER_CAUTION("Unable to find the component " << comp_nb);
+            //SERVER_CAUTION("Unable to find the component " << comp_nb);
         }
     	END_SAFE(mutex);
 
     	if (!component) {
-            SERVER_CAUTION("Null component: " << comp_nb);
+            //SERVER_CAUTION("Null component: " << comp_nb);
             return NULL;
     	}
 
@@ -296,7 +306,10 @@ namespace Rhoban
     void ServerHub::registerComponent(ServerComponent *component)
     {
         BEGIN_SAFE(mutex);
-        SERVER_MSG("Registering component " << component->DestinationID());
+        if(component->DestinationID()  < RHOBAN_MESSAGE_DESTINATIONS_NB)
+        	SERVER_MSG("Registering component " << RHOBAN_MESSAGE_DESTINATIONS[component->DestinationID()])
+        else
+        	SERVER_MSG("Registering component " << component->DestinationID());
         components[component->DestinationID()] = component;
         mutexes[component->DestinationID()] = new Mutex();
         component->setHub(this);
@@ -312,6 +325,8 @@ namespace Rhoban
         components[type] = component;
         mutexes[type] = new Mutex();
         component->setHub(this);
+        if(type == 0)
+        	fallbackComponent = component;
         END_SAFE(mutex);
     }
     

@@ -29,6 +29,7 @@ namespace Rhoban
     {
         int port;
         config->read("server", "port", 12345, port);
+
         config->help();
 
         try {

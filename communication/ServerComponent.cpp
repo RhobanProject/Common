@@ -40,6 +40,7 @@ Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, i
             Message * answer = process(msg_in, msg_out, sync, timeout);
 
             if (answer) {
+            	answer->length = answer->getSize() - MSG_HEADER_SIZE;
                 answer->write_header(answer->buffer);
             }
 

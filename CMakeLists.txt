@@ -94,6 +94,7 @@ set (CONFIG_SOURCES
 # Motion
 set (MOTION_SOURCES
     motion/LinearSpline.cpp
+    motion/StmSpawn.cpp
     )
 
 # App
