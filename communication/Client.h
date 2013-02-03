@@ -54,8 +54,9 @@ namespace Rhoban
 
             //vectors of in and out msgs managed by the client
             //one msg per component type
-            vector<Message *> inMessages;
-            vector<Message *> outMessages;
+            map<ui16, Message *> inMessages;
+            map<ui16, Message *> outMessages;
+            Message * getOutMessage(ui16 destination);
             
             Callable *hub;
 

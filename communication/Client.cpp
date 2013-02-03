@@ -36,12 +36,6 @@ namespace Rhoban
     Client::Client(Callable *hub_) : hub(hub_)
     {
         headerBuffer.alloc(MSG_HEADER_SIZE);
-
-        for(int i =0;i < MSG_TYPE_MAX_NB; i++)
-        {
-            inMessages.push_back(new Message());
-            outMessages.push_back(new Message());
-        }
     }
 
     /**
@@ -49,21 +43,25 @@ namespace Rhoban
      */
     Client::~Client()
     {
-        for(int i =0;i < MSG_TYPE_MAX_NB; i++)
-        {
-            if(inMessages[i])
-            {
-                delete(inMessages[i]);
-                inMessages[i] = 0;
-            }
-            if(outMessages[i])
-            {
-                delete(outMessages[i]);
-                outMessages[i] = 0;
-            }
-        }
+    	for(map<ui16,Message *>::iterator it = outMessages.begin(); it != outMessages.end(); it++)
+    		if(it->second != 0)
+    			delete it->second;
+    	outMessages.clear();
     }
 
+    Message * Client::getOutMessage(ui16 destination)
+    {
+    	map<ui16,Message *>::iterator it = outMessages.find(destination);
+    	if(it == outMessages.end())
+    	{
+    		Message * msg = new Message;
+    		outMessages[destination] = msg;
+    		return msg;
+    	}
+    	else
+    		return it->second;
+
+    }
     /**
      * Logs an error
      */
@@ -97,16 +95,12 @@ namespace Rhoban
             throw string("Cannot process null message");
         }
 
-        Message *msg_out;
-
-        if (!msg->answer) {
-            msg_out = outMessages[msg->destination];
-            msg_out->clear();
-            msg_out->uid = msg->uid;
-            msg_out->destination = msg->destination;
-            msg_out->source = msg->source;
-            msg_out->command = msg->command;
-        }
+        Message * msg_out = getOutMessage(msg->destination);
+        msg_out->clear();
+        msg_out->uid = msg->uid;
+        msg_out->destination = msg->destination;
+        msg_out->source = msg->source;
+        msg_out->command = msg->command;
 
         // Calling the component on the given message
         SERVER_DEBUG("InternalClient ("<<this<<") <-- message l" << msg->length << " s"<< msg->source <<" t"<< msg->destination << " st"<< msg->command << "("<<msg->uid<<") <-- remote ");
@@ -120,7 +114,7 @@ namespace Rhoban
                     SERVER_DEBUG("InternalClient ("<<this<<") --> message l" << answer->length << " s"<< answer->source <<" t"<< answer->destination << " st"<< answer->command << "("<<answer->uid<<") --> remote ");
                 sendMessage(answer);
             }
-        } catch (string exc) {
+        } catch (string & exc) {
             ostringstream smsg;
             smsg << "Failed to process message " << msg->uid << ": " << exc;
             SERVER_DEBUG(smsg.str());
