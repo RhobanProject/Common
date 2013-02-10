@@ -264,11 +264,6 @@ namespace Rhoban
     	BEGIN_SAFE(mutex);
         component = getComponent(comp_nb);
 
-        if(comp_nb == MSG_TYPE_STM)
-        {
-        	cout << "Calling strm component " << endl;
-        }
-
         if (!component) {
             //SERVER_CAUTION("Unable to find the component " << comp_nb);
         }
