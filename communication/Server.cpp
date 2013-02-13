@@ -97,7 +97,6 @@ namespace Rhoban
                     {
                         try
                         {
-                            cout << "Echoing message of size " << msg_in->length  << endl;
                             msg->source = MSG_TYPE_SERVER;
                             msg->destination = msg_in->source;
                             msg->command = MSG_SERVER_ECHO;

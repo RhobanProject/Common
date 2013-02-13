@@ -88,7 +88,7 @@ namespace Rhoban
         deleteEntry(uid);
 
         if(retval->command == MSG_ERROR_COMMAND) {
-            throw string("Error message:\n\t") + retval->read_string();
+            throw string("Error message: ") + retval->read_string();
         } else {
             return retval;
         }

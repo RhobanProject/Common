@@ -39,10 +39,8 @@ Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, i
 
             Message * answer = process(msg_in, msg_out, sync, timeout);
 
-            if (answer) {
-            	answer->length = answer->getSize() - MSG_HEADER_SIZE;
-                answer->write_header(answer->buffer);
-            }
+            if (answer)
+                answer->write_header();
 
             return answer;
         }
@@ -70,6 +68,11 @@ Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 Message *ServerComponent::callSync(Message *msg_in, Message *msg_out, int timeout)
 {
     return doCall(msg_in, msg_out, true, timeout);
+}
+
+void ServerComponent::setHub(Callable * hub)
+{
+	this->hub = hub;
 }
 
 void ServerComponent::loadConfig(ConfigFile &config)
