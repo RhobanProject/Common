@@ -59,6 +59,11 @@ namespace Rhoban
     void init_cursor();
 
     /**
+     * Ecris les en-têtes dans le buffer
+     */
+    void write_header();
+
+    /**
      * Lis un entier signé ou non signé
      */
     ui32 read_uint();

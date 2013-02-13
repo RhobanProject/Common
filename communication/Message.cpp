@@ -214,6 +214,11 @@ namespace Rhoban
         cursor = MSG_HEADER_SIZE;
     }
 
+    void Message::write_header(){
+    	length = size - MSG_HEADER_SIZE;
+    	Header::write_header(buffer);
+    }
+
     void Message::clear()
     {
         Header::clear();
@@ -224,8 +229,7 @@ namespace Rhoban
 
     char* Message::getRaw()
     {
-        length = size - MSG_HEADER_SIZE;
-        write_header(buffer);
+        write_header();
         return buffer;
     }
 
