@@ -30,13 +30,14 @@ void StmSpawner::execute()
 	{
 		try
 		{
+                    int ret;
 
 			//todo detect if the stm machine is already running
 			//todo pass listening port of the server by argument
 			cout << "Creating stm server using py file '" << path_to_py_server.c_str() <<"' ..." << endl;
 #ifdef WIN32
 			//http://msdn.microsoft.com/en-us/library/20y988d2%28v=vs.71%29.aspx
-			int ret = _spawnlp(_P_WAIT,
+			ret = _spawnlp(_P_WAIT,
 					"python3","python3",path_to_py_server.c_str(),
 					"-s", "\"localhost\"",
 					"-p", my_itoa(port).c_str(),
