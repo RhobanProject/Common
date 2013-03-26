@@ -43,7 +43,11 @@ namespace Rhoban
             void processIncomingMessage(Message *);
             virtual void processMailboxMessage(Message *);
             virtual void processMailboxAnswer(Message *);
-            void processErrorMessage(Message *);
+
+            /*
+             * Does nothing, can be overriden if needed?
+             */
+            virtual void processErrorMessage(Message *);
             void garbageCollector();
 
             Mutex process;

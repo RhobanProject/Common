@@ -51,12 +51,15 @@ namespace Rhoban
     {
         try
         {
+        	/*
             ui32 dest = message->destination;
+
             if(dest < RHOBAN_MESSAGE_DESTINATIONS_NB)
                 cout << "Error message from " << RHOBAN_MESSAGE_DESTINATIONS[dest] << ":" << endl << "\t";
             else
                 cout << "Error message from " << dest << ":" << endl << "\t";
             cout << message->read_string() << endl;
+            */
         }
         catch(const string & exc)
         {

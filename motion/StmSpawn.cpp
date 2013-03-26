@@ -62,6 +62,7 @@ void StmSpawner::execute()
 				}
 				throw err.str();
 			}
+			cout << "Server exited with code " << ret << endl;
 #else
 			switch(int pid=fork())
 			{
@@ -76,7 +77,6 @@ void StmSpawner::execute()
 			}
 
 #endif
-			cout << "Server exited with code " << ret << endl;
 
 		}
 		catch(const string & exc)
