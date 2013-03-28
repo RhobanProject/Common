@@ -106,6 +106,7 @@ namespace Rhoban
     READ_ARRAY_HEADER(int, read_int);
     READ_ARRAY_HEADER(float, read_float);
     READ_ARRAY_HEADER(double, read_double);
+    READ_ARRAY_HEADER(bool, read_bool);
 
     /**
      * Ecris un entier

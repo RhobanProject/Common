@@ -202,6 +202,7 @@ namespace Rhoban
     READ_ARRAY(int, read_int);
     READ_ARRAY(float, read_float);
     READ_ARRAY(double, read_double);
+    READ_ARRAY(bool, read_bool);
 
     void Message::init()
     {

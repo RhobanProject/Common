@@ -14,7 +14,7 @@
 
 using namespace std;
 
-class StmSpawner : public Thread
+class StmSpawner : public Rhoban::Thread
 {
 public:
 	StmSpawner(string path_to_py_server, ui32 port, string command_store) : path_to_py_server(path_to_py_server), port(port), path_to_command_store(command_store) {};
