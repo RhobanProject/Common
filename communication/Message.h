@@ -89,6 +89,11 @@ namespace Rhoban
     vector<ui8> read_array(void);
 
     /**
+     * Lis un tableau de tablean de caractères
+     */
+    vector< vector<ui8> > read_array_array(void);
+
+    /**
      * Il est possible de lire des vecteurs d'un type à l'aide de la méthode
      * read_TYPE_array, ou TYPE est un type lisible
      */

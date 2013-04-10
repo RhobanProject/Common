@@ -181,6 +181,16 @@ namespace Rhoban
         return Buffer::read_array(length, cursor- length);
     }
 
+    vector< vector<ui8> > Message::read_array_array(void)
+    {
+        vector< vector<ui8> > values;
+        int length = read_uint();
+        for (int i = 0; i < length; i++) {
+            values.push_back(read_array());
+        }
+        return values;
+    }
+
 #define _READ_ARRAY(TYPE, FUNCTION) \
     vector< TYPE > Message:: FUNCTION##_array () \
     { \
