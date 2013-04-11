@@ -29,7 +29,9 @@ namespace Rhoban
      */
     Server::Server(ServerHub *launcher_) : launcher(launcher_), nextClientId(1000)
     {
+    	SERVER_DEBUG("Server registering itself as a component")
         launcher->registerComponent(new CoreServerComponent(this));
+    	SERVER_DEBUG("Server registered itself as a component")
     }
 
     /**
@@ -63,7 +65,9 @@ namespace Rhoban
      */
     ServerInternalClient *Server::createClient()
     {
+    	SERVER_DEBUG("Server creating client");
         ServerInternalClient *client = new ServerInternalClient(launcher, nextClientId++);
+    	SERVER_DEBUG("Server created client");
 
         // Registering the client as a component
         launcher->registerComponent(client);
@@ -80,6 +84,7 @@ namespace Rhoban
      */
     Message * CoreServerComponent::process(Message * msg_in, Message * msg, bool sync, int timeout)
     {
+    	SERVER_DEBUG("Server core component processing message");
         try
         {
             switch (msg_in->command)
