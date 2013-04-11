@@ -171,6 +171,7 @@ namespace Rhoban
     APPEND_VECTOR_HEADER(int);
     APPEND_VECTOR_HEADER(double);
     APPEND_VECTOR_HEADER(float);
+    APPEND_VECTOR_HEADER(bool);
 
     /**
      * Affiche le message (peut servir pour débugger)

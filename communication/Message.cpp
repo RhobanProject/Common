@@ -136,6 +136,7 @@ namespace Rhoban
     APPEND_VECTOR(int);
     APPEND_VECTOR(double);
     APPEND_VECTOR(float);
+    APPEND_VECTOR(bool);
 
     ui32 Message::read_uint(void)
     {
