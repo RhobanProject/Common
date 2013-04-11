@@ -24,65 +24,106 @@
 
 using namespace std;
 
-void StmSpawner::execute()
+StmSpawner::StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store) : hub(hub), path_to_py_server(path_to_py_server), port(port), path_to_command_store(command_store)
 {
-	while(true)
-	{
-		try
-		{
-                    int ret;
+	init(1);
+}
 
-			//todo detect if the stm machine is already running
-			//todo pass listening port of the server by argument
-			cout << "Creating stm server using py file '" << path_to_py_server.c_str() <<"' ..." << endl;
+bool StmSpawner::check_stmloader_already_exists()
+{
+	try
+	{
+		Message msg_in,msg_out;
+		msg_in.destination = MSG_TYPE_STM;
+		msg_in.source = 0;
+		msg_in.command = STM_PING;
+		msg_in.append("ping");
+		Message * answer = hub->callSync(&msg_in, &msg_out, 1000);
+		if(answer == NULL)
+		{
+			cout << "Found no stmloader, no answer" << endl;
+			return false;
+		}
+		else
+		{
+			bool ok = (answer->read_string() == "ping");
+			if(ok)
+				cout << "StmSpawner found stmloader" << endl;
+			else
+				cout << "StmSpawner found stmloader but got wrong answer" << endl;
+			return answer;
+		}
+	}
+	catch(string exc)
+	{
+		cout << "StmSpawner found no stmloader: \n\t" << exc << endl;
+		return false;
+	}
+
+}
+
+void StmSpawner::launch_stmloader()
+{
+	try
+	{
+		int ret;
+
+		//todo detect if the stm machine is already running
+		//todo pass listening port of the server by argument
+		cout << "Creating stm server using py file '" << path_to_py_server.c_str() <<"' ..." << endl;
 #ifdef WIN32
-			//http://msdn.microsoft.com/en-us/library/20y988d2%28v=vs.71%29.aspx
-			ret = _spawnlp(_P_WAIT,
-					"python3","python3",path_to_py_server.c_str(),
-					"-s", "\"localhost\"",
-					"-p", my_itoa(port).c_str(),
-					"-c", path_to_command_store.c_str(),
-					NULL);
-			if(ret == -1)
+		//http://msdn.microsoft.com/en-us/library/20y988d2%28v=vs.71%29.aspx
+		ret = _spawnlp(_P_WAIT,
+				"python3","python3",path_to_py_server.c_str(),
+				"-s", "\"localhost\"",
+				"-p", my_itoa(port).c_str(),
+				"-c", path_to_command_store.c_str(),
+				NULL);
+		if(ret == -1)
+		{
+			stringstream err;
+			cout << "Failed to spawn stm process with path '" << path_to_py_server << "'" << endl << "\tErrno " << errno << endl << "\t";
+			switch(errno)
 			{
-				stringstream err;
-				cout << "Failed to spawn stm process with path '" << path_to_py_server << "'" << endl << "\tErrno " << errno << endl << "\t";
-				switch(errno)
-				{
-				case E2BIG:
-					err << string("Argument list exceeds 1024 bytes"); break;
-				case EINVAL:
-					err <<  string("File or path is invalid"); break;
-				case ENOENT:
-					err <<  string("File or path is not found"); break;
-				case ENOEXEC:
-					err <<  string("Specified file is not executable or has invalid executable-file format"); break;
-				case ENOMEM:
-					err <<  string("Not enough memory is available to execute new process"); break;
-				}
-				throw err.str();
+			case E2BIG:
+				err << string("Argument list exceeds 1024 bytes"); break;
+			case EINVAL:
+				err <<  string("File or path is invalid"); break;
+			case ENOENT:
+				err <<  string("File or path is not found"); break;
+			case ENOEXEC:
+				err <<  string("Specified file is not executable or has invalid executable-file format"); break;
+			case ENOMEM:
+				err <<  string("Not enough memory is available to execute new process"); break;
 			}
-			cout << "Server exited with code " << ret << endl;
+			throw err.str();
+		}
+		cout << "Server exited with code " << ret << endl;
 #else
-			switch(int pid=fork())
-			{
-			case -1:
-				throw string("Error while forking");
-			case 0:
-				execl("python3", path_to_py_server.c_str(), NULL, NULL); break;
-			default:
-				waitpid(pid,NULL,0);
-				cout << "stm_server spawned" << endl;
-				break;
-			}
+		switch(int pid=fork())
+		{
+		case -1:
+			throw string("Error while forking");
+		case 0:
+			execl("python3", path_to_py_server.c_str(), NULL, NULL); break;
+		default:
+			waitpid(pid,NULL,0);
+			cout << "stm_server spawned" << endl;
+			break;
+		}
 
 #endif
 
-		}
-		catch(const string & exc)
-		{
-			cerr <<  "Could not create stm : \n\t" << exc << endl;
-		}
-		syst_wait_ms(500);
 	}
+	catch(const string & exc)
+	{
+		cerr <<  "Could not create stm : \n\t" << exc << endl;
+	}
+
+}
+
+void StmSpawner::step()
+{
+	if(!check_stmloader_already_exists())
+		launch_stmloader();
 }

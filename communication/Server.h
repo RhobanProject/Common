@@ -35,7 +35,7 @@ using namespace Rhoban;
  * 2: Messages
  * 3: Debug
  */
-#define SERVER_LOG_LEVEL 3
+#define SERVER_LOG_LEVEL 2
 
 #define SERVER_CAUTION(...)     LOG_CPP(1, SERVER_LOG_LEVEL, "server:caution", __VA_ARGS__)
 #define SERVER_MSG(...)         LOG_CPP(2, SERVER_LOG_LEVEL, "server", __VA_ARGS__)
@@ -164,6 +164,11 @@ namespace Rhoban
              * Retreive a component
              */
             ServerComponent *getComponent(ui16 type);
+
+            /*
+             * Whether a component has been registered
+             */
+            bool hasComponent(ui16 type){ return getComponent(type) != fallbackComponent; };
 
             /**
              * Removes the component from the hub
