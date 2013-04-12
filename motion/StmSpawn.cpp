@@ -31,37 +31,39 @@ StmSpawner::StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, str
 
 bool StmSpawner::check_stmloader_already_exists()
 {
-	try
+	int max_tries = 3;
+	while(max_tries-- >= 0)
 	{
-		//give time to the machine to connect to the server
-		syst_wait_ms(3000);
-		Message msg_in,msg_out;
-		msg_in.destination = MSG_TYPE_STM;
-		msg_in.source = 0;
-		msg_in.command = STM_PING;
-		msg_in.append("ping");
-		Message * answer = hub->callSync(&msg_in, &msg_out, 1000);
-		if(answer == NULL)
+		try
 		{
-			cout << "Found no stmloader, no answer" << endl;
-			return false;
-		}
-		else
-		{
-			bool ok = (answer->read_string() == "ping");
-			if(ok)
-				cout << "StmSpawner found stmloader" << endl;
+			//give time to the machine to connect to the server
+			syst_wait_ms(3000);
+			Message msg_in,msg_out;
+			msg_in.destination = MSG_TYPE_STM;
+			msg_in.source = 0;
+			msg_in.command = STM_PING;
+			msg_in.append("ping");
+			Message * answer = hub->callSync(&msg_in, &msg_out, 1000);
+			if(answer == NULL)
+			{
+				throw string("no answer");
+			}
 			else
-				cout << "StmSpawner found stmloader but got wrong answer" << endl;
-			return answer;
+			{
+				bool ok = (answer->read_string() == "ping");
+				if(ok)
+					cout << "StmSpawner found stmloader" << endl;
+				else
+					throw string("StmSpawner found stmloader but got wrong answer");
+				return answer;
+			}
+		}
+		catch(string exc)
+		{
+			cout << "StmSpawner found no stmloader, " << max_tries +1 << " to go : \n\t" << exc << endl;
 		}
 	}
-	catch(string exc)
-	{
-		cout << "StmSpawner found no stmloader: \n\t" << exc << endl;
-		return false;
-	}
-
+	return false;
 }
 
 void StmSpawner::launch_stmloader()
