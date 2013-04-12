@@ -33,6 +33,8 @@ bool StmSpawner::check_stmloader_already_exists()
 {
 	try
 	{
+		//give time to the machine to connect to the server
+		syst_wait_ms(3000);
 		Message msg_in,msg_out;
 		msg_in.destination = MSG_TYPE_STM;
 		msg_in.source = 0;
