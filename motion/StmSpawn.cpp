@@ -60,7 +60,7 @@ bool StmSpawner::check_stmloader_already_exists()
 		}
 		catch(string exc)
 		{
-			cout << "StmSpawner found no stmloader, " << max_tries +1 << " to go : \n\t" << exc << endl;
+			cout << "StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process..." << endl;
 		}
 	}
 	return false;
@@ -86,17 +86,17 @@ void StmSpawner::launch_stmloader()
 		if(ret == -1)
 		{
 			stringstream err;
-			cout << "Failed to spawn stm process with path '" << path_to_py_server << "'" << endl << "\tErrno " << errno << endl << "\t";
+			//cout << "Failed to spawn stm process with path '" << path_to_py_server << "'" << endl << "\tErrno " << errno << endl << "\t";
 			switch(errno)
 			{
 			case E2BIG:
 				err << string("Argument list exceeds 1024 bytes"); break;
 			case EINVAL:
-				err <<  string("File or path is invalid"); break;
+				err <<  "File or path '"<< path_to_py_server <<"' is invalid"; break;
 			case ENOENT:
-				err <<  string("File or path is not found"); break;
+				err <<  "File or path '"<< path_to_py_server <<"' is not found"; break;
 			case ENOEXEC:
-				err <<  string("Specified file is not executable or has invalid executable-file format"); break;
+				err <<  "Specified file '"<< path_to_py_server <<"' is not executable or has invalid executable-file format"; break;
 			case ENOMEM:
 				err <<  string("Not enough memory is available to execute new process"); break;
 			}
