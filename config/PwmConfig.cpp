@@ -14,11 +14,13 @@
 string PwmConfig::to_xml() const
 {
     string result;
+    result += "<pwms>";
     for(uint i =0; i< pwms.size(); i++)
     {
         const PwmDeviceParameter *pdp = pwms[i];
         result += "<" + pdp->class_name()+ ">" + pdp->to_xml() + "</" + pdp->class_name()+ ">";
     }
+    result += "</pwms>";
     return result;
 }
 
@@ -48,22 +50,17 @@ string PwmConfig::class_name() const
 
 void PwmDeviceParameter::from_xml(TiXmlNode * node)
 {
-	frequency = (uint) XMLTools::get_int_element(node,"frequency");
-	pin = XMLTools::get_string_element(node,"pin");
-	name = XMLTools::get_string_element(node,"name");
-	cyclic_rate = XMLTools::get_double_element(node,"cyclic_rate");
-	max = XMLTools::get_double_element(node,"max");
-	min = XMLTools::get_double_element(node,"min");
+    name = XMLTools::get_string_element(node, "name");
+    pin = XMLTools::get_string_element(node, "pin");
+    stepsPerDegree = XMLTools::get_float_element(node, "stepsPerDegree");
 }
 
 string PwmDeviceParameter::to_xml() const
 {
-	ostringstream result;
-	result << "<frequency>" << frequency << "</frequency>";
-	result << "<pin>" << pin << "</pin>";
-	result << "<name>" << name << "</name>";
-	result << "<cyclic_rate>" << cyclic_rate << "</cyclic_rate>";
-	result << "<max>" << max << "</max>";
-	result << "<min>" << min << "</min>";
-	return result.str();
+    ostringstream result;
+    result << "<name>" << name << "</name>";
+    result << "<pin>" << pin << "</pin>";
+    result << "<stepsPerDegree>" << stepsPerDegree << "</stepsPerDegree>";
+    result << "<cyclicRate>" << cyclicRate << "</cyclicRate>";
+    return result.str();
 }

@@ -36,17 +36,14 @@ class PwmConfig : public Config
 class PwmDeviceParameter : public Config
 {
 public:
-	PwmDeviceParameter():frequency(0), cyclic_rate(0){name=""; pin="";};
+	PwmDeviceParameter(): cyclicRate(0), stepsPerDegree(1.0) {name=""; pin="";};
 
 	string name;
-	uint frequency;
 
-	//entre 0 et 100
-	float cyclic_rate;
-	//maximal cyclic rate
-	float min;
-	//minimal cyclic rate
-	float max;
+        // How many steps per degree ?
+	float stepsPerDegree;
+
+        float cyclicRate;
 
 	string pin;
 
