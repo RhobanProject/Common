@@ -37,9 +37,9 @@ namespace Rhoban
              * Stops
              */
             void stop();
-            
-        protected:
+
             ServerHub hub;
+        protected:
             ConfigFile *config;
 
             Server *server;

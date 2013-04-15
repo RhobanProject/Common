@@ -88,7 +88,11 @@ namespace Rhoban
         deleteEntry(uid);
 
         if(retval->command == MSG_ERROR_COMMAND) {
-            throw string("Error message: ") + retval->read_string();
+            ui32 dest = message->destination;
+            if(dest < RHOBAN_MESSAGE_DESTINATIONS_NB)
+            	throw string("Error from ") + RHOBAN_MESSAGE_DESTINATIONS[dest] + " : " + retval->read_string();
+            else
+            	throw string("Error message : ") + retval->read_string();
         } else {
             return retval;
         }

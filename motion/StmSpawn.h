@@ -10,21 +10,27 @@
 
 #include <stdlib.h>
 #include <string>
-#include <threading/Thread.h>
+#include <threading/TimedThread.h>
+#include <communication/Server.h>
 
 using namespace std;
 
-class StmSpawner : public Rhoban::Thread
+class StmSpawner : public SlowTimedThread
 {
 public:
-	StmSpawner(string path_to_py_server, ui32 port, string command_store) : path_to_py_server(path_to_py_server), port(port), path_to_command_store(command_store) {};
+	StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store);
 
-	virtual void execute(void);
+	virtual void step(void);
 
 private:
+
+	bool check_stmloader_already_exists();
+	void launch_stmloader();
+
 	string path_to_py_server;
 	ui32 port;
 	string path_to_command_store;
+	ServerHub * hub;
 };
 
 #endif /* STMSPAWN_H_ */

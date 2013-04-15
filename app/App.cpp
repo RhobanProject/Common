@@ -28,7 +28,7 @@ namespace Rhoban
     void App::runServer()
     {
         int port;
-        config->read("server", "port", 12345, port);
+        config->read("server", "port", 7777, port);
 
         config->help();
 

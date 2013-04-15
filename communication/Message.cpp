@@ -136,6 +136,7 @@ namespace Rhoban
     APPEND_VECTOR(int);
     APPEND_VECTOR(double);
     APPEND_VECTOR(float);
+    APPEND_VECTOR(bool);
 
     ui32 Message::read_uint(void)
     {
@@ -179,6 +180,16 @@ namespace Rhoban
         ui32 length = read_uint();
         cursor += length;
         return Buffer::read_array(length, cursor- length);
+    }
+
+    vector< vector<ui8> > Message::read_array_array(void)
+    {
+        vector< vector<ui8> > values;
+        int length = read_uint();
+        for (int i = 0; i < length; i++) {
+            values.push_back(read_array());
+        }
+        return values;
     }
 
 #define _READ_ARRAY(TYPE, FUNCTION) \

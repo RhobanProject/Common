@@ -165,6 +165,11 @@ namespace Rhoban
              */
             ServerComponent *getComponent(ui16 type);
 
+            /*
+             * Whether a component has been registered
+             */
+            bool hasComponent(ui16 type){ return getComponent(type) != fallbackComponent; };
+
             /**
              * Removes the component from the hub
              */
