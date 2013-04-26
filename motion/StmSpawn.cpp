@@ -51,16 +51,17 @@ bool StmSpawner::check_stmloader_already_exists()
 			else
 			{
 				bool ok = (answer->read_string() == "ping");
-				if(ok)
-					cout << "StmSpawner found stmloader" << endl;
-				else
+				if(ok) {
+					STM_DEBUG("StmSpawner found stmloader");
+                                } else {
 					throw string("StmSpawner found stmloader but got wrong answer");
+                                }
 				return answer;
 			}
 		}
 		catch(string exc)
 		{
-			cout << "StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process..." << endl;
+			STM_CAUTION("StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process...");
 		}
 	}
 	return false;
@@ -74,7 +75,7 @@ void StmSpawner::launch_stmloader()
 
 		//todo detect if the stm machine is already running
 		//todo pass listening port of the server by argument
-		cout << "Creating stm server using py file '" << path_to_py_server.c_str() <<"' ..." << endl;
+		STM_MSG("Creating stm server using py file '" << path_to_py_server.c_str() <<"' ...");
 #ifdef WIN32
 		//http://msdn.microsoft.com/en-us/library/20y988d2%28v=vs.71%29.aspx
 		ret = _spawnlp(_P_WAIT,
@@ -102,17 +103,21 @@ void StmSpawner::launch_stmloader()
 			}
 			throw err.str();
 		}
-		cout << "Server exited with code " << ret << endl;
+		STM_MSG("Server exited with code " << ret);
 #else
 		switch(int pid=fork())
 		{
 		case -1:
 			throw string("Error while forking");
 		case 0:
-			execl("python3", path_to_py_server.c_str(), NULL, NULL); break;
+			execl("/usr/bin/python3", "python3", path_to_py_server.c_str(),
+				"-s", "localhost",
+				"-p", my_itoa(port).c_str(),
+				"-c", path_to_command_store.c_str(),
+                                NULL);
+                        break;
 		default:
-			waitpid(pid,NULL,0);
-			cout << "stm_server spawned" << endl;
+			STM_MSG("STM Server spawned");
 			break;
 		}
 
@@ -121,13 +126,14 @@ void StmSpawner::launch_stmloader()
 	}
 	catch(const string & exc)
 	{
-		cerr <<  "Could not create stm : \n\t" << exc << endl;
+		STM_CAUTION("Could not create STM server: \n\t" << exc);
 	}
 
 }
 
 void StmSpawner::step()
 {
-	if(!check_stmloader_already_exists())
-		launch_stmloader();
+	if(!check_stmloader_already_exists()) {
+	    launch_stmloader();
+        }
 }
