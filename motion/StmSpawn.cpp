@@ -24,7 +24,8 @@
 
 using namespace std;
 
-StmSpawner::StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store) : hub(hub), path_to_py_server(path_to_py_server), port(port), path_to_command_store(command_store)
+StmSpawner::StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store, string python_cmd)
+	: hub(hub), path_to_py_server(path_to_py_server), port(port), path_to_command_store(command_store), python_cmd(python_cmd)
 {
 	init(1);
 }
@@ -79,7 +80,7 @@ void StmSpawner::launch_stmloader()
 #ifdef WIN32
 		//http://msdn.microsoft.com/en-us/library/20y988d2%28v=vs.71%29.aspx
 		ret = _spawnlp(_P_WAIT,
-				"python3","python3",path_to_py_server.c_str(),
+				python_cmd.c_str(),python_cmd.c_str(),path_to_py_server.c_str(),
 				"-s", "\"localhost\"",
 				"-p", my_itoa(port).c_str(),
 				"-c", path_to_command_store.c_str(),
@@ -93,11 +94,11 @@ void StmSpawner::launch_stmloader()
 			case E2BIG:
 				err << string("Argument list exceeds 1024 bytes"); break;
 			case EINVAL:
-				err <<  "File or path '"<< path_to_py_server <<"' is invalid"; break;
+				err <<  "File or path '"<< python_cmd << " " << path_to_py_server <<"' is invalid"; break;
 			case ENOENT:
-				err <<  "File or path '"<< path_to_py_server <<"' is not found"; break;
+				err <<  "File or path '"<< python_cmd << " " << path_to_py_server <<"' is not found"; break;
 			case ENOEXEC:
-				err <<  "Specified file '"<< path_to_py_server <<"' is not executable or has invalid executable-file format"; break;
+				err <<  "Specified file '"<< python_cmd << " " << path_to_py_server <<"' is not executable or has invalid executable-file format"; break;
 			case ENOMEM:
 				err <<  string("Not enough memory is available to execute new process"); break;
 			}

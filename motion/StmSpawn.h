@@ -31,7 +31,7 @@ using namespace std;
 class StmSpawner : public SlowTimedThread
 {
 public:
-	StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store);
+	StmSpawner(ServerHub * hub, string path_to_py_server, ui32 port, string command_store, string python_cmd);
 
 	virtual void step(void);
 
@@ -43,6 +43,7 @@ private:
 	string path_to_py_server;
 	ui32 port;
 	string path_to_command_store;
+	string python_cmd;
 	ServerHub * hub;
 };
 
