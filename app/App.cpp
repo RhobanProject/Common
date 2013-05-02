@@ -1,3 +1,4 @@
+#include <timing/sleep.h>
 #include "App.h"
 
 namespace Rhoban
@@ -45,7 +46,7 @@ namespace Rhoban
     /**
      * Runs as a standalone client
      */
-    void App::runStandalone()
+    void App::runStandalone(bool insist)
     {
         string host;
         int port;
@@ -53,16 +54,20 @@ namespace Rhoban
         config->read("client", "port", 7777, port);
         config->help();
 
-        try {
-            client = new RemoteClient(&hub);
-            client->connectTo(host.c_str(), port, false);
-            client->registerComponents();
-            client->execute();
-        } catch (string err) {
-            cout << "App error: " << err << endl;
-        }
+        while (insist) {
+            cout << "App: running standalone client" << endl;
+            try {
+                client = new RemoteClient(&hub);
+                client->connectTo(host.c_str(), port, false);
+                client->registerComponents();
+                client->execute();
+            } catch (string err) {
+                cout << "App error: " << err << endl;
+            }
+            sleep_ms(500);
 
-        stop();
+            stop();
+        }
     }
 
     /**
