@@ -50,7 +50,7 @@ namespace Rhoban
         string host;
         int port;
         config->read("client", "host", "127.0.0.1", host);
-        config->read("client", "port", 12345, port);
+        config->read("client", "port", 7777, port);
         config->help();
 
         try {
