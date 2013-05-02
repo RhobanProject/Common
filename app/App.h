@@ -30,8 +30,11 @@ namespace Rhoban
 
             /**
              * Runs as a standalone client
+             *
+             * If insist is true, the component will try and try to connect
+             * to the server until it can reach it
              */
-            void runStandalone();
+            void runStandalone(bool insist = true);
 
             /**
              * Stops
