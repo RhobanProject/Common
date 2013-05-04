@@ -62,7 +62,7 @@ bool StmSpawner::check_stmloader_already_exists()
 		}
 		catch(string exc)
 		{
-			STM_CAUTION("StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process...");
+			STM_DEBUG("StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process...");
 		}
 	}
 	return false;
