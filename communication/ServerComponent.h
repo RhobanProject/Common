@@ -55,7 +55,7 @@ class ServerComponentTask;
      */
     class ServerComponent : public Callable
     {
-    	friend ServerComponentTask;
+    	friend class ServerComponentTask;
 
         public:
             ServerComponent() : hub(0){};
