@@ -19,6 +19,21 @@
 
 #include "ServerComponent.h"
 
+ServerComponentTask::ServerComponentTask(ServerComponent * component, Message *msg_in, Callable * hub):
+component(component), msg_in(msg_in), hub(hub)
+{
+
+
+}
+
+void ServerComponentTask::execute()
+{
+	Message msg_out;
+	component->process(msg_in,&msg_out);
+	component->processAnswer(&msg_out);
+}
+
+
 Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, int timeout)
 {
     if (respondTo(msg_in->destination)) {

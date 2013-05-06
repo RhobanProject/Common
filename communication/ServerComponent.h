@@ -22,6 +22,7 @@
 #include <configfile/ConfigFile.h>
 
 #include "Callable.h"
+#include <threading/Thread.h>
 
 using namespace Rhoban;
 
@@ -45,12 +46,16 @@ using namespace Rhoban;
  */
 namespace Rhoban
 {
+
+class ServerComponentTask;
+
     /*
      * A server component is callable.
      * It encapsulates a hub to connect to other components.
      */
     class ServerComponent : public Callable
     {
+    	friend ServerComponentTask;
 
         public:
             ServerComponent() : hub(0){};
@@ -70,6 +75,7 @@ namespace Rhoban
             /* sets the hub used to connect to other components */
             void setHub(Callable * hub);
 
+
             /**
              * Reads the components config from the config file
              */
@@ -88,6 +94,26 @@ namespace Rhoban
             virtual void processAnswer(Message * answer);
 
     };
+
+    /*
+     * This creates a parallel task to process a message and sends the answer in an asynchronous way
+     */
+    	class ServerComponentTask :  public Thread
+    	{
+    	public:
+    		ServerComponentTask(ServerComponent * component, Message *msg_in, Callable * hub);
+
+
+    	protected:
+    		void execute();
+
+    	private:
+    		ServerComponent * component;
+    		Message *msg_in;
+    		Callable * hub;
+
+    	};
+
 }
 
 #endif /* COMPONENT_H_ */
