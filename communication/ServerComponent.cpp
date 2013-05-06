@@ -19,11 +19,10 @@
 
 #include "ServerComponent.h"
 
-ServerComponentTask::ServerComponentTask(ServerComponent * component, Message *msg_in, Callable * hub):
-component(component), msg_in(msg_in), hub(hub)
+ServerComponentTask::ServerComponentTask(ServerComponent * component, Message *msg_in):
+component(component), msg_in(msg_in)
 {
-
-
+	start();
 }
 
 void ServerComponentTask::execute()
@@ -84,6 +83,12 @@ Message *ServerComponent::callSync(Message *msg_in, Message *msg_out, int timeou
 {
     return doCall(msg_in, msg_out, true, timeout);
 }
+
+Message * ServerComponent::callAsync(Message *msg_in)
+{
+	ServerComponentTask task(this,msg_in);
+}
+
 
 void ServerComponent::setHub(Callable * hub)
 {

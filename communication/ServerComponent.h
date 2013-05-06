@@ -72,6 +72,11 @@ class ServerComponentTask;
 
             Message *callSync(Message *msg_in, Message *msg_out, int timeout);
 
+            /*
+             * Asynchronous processing of the message using a new thread
+             */
+            Message *callAsync(Message *msg_in);
+
             /* sets the hub used to connect to other components */
             void setHub(Callable * hub);
 
@@ -101,7 +106,7 @@ class ServerComponentTask;
     	class ServerComponentTask :  public Thread
     	{
     	public:
-    		ServerComponentTask(ServerComponent * component, Message *msg_in, Callable * hub);
+    		ServerComponentTask(ServerComponent * component, Message *msg_in);
 
 
     	protected:
@@ -110,8 +115,6 @@ class ServerComponentTask;
     	private:
     		ServerComponent * component;
     		Message *msg_in;
-    		Callable * hub;
-
     	};
 
 }
