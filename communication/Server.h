@@ -205,7 +205,7 @@ namespace Rhoban
             map<ui16, Mutex *> mutexes;
 
             bool thread_safe;
-            Mutex mutex;
+            Mutex components_mutex;
     };
 }
 

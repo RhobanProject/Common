@@ -240,14 +240,14 @@ namespace Rhoban
 
     ServerHub::~ServerHub()
     {
-    	BEGIN_SAFE(mutex)
+    	BEGIN_SAFE(components_mutex)
     	for(map<ui16, Callable *>::iterator it = components.begin(); it != components.end(); it++)
     		if(it->first != MSG_TYPE_SERVER && it->second)
     		{
     			delete it->second;
     			it->second = 0;
     		}
-    	END_SAFE(mutex)
+    	END_SAFE(components_mutex)
     }
 
     Message* ServerHub::call(Message* msg_in, Message * msg_out)
@@ -265,13 +265,11 @@ namespace Rhoban
         ServerComponent *component;
         ui16 comp_nb = msg_in->destination;
 
-    	BEGIN_SAFE(mutex);
         component = getComponent(comp_nb);
 
         if (!component) {
             //SERVER_CAUTION("Unable to find the component " << comp_nb);
         }
-    	END_SAFE(mutex);
 
     	if (!component) {
             //SERVER_CAUTION("Null component: " << comp_nb);
@@ -304,7 +302,7 @@ namespace Rhoban
      */
     void ServerHub::registerComponent(ServerComponent *component)
     {
-        BEGIN_SAFE(mutex);
+        BEGIN_SAFE(components_mutex);
         if(component->DestinationID()  < RHOBAN_MESSAGE_DESTINATIONS_NB)
         	SERVER_MSG("Registering component " << RHOBAN_MESSAGE_DESTINATIONS[component->DestinationID()])
         else
@@ -312,7 +310,7 @@ namespace Rhoban
         components[component->DestinationID()] = component;
         mutexes[component->DestinationID()] = new Mutex();
         component->setHub(this);
-        END_SAFE(mutex);
+        END_SAFE(components_mutex);
     }
 
     /**
@@ -320,13 +318,13 @@ namespace Rhoban
      */
     void ServerHub::registerComponent(ui16 type, ServerComponent *component)
     {
-        BEGIN_SAFE(mutex);
+        BEGIN_SAFE(components_mutex);
         components[type] = component;
         mutexes[type] = new Mutex();
         component->setHub(this);
         if(type == 0)
         	fallbackComponent = component;
-        END_SAFE(mutex);
+        END_SAFE(components_mutex);
     }
     
     /**
@@ -334,13 +332,19 @@ namespace Rhoban
      */
     ServerComponent *ServerHub::getComponent(ui16 type)
     {
+    	ServerComponent * comp = NULL;
+        BEGIN_SAFE(components_mutex);
         map<ui16, Callable *>::iterator it = components.find(type);
 
         if (it != components.end()) {
-            return dynamic_cast<ServerComponent *>((*it).second);
+            comp = dynamic_cast<ServerComponent *>((*it).second);
         }
+        END_SAFE(components_mutex);
 
-        return fallbackComponent;
+        if(comp != NULL)
+        	return comp;
+        else
+        	return fallbackComponent;
     }
     
     /**
@@ -349,10 +353,10 @@ namespace Rhoban
     void ServerHub::removeComponent(ui16 type)
     {
         SERVER_MSG("Unregistering component " << type);
-        BEGIN_SAFE(mutex);
+        BEGIN_SAFE(components_mutex);
         components.erase(type);
         mutexes.erase(type);
-    	END_SAFE(mutex);
+    	END_SAFE(components_mutex);
     }
 
     /**
@@ -363,6 +367,7 @@ namespace Rhoban
         vector<ui16> types;
         map<ui16, Callable*>::iterator it;
 
+        BEGIN_SAFE(components_mutex);
         for (it = components.begin(); it != components.end(); it++) {
             ServerComponent *comp = dynamic_cast<ServerComponent*>((*it).second);
 
@@ -372,8 +377,11 @@ namespace Rhoban
         }
 
         for (vector<ui16>::iterator vit = types.begin(); vit != types.end(); vit++) {
-            removeComponent(*vit);
+        	components.erase(*vit);
+        	    mutexes.erase(*vit);
         }
+    	END_SAFE(components_mutex);
+
     }
     
     /**
@@ -384,6 +392,7 @@ namespace Rhoban
         vector<ServerComponent *> componentsVector;
         map<ui16, Callable *>::iterator it;
 
+        BEGIN_SAFE(components_mutex);
         for (it = components.begin(); it != components.end(); it++) {
             ServerComponent *component = dynamic_cast<ServerComponent *>((*it).second);
 
@@ -391,6 +400,7 @@ namespace Rhoban
                 componentsVector.push_back(component);
             }
         }
+    	END_SAFE(components_mutex);
 
         return componentsVector;
     }

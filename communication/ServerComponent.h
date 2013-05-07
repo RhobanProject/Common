@@ -91,9 +91,10 @@ class ServerComponentTask;
              */
             virtual bool respondTo(ui16 id);
 
-        protected:
             /* Connection to other components */
             Callable * hub;
+
+        protected:
 
             virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
             virtual void processAnswer(Message * answer);
