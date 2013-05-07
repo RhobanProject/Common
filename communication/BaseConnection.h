@@ -25,16 +25,12 @@ using namespace std;
     
 namespace Rhoban
 {  
-    //typedef void sendCallback(Message *, void *);
-
     class BaseConnection : public virtual TCPClient, public virtual Mailbox
     {
         public:
             BaseConnection();
 
             void sendMessage(Message *message);
-            Message *sendMessageReceive(Message *message, int timeout=1000);
-            void sendMessageCallback(Message *message, sendCallback *callback, void *data=NULL);
             void startMailbox();
             Message *getMessage();
             Message *getMessage(Message *message);

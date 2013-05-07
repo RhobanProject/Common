@@ -71,39 +71,6 @@ namespace Rhoban
         return message;
     }
 
-    Message *BaseConnection::sendMessageReceive(Message *message, int timeout)
-    {
-        ui32 uid = message->getUid();
-
-        //preparing message and condition
-        MailboxEntry * entry = addEntry(uid);
-
-        entry->lock();
-        sendMessage(message);
-        entry->wait(timeout);
-        entry->unlock();
-
-        Message * retval = entry->getResponse();
-
-        deleteEntry(uid);
-
-        if(retval->command == MSG_ERROR_COMMAND) {
-            ui32 dest = message->destination;
-            if(dest < RHOBAN_MESSAGE_DESTINATIONS_NB)
-            	throw string("Error from ") + RHOBAN_MESSAGE_DESTINATIONS[dest] + " : " + retval->read_string();
-            else
-            	throw string("Error message : ") + retval->read_string();
-        } else {
-            return retval;
-        }
-    }
-
-    void BaseConnection::sendMessageCallback(Message *message, sendCallback *callback, void *data)
-    {
-        addEntry(message->getUid(), callback, data);
-        sendMessage(message);
-    }
-
     void BaseConnection::startMailbox()
     {
         start(NULL);
