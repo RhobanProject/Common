@@ -21,6 +21,7 @@
 #include <logging/log.h>
 #include <configfile/ConfigFile.h>
 
+#include "Mailbox.h"
 #include "Callable.h"
 #include <threading/Thread.h>
 
@@ -47,76 +48,80 @@ using namespace Rhoban;
 namespace Rhoban
 {
 
-class ServerComponentTask;
+    class ServerComponentTask;
 
     /*
      * A server component is callable.
      * It encapsulates a hub to connect to other components.
      */
-    class ServerComponent : public Callable
+    class ServerComponent : public Callable, public Mailbox
     {
-    	friend class ServerComponentTask;
+        friend class ServerComponentTask;
 
         public:
-            ServerComponent() : hub(0){};
-            virtual ~ServerComponent(){};
+        ServerComponent() : hub(0){};
+        virtual ~ServerComponent(){};
 
-            /* The destination id of this component */
-            const ui16 virtual DestinationID() const = 0;
+        virtual bool isConnected();
+        virtual Message *getMessage();
+        virtual void sendMessage(Message *message);
 
-            Message *doCall(Message *msg_in, Message *msg_out, bool sync, int timeout);
+        /* The destination id of this component */
+        const ui16 virtual DestinationID() const = 0;
 
-            /* IF the message can be processed by this component then process is used */
-            /* otherwise the message is routed to the hub */
-            Message *call(Message *msg_in, Message *msg_out);
+        Message *doCall(Message *msg_in, Message *msg_out, bool sync, int timeout);
 
-            Message *callSync(Message *msg_in, Message *msg_out, int timeout);
+        /* IF the message can be processed by this component then process is used */
+        /* otherwise the message is routed to the hub */
+        Message *call(Message *msg_in, Message *msg_out);
 
-            /*
-             * Asynchronous processing of the message using a new thread
-             */
-            Message *callAsync(Message *msg_in);
+        Message *callSync(Message *msg_in, Message *msg_out, int timeout);
 
-            /* sets the hub used to connect to other components */
-            void setHub(Callable * hub);
+        /*
+         * Asynchronous processing of the message using a new thread
+         */
+        Message *callAsync(Message *msg_in);
+
+        /* sets the hub used to connect to other components */
+        void setHub(Callable * hub);
 
 
-            /**
-             * Reads the components config from the config file
-             */
-            virtual void loadConfig(ConfigFile &config);
+        /**
+         * Reads the components config from the config file
+         */
+        virtual void loadConfig(ConfigFile &config);
 
-            /**
-             * Does the server component responds to this id ?
-             */
-            virtual bool respondTo(ui16 id);
+        /**
+         * Does the server component responds to this id ?
+         */
+        virtual bool respondTo(ui16 id);
 
-            /* Connection to other components */
-            Callable * hub;
+        /* Connection to other components */
+        Callable * hub;
 
         protected:
 
-            virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
-            virtual void processAnswer(Message * answer);
+        virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
+        virtual void processAnswer(Message * answer);
 
     };
 
     /*
      * This creates a parallel task to process a message and sends the answer in an asynchronous way
      */
-    	class ServerComponentTask :  public Thread
-    	{
-    	public:
-    		ServerComponentTask(ServerComponent * component, Message *msg_in);
+    class ServerComponentTask :  public Thread
+    {
+        public:
+            ServerComponentTask(ServerComponent * component, Message *msg_in);
 
 
-    	protected:
-    		void execute();
+        protected:
+            void execute();
 
-    	private:
-    		ServerComponent * component;
-    		Message *msg_in;
-    	};
+        private:
+            ServerComponent * component;
+            Message *msg_in;
+    };
 
 }
 

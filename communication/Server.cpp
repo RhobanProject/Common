@@ -226,7 +226,7 @@ namespace Rhoban
 
     void ServerInternalClient::loop()
     {
-        this->Mailbox::execute();
+        this->NetworkComponent::execute();
     }
 
     bool ServerInternalClient::respondTo(ui16 type)

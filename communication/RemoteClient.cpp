@@ -34,7 +34,7 @@ namespace Rhoban
                 message->command = MSG_SERVER_REGISTER_COMPONENT;
                 message->append((ui32)component->DestinationID());
 
-                sendMessage(message);
+                this->BaseConnection::sendMessage(message);
                 SERVER_MSG("Registering remote component " << component->DestinationID());
             }
         }

@@ -12,16 +12,16 @@ namespace Rhoban
     Message *NetworkComponent::process(Message * msg_in, Message * msg_out, bool sync, int timeout)
     {
         if (!sync) {
-            sendMessage(msg_in);
+            this->BaseConnection::sendMessage(msg_in);
             return NULL;
         } else {
-            return sendMessageReceive(msg_in, timeout);
+            return this->BaseConnection::sendMessageReceive(msg_in, timeout);
         }
     }
             
     void NetworkComponent::processAnswer(Message *msg_in)
     {
-        sendMessage(msg_in);
+        this->BaseConnection::sendMessage(msg_in);
     }
 
     /**
@@ -100,7 +100,7 @@ namespace Rhoban
             // If the component answered
             if (!msg->answer && answer) {
                     SERVER_DEBUG("NetworkComponent ("<<this<<") --> message l" << answer->length << " s"<< answer->source <<" t"<< answer->destination << " st"<< answer->command << "("<<answer->uid<<") --> remote ");
-                sendMessage(answer);
+                this->BaseConnection::sendMessage(answer);
             }
         } catch (string & exc) {
             ostringstream smsg;
@@ -111,7 +111,7 @@ namespace Rhoban
             msg_out->source = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
-            sendMessage(msg_out);
+            this->BaseConnection::sendMessage(msg_out);
         } catch (...)
         {
             ostringstream smsg;
@@ -123,7 +123,12 @@ namespace Rhoban
             msg_out->destination = msg->destination;
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
-            sendMessage(msg_out);
+            this->BaseConnection::sendMessage(msg_out);
         }
+    }
+
+    void NetworkComponent::execute()
+    {
+        this->BaseConnection::execute();
     }
 }

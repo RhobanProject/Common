@@ -23,6 +23,8 @@ namespace Rhoban
             void processAnswer(Message *msg_in);
             
             const ui16 virtual DestinationID() const { return 0; }
+            
+            void execute();
 
         protected:
             void logError(string message);
