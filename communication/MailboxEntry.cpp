@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <map>
 #include <ctime>
+#include <threading/Thread.h>
 #include "MailboxEntry.h"
 
 using namespace std;
@@ -25,6 +26,8 @@ namespace Rhoban
         callback = NULL;
         creationDate = time(NULL);
         data = NULL; 
+        sameThreadResponded = false;
+        threadId = Thread::currentThreadId();
     }
 
     MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)

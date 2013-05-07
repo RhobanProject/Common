@@ -97,7 +97,12 @@ namespace Rhoban
                         if(entry->isWaiting())
                         {
                             entry->setResponse(message);
-                            entry->broadcast();
+
+                            if (entry->threadId == Thread::currentThreadId()) {
+                                entry->sameThreadResponded = true;
+                            } else {
+                                entry->broadcast();
+                            }
                         }
                         else
                         {
@@ -183,8 +188,11 @@ namespace Rhoban
 
         entry->lock();
         sendMessage(message);
-        entry->wait(timeout);
-        entry->unlock();
+
+        if (!entry->sameThreadResponded) {
+            entry->wait(timeout);
+            entry->unlock();
+        }
 
         Message * retval = entry->getResponse();
 

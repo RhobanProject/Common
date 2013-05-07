@@ -24,32 +24,35 @@ using namespace std;
 
 namespace Rhoban
 {
-  typedef void sendCallback(Message *, void *);
+    typedef void sendCallback(Message *, void *);
 
-  class MailboxEntry : public Condition
-  {
-  public:
-    MailboxEntry(ui32 uid);
-    MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
-    ~MailboxEntry();
-    void wait(int timeout);
-    bool isWaiting();
-    bool isCallback();
-    void executeCallback(Message *message);
-    ui32 getUid();
-    time_t getCreationDate();
-    Message * getResponse();
-    void setResponse(Message * message);
+    class MailboxEntry : public Condition
+    {
+        public:
+            MailboxEntry(ui32 uid);
+            MailboxEntry(ui32 uid, sendCallback *callback, void *data=NULL);
+            ~MailboxEntry();
+            void wait(int timeout);
+            bool isWaiting();
+            bool isCallback();
+            void executeCallback(Message *message);
+            ui32 getUid();
+            time_t getCreationDate();
+            Message * getResponse();
+            void setResponse(Message * message);
 
-  protected:
-    Message * response;
-    sendCallback* callback;
-    ui32 uid;
-    time_t creationDate;
-	void *data;
+            int threadId;
+            bool sameThreadResponded;
 
-	bool waiting;
-  };
+        protected:
+            Message * response;
+            sendCallback* callback;
+            ui32 uid;
+            time_t creationDate;
+            void *data;
+
+            bool waiting;
+    };
 }
 
 #endif // MAILBOX_ENTRY_H
