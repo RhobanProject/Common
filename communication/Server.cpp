@@ -206,7 +206,7 @@ namespace Rhoban
     void ServerInternalClient::processMailboxMessage(Message *msg)
     {
         msg->source = clientId;
-        this->Client::processMessage(msg);
+        this->NetworkComponent::processMessage(msg);
     }
             
     void ServerInternalClient::addId(ui16 id)

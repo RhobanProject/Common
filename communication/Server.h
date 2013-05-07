@@ -18,10 +18,10 @@
 #include <logging/log.h>
 #include <sockets/TCPServer.h>
 
+#include "rhobanProtocol.h"
 #include "communicationCommon.h"
 #include "ServerComponent.h"
 #include "NetworkComponent.h"
-#include "Client.h"
 #include "Callable.h"
 
 using namespace std;

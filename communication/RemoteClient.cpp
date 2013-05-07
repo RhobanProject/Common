@@ -20,7 +20,7 @@ namespace Rhoban
     {
         SERVER_MSG("Registering remote components");
         Message *message = new Message();
-        ServerHub *serverHub = dynamic_cast<ServerHub*>(this->Client::hub);
+        ServerHub *serverHub = dynamic_cast<ServerHub*>(this->NetworkComponent::hub);
 
         if (serverHub) {
             vector<ServerComponent *> components = serverHub->getComponents();
