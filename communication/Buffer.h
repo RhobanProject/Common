@@ -42,6 +42,11 @@ namespace Rhoban
 
             Buffer();
 
+            /* copy constructor */
+            Buffer(const Buffer&);
+
+            Buffer & operator=(const Buffer& o);
+
             Buffer(char * buf, ui32 siz);
 
             void alloc(ui32 new_size);

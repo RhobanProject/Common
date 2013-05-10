@@ -22,11 +22,26 @@ using namespace std;
 
 namespace Rhoban
 {
-    Message::Message() : Header()
+    Message::Message() : Header(), Buffer()
     {
-        alloc(MSG_MIN_SIZE);
-        init();
+        Buffer::alloc(MSG_MIN_SIZE);
+        Message::init();
     }
+
+    Message::Message(const Message & o) : Header(o), Buffer(o), cursor(o.cursor)
+    {
+
+    }
+
+    /*
+    void Message::operator=(const Message& o)
+    {
+    	Header::operator =(o);
+    	Buffer::operator =(o);
+    	cursor = o.cursor;
+    }
+    */
+
 
     Message::Message(ui32 size, char *buffer) : Header()
     {

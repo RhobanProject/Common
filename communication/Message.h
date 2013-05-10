@@ -32,6 +32,13 @@ namespace Rhoban
     Message();
 
     /**
+     * Copy constructor
+     */
+    Message(const Message &);
+
+    //void operator=(const Message& o);
+
+    /**
      * Construit un message à partir d'un buffer existant
      */
     Message(ui32 size, char *buffer = NULL);

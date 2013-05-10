@@ -27,12 +27,29 @@
 
 namespace Rhoban
 {
-  Buffer::Buffer(): buffer(0), size(0), buffer_size(0), owned(1)
+  Buffer::Buffer(): buffer(0), size(0), buffer_size(0), owned(true)
   {
-    alloc(MSG_HEADER_SIZE + BUFFER_INI_SIZE);
+    //alloc(MSG_HEADER_SIZE + BUFFER_INI_SIZE);
   }
 
-  Buffer::Buffer(char * buf, ui32 siz): buffer(buf), size(0), buffer_size(siz), owned(0)
+  /* copy constructor */
+  Buffer::Buffer(const Buffer& o) : buffer(NULL), size(o.size), buffer_size(o.buffer_size), owned(true)
+  {
+	  buffer = (char *) malloc(buffer_size);
+	  memcpy(buffer,o.buffer,buffer_size);
+  }
+
+  Buffer & Buffer::operator=(const Buffer& o)
+  {
+	  if(this != &o)
+	  {
+		  size = o.size;
+		  alloc(size);
+		  memcpy(buffer, o.buffer, size);
+	  }
+  }
+
+  Buffer::Buffer(char * buf, ui32 siz): buffer(buf), size(0), buffer_size(siz), owned(false)
   {
   }
 

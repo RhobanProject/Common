@@ -17,6 +17,7 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
+#include <list>
 #include <string>
 #include <logging/log.h>
 #include <configfile/ConfigFile.h>
@@ -60,7 +61,7 @@ namespace Rhoban
 
         public:
         ServerComponent() : hub(0){};
-        virtual ~ServerComponent(){};
+        virtual ~ServerComponent();
 
         virtual bool isConnected();
         virtual Message *getMessage();
@@ -76,11 +77,6 @@ namespace Rhoban
         Message *call(Message *msg_in, Message *msg_out);
 
         Message *callSync(Message *msg_in, Message *msg_out, int timeout);
-
-        /*
-         * Asynchronous processing of the message using a new thread
-         */
-        Message *callAsync(Message *msg_in);
 
         /* sets the hub used to connect to other components */
         void setHub(Callable * hub);
@@ -102,7 +98,35 @@ namespace Rhoban
         protected:
 
         virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
+
+        /*
+         * Asynchronous processing of the message using a new thread
+         */
+        virtual Message * processAsync(Message *msg_in);
+
+        /*
+         * Should the message be processed on a separate thread
+         */
+        virtual bool isAsync(Message *msg_in) { return false; }
+
+        /*
+         * Processing answer to messages
+         */
         virtual void processAnswer(Message * answer);
+
+        /*
+         * Currently running tasks
+         */
+        list<ServerComponentTask *> current_tasks;
+
+        /* protects concurrent access to the task list */
+        Mutex tasks_mutex;
+
+        /* deletes tasks that have finished */
+        void cleanup_tasks();
+
+        /* terminates and delete all tasks */
+        void delete_tasks();
 
     };
 
@@ -112,15 +136,23 @@ namespace Rhoban
     class ServerComponentTask :  public Thread
     {
         public:
-            ServerComponentTask(ServerComponent * component, Message *msg_in);
+    	/*
+    	 * Creates a task that will send the msg_in
+    	 * The answer will be stored in the msg_out if not null
+    	 */
+    	ServerComponentTask(ServerComponent * component, Message *msg_in, Message *msg_out = NULL);
 
+    	virtual ~ServerComponentTask();
 
         protected:
             void execute();
 
         private:
             ServerComponent * component;
-            Message *msg_in;
+            Message msg_in;
+            Message * msg_out;
+            bool cleanup_msg_out;
+
     };
 
 }
