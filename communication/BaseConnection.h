@@ -32,8 +32,7 @@ namespace Rhoban
 
             void sendMessage(Message *message);
             void startMailbox();
-            Message *getMessage();
-            Message *getMessage(Message *message);
+            void getMessage(Message *message);
             void connectTo(const char *address, int port, bool runThread = true);
             void execute();
 

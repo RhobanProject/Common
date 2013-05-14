@@ -89,12 +89,12 @@ namespace Rhoban
         return creationDate;
     }
 
-    Message * MailboxEntry::getResponse()
+    Message MailboxEntry::getResponse()
     {
         return response;
     }
 
-    void MailboxEntry::setResponse(Message * message)
+    void MailboxEntry::setResponse(const Message & message)
     {
         response = message;
     }

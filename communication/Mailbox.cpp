@@ -40,10 +40,11 @@ namespace Rhoban
 
     void Mailbox::execute()
     {
+        Message message;
         while (isConnected())
         {
-            Message *message = getMessage();
-            processIncomingMessage(message);
+            getMessage(&message);
+            processIncomingMessage(&message);
         }
     }
 
@@ -96,7 +97,7 @@ namespace Rhoban
                     BEGIN_SAFE((*entry))
                         if(entry->isWaiting())
                         {
-                            entry->setResponse(message);
+                            entry->setResponse(*message);
 
                             if (entry->threadId == Thread::currentThreadId()) {
                                 entry->sameThreadResponded = true;
@@ -112,7 +113,6 @@ namespace Rhoban
                                 deleteEntry = true;
                                 entries.erase(uid);
                             }
-                            delete message;
                         }
                     END_SAFE((*entry))
                         if(deleteEntry)
@@ -120,11 +120,9 @@ namespace Rhoban
 
                 } else {
                     processMailboxAnswer(message);
-                    delete message;
                 }
             } else {
                 processMailboxMessage(message);
-                delete message;
             }
         END_SAFE(process)
     }
@@ -179,7 +177,7 @@ namespace Rhoban
         }
     }
 
-    Message *Mailbox::sendMessageReceive(Message *message, int timeout)
+    Message Mailbox::sendMessageReceive(Message *message, int timeout)
     {
         ui32 uid = message->getUid();
 
@@ -194,16 +192,16 @@ namespace Rhoban
             entry->unlock();
         }
 
-        Message * retval = entry->getResponse();
+        Message retval = entry->getResponse();
 
         deleteEntry(uid);
 
-        if(retval->command == MSG_ERROR_COMMAND) {
+        if(retval.command == MSG_ERROR_COMMAND) {
             ui32 dest = message->destination;
             if(dest < RHOBAN_MESSAGE_DESTINATIONS_NB)
-            	throw string("Error from ") + RHOBAN_MESSAGE_DESTINATIONS[dest] + " : " + retval->read_string();
+            	throw string("Error from ") + RHOBAN_MESSAGE_DESTINATIONS[dest] + " : " + retval.read_string();
             else
-            	throw string("Error message : ") + retval->read_string();
+            	throw string("Error message : ") + retval.read_string();
         } else {
             return retval;
         }

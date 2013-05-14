@@ -19,7 +19,7 @@ namespace Rhoban
             NetworkComponent(Callable *hub);
             virtual ~NetworkComponent();
 
-            Message *process(Message *msg_in, Message *msg_out, bool sync = false, int timeout = 0);
+            Message * process(Message *msg_in, Message *msg_out, bool sync = false, int timeout = 0);
             void processAnswer(Message *msg_in);
             
             const ui16 virtual DestinationID() const { return 0; }

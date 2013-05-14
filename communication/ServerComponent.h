@@ -64,7 +64,7 @@ namespace Rhoban
         virtual ~ServerComponent();
 
         virtual bool isConnected();
-        virtual Message *getMessage();
+        virtual void getMessage(Message *);
         virtual void sendMessage(Message *message);
 
         /* The destination id of this component */

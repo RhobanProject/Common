@@ -38,14 +38,14 @@ namespace Rhoban
             void executeCallback(Message *message);
             ui32 getUid();
             time_t getCreationDate();
-            Message * getResponse();
-            void setResponse(Message * message);
+            Message getResponse();
+            void setResponse(const Message & message);
 
             int threadId;
             bool sameThreadResponded;
 
         protected:
-            Message * response;
+            Message response;
             sendCallback* callback;
             ui32 uid;
             time_t creationDate;

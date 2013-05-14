@@ -35,10 +35,10 @@ namespace Rhoban
             void deleteEntry(ui32 uid);
 
             virtual bool isConnected()=0;
-            virtual Message *getMessage()=0;
+            virtual void getMessage(Message *)=0;
             virtual void sendMessage(Message *message)=0;
             
-            Message *sendMessageReceive(Message *message, int timeout=1000);
+            Message sendMessageReceive(Message *message, int timeout=1000);
             void sendMessageCallback(Message *message, sendCallback *callback, void *data=NULL);
 
 

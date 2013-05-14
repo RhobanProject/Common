@@ -195,9 +195,8 @@ bool ServerComponent::isConnected()
 	return true;
 }
 
-Message *ServerComponent::getMessage()
+void ServerComponent::getMessage(Message *)
 {
-	return NULL;
 }
 
 void ServerComponent::sendMessage(Message *message)
