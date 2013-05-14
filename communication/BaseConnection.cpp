@@ -50,18 +50,6 @@ namespace Rhoban
         receiveAll(message->getBuffer(), MSG_HEADER_SIZE);
         message->read_header(message->getBuffer());
 
-        cout << "Base connection got message header of length " << message->length;
-        cout << " dest " << message->destination << " source " << message->source <<  endl;
-
-        if( (message->destination == 4) && (message->source == 7))
-        {
-        	cout << "Warning " << endl;
-        }
-        if( (message->destination == 7) && (message->source == 4))
-        {
-        	cout << "Warning " << endl;
-        }
-
         message->alloc(message->getLength() + MSG_HEADER_SIZE);
         message->setSize(message->getLength() + MSG_HEADER_SIZE);
         receiveAll(message->getBuffer() + MSG_HEADER_SIZE, message->getLength());
