@@ -22,7 +22,6 @@ namespace Rhoban
     {
         this->uid = uid;
         waiting = false;
-        response = NULL;
         callback = NULL;
         creationDate = time(NULL);
         data = NULL; 
@@ -34,10 +33,11 @@ namespace Rhoban
     {
         this->uid = uid;
         waiting = false;
-        response = NULL;
         this->callback = callback;
         creationDate = time(NULL);
         this->data = data;    
+        threadId = -1;
+        sameThreadResponded = false;
     }
 
     MailboxEntry::~MailboxEntry()
