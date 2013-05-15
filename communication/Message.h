@@ -164,7 +164,7 @@ namespace Rhoban
      * TYPE est un type d'élément ajoutable.
      */
 #define _APPEND_VECTOR_HEADER(TYPE)		\
-    void append(vector< TYPE > &values);
+    void append(const vector< TYPE > &values);
 
 #define APPEND_VECTOR_HEADER(TYPE)			\
     _APPEND_VECTOR_HEADER(TYPE)				\

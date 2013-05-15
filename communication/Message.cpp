@@ -129,7 +129,7 @@ namespace Rhoban
     Message & operator<< (Message & msg , vector<unsigned int> & val ) { msg.append(val); return msg; }
 
 #define _APPEND_VECTOR(TYPE) \
-    void Message::append(vector< TYPE > &values) \
+    void Message::append(const vector< TYPE > &values) \
     { \
         int length = values.size(); \
         append((ui32) length); \
