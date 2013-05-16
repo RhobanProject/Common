@@ -286,6 +286,7 @@ namespace Rhoban
     \
     void Message::read(vector< TYPE > &value) { \
         int length = read_uint(); \
+        value.resize(length); \
         for (int i = 0; i < length; i++) { \
             read(value[i]); \
         } \
