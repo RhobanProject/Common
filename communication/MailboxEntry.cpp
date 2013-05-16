@@ -20,6 +20,7 @@ namespace Rhoban
 {
     MailboxEntry::MailboxEntry(ui32 uid)
     {
+        hasResponse = false;
         this->uid = uid;
         waiting = false;
         callback = NULL;
@@ -31,6 +32,7 @@ namespace Rhoban
 
     MailboxEntry::MailboxEntry(ui32 uid, sendCallback *callback, void *data)
     {
+        hasResponse = false;
         this->uid = uid;
         waiting = false;
         this->callback = callback;
@@ -96,6 +98,7 @@ namespace Rhoban
 
     void MailboxEntry::setResponse(const Message & message)
     {
+        hasResponse = true;
         response = message;
     }
 

@@ -192,6 +192,10 @@ namespace Rhoban
             entry->unlock();
         }
 
+        if (!entry->hasResponse) {
+            throw string("Unable to get a response for the message");
+        }
+
         Message retval = entry->getResponse();
 
         deleteEntry(uid);

@@ -43,6 +43,7 @@ namespace Rhoban
 
             int threadId;
             bool sameThreadResponded;
+            bool hasResponse;
 
         protected:
             Message response;
