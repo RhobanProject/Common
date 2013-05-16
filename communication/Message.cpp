@@ -153,58 +153,124 @@ namespace Rhoban
     APPEND_VECTOR(float);
     APPEND_VECTOR(bool);
 
+    void Message::read(ui32 &value)
+    {
+        cursor += sizeof(ui32);
+        value = Buffer::read_uint(cursor-sizeof(ui32));
+    }
+
     ui32 Message::read_uint(void)
     {
-        cursor += sizeof(ui32);
-        return Buffer::read_uint(cursor-sizeof(ui32));
+        ui32 value;
+        read(value);
+
+        return value;
     }
 
-    int Message::read_int(void)
+    void Message::read(int &value)
     {
         cursor += sizeof(ui32);
-        return Buffer::read_int(cursor-sizeof(ui32));
+        value = Buffer::read_int(cursor-sizeof(ui32));
     }
 
-    float Message::read_float(void)
+    int Message::read_int()
+    {
+        int value;
+        read(value);
+
+        return value;
+    }
+
+    void Message::read(float &value)
     {
         cursor += sizeof(float);
-        return Buffer::read_float(cursor-sizeof(float));
+        value = Buffer::read_float(cursor-sizeof(float));
+    }
+
+    float Message::read_float()
+    {
+        float value;
+        read(value);
+
+        return value;
+    }
+
+    void Message::read(double &value)
+    {
+        value = (double)read_float();
     }
 
     double Message::read_double(void)
     {
-        return (double) read_float();
+        double value;
+        read(value);
+
+        return value;
+    }
+
+    void Message::read(string &value)
+    {
+        ui32 length = read_uint();
+        cursor += length;
+        value = Buffer::read_string(length,cursor-length);
     }
 
     string Message::read_string(void)
     {
-        ui32 length = read_uint();
-        cursor += length;
-        return Buffer::read_string(length,cursor-length);
+        string value;
+        read(value);
+
+        return value;
     }
 
-    bool Message::read_bool(void)
+    void Message::read(bool &value)
     {
-    	//presumably 1
         cursor += sizeof(char);
-        return Buffer::read_bool(cursor - sizeof(char));
+        value = Buffer::read_bool(cursor - sizeof(char));
+    }
+
+    void Message::read(vector<bool>::reference value)
+    {
+        value = read_bool();
+    }
+
+    bool Message::read_bool()
+    {
+        bool value;
+        read(value);
+
+        return value;
+    }
+
+    void Message::read(vector<ui8> &value)
+    {
+        ui32 length = read_uint();
+        cursor += length;
+        value = Buffer::read_array(length, cursor- length);
     }
 
     vector<ui8> Message::read_array(void)
     {
-        ui32 length = read_uint();
-        cursor += length;
-        return Buffer::read_array(length, cursor- length);
+        vector<ui8> value;
+        read(value);
+
+        return value;
     }
 
-    vector< vector<ui8> > Message::read_array_array(void)
+    void Message::read(vector< vector<ui8> > &value)
     {
-        vector< vector<ui8> > values;
         int length = read_uint();
         for (int i = 0; i < length; i++) {
-            values.push_back(read_array());
+            read(value[i]);
         }
-        return values;
+    }
+
+    vector< vector<ui8> > Message::read_array_array()
+    {
+        vector< vector<ui8> > value;
+        read(value);
+
+        return value;
     }
 
 #define _READ_ARRAY(TYPE, FUNCTION) \
@@ -216,6 +282,13 @@ namespace Rhoban
             values.push_back( FUNCTION () ); \
         } \
         return values; \
+    } \
+    \
+    void Message::read(vector< TYPE > &value) { \
+        int length = read_uint(); \
+        for (int i = 0; i < length; i++) { \
+            read(value[i]); \
+        } \
     }
 
 #define READ_ARRAY(TYPE, FUNCTION) \

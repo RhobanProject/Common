@@ -74,44 +74,53 @@ namespace Rhoban
      * Lis un entier signé ou non signé
      */
     ui32 read_uint();
+    void read(ui32 &value);
     int read_int();
+    void read(int &value);
 
     /* Lit un booléen */
     bool read_bool();
+    void read(bool &value);
+    void read(vector<bool>::reference value);
 
     /**
      * Lis un nombre flottant depuis les données
      */
-    float read_float(void);
-    double read_double(void);
+    float read_float();
+    void read(float &value);
+    double read_double();
+    void read(double &value);
 
     /**
      * Lis une chaîne de caractère
      */
     string read_string(void);
+    void read(string &value);
 
     /**
      * Lis un tableau de caractères
      */
     vector<ui8> read_array(void);
+    void read(vector<ui8> &value);
 
     /**
      * Lis un tableau de tablean de caractères
      */
     vector< vector<ui8> > read_array_array(void);
+    void read(vector< vector<ui8> > &value);
 
     /**
      * Il est possible de lire des vecteurs d'un type à l'aide de la méthode
      * read_TYPE_array, ou TYPE est un type lisible
      */
 #define _READ_ARRAY_HEADER(TYPE, FUNCTION)	\
-    vector< TYPE > FUNCTION##_array ();
+    vector< TYPE > FUNCTION##_array (); \
+    void read(vector< TYPE > &value);
 
 #define READ_ARRAY_HEADER(TYPE, FUNCTION)			\
     _READ_ARRAY_HEADER(TYPE, FUNCTION )				\
     _READ_ARRAY_HEADER(vector< TYPE >, FUNCTION ## _array ) \
     _READ_ARRAY_HEADER(vector< vector< TYPE > >, FUNCTION ## _array_array )
-
 
     READ_ARRAY_HEADER(string, read_string);
     READ_ARRAY_HEADER(ui32, read_uint);
