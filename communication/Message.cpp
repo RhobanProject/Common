@@ -249,6 +249,23 @@ namespace Rhoban
         value = Buffer::read_array(length, cursor- length);
     }
 
+    ui8 Message::read_ui8(void)
+    {
+    	ui8 value;
+    	read(value);
+    	return value;
+    }
+
+    void Message::read(ui8 &value)
+    {
+    	if(cursor < size)
+    	{
+    		value = buffer[cursor++];
+    	}
+    	    else
+    	      throw string("Buffer too small to read such a string");
+    }
+
     vector<ui8> Message::read_array(void)
     {
         vector<ui8> value;

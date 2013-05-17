@@ -97,6 +97,10 @@ namespace Rhoban
     string read_string(void);
     void read(string &value);
 
+    /* Lit un caract�re */
+    ui8 read_ui8(void);
+    void read(ui8 &value);
+
     /**
      * Lis un tableau de caractères
      */
@@ -167,6 +171,7 @@ namespace Rhoban
     friend Message & operator<< (Message & msg , vector<float> &val);
     friend Message & operator<< (Message & msg , vector<int> &val);
     friend Message & operator<< (Message & msg , vector<unsigned int> &val);
+
 
     /**
      * Il est possible d'ajouter des éléments de type vector<TYPE>, ou
