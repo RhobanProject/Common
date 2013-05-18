@@ -119,6 +119,8 @@ Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 
 Message *ServerComponent::callSync(Message *msg_in, Message *msg_out, int timeout)
 {
+	if(msg_out)
+		msg_out->clear();
 	return doCall(msg_in, msg_out, true, timeout);
 }
 
