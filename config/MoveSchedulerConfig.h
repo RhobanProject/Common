@@ -41,6 +41,9 @@ public:
   ServosConfig servos_config;
   MoveSchedulerSensorsConfig sensors_config;
 
+  /* moves tha should be automatically loaded at startup */
+  vector<string> autoload_moves;
+
   MoveSchedulerConfig();
   MoveSchedulerConfig(string config);
   virtual ~MoveSchedulerConfig(){};
@@ -49,6 +52,8 @@ public:
   string to_xml() const;
 
   string class_name() const;
+
+  static string MovesDirectoryName() { return "Moves"; };
 
   bool config_loaded;
 };

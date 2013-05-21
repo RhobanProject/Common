@@ -27,47 +27,57 @@ MoveSchedulerConfig mpconfig;
  */
 MoveSchedulerConfig::MoveSchedulerConfig()
 {
-  config_loaded = false;
+	config_loaded = false;
 }
 
 MoveSchedulerConfig::MoveSchedulerConfig(string configfile)
 {
-  config_loaded = false;
-		
-  load_file(configfile);
+	config_loaded = false;
+
+	load_file(configfile);
 }
 
 
 string MoveSchedulerConfig::class_name() const
 {
-  return "MoveSchedulerConfig";
+	return "MoveSchedulerConfig";
 }
 
 
 void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 {
-  TiXmlNode * sub_node = node->FirstChild("ServosConfig");
+	TiXmlNode * sub_node = node->FirstChild("ServosConfig");
 
-  if(!sub_node)
-    throw string("No ServosConfig node in moveschedulerconfig stream");
+	if(!sub_node)
+		cout << "No ServosConfig node in moveschedulerconfig stream" << endl;
+	else
+		servos_config.from_xml(sub_node);
 
-  servos_config.from_xml(sub_node);
+	sub_node = node->FirstChild("SensorsConfig");
+	if(!sub_node)
+		cout << "No SensorsConfig node in moveschedulerconfig stream" << endl;
+	else
+		sensors_config.from_xml(sub_node);
 
-  sub_node = node->FirstChild("SensorsConfig");
+	try
+	{
+		XML_READ_STRING_ARRAY(node,autoload_moves)
+	}
+	catch(string & exc)
+	{
+		cout << "Failed to read autoload moves list: \t\n" << exc << endl;
+	}
 
-  if(!sub_node)
-    throw string("No SensorsConfig node in moveschedulerconfig stream");
-  sensors_config.from_xml(sub_node);
-
-  config_loaded = true;
+	config_loaded = true;
 
 
 }
 
 string MoveSchedulerConfig::to_xml() const
 {
-  stringstream result;
-  result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
-  result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
-  return result.str();
+	stringstream result;
+	result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
+	result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
+	XML_WRITE_STRING_ARRAY(result, autoload_moves)
+	return result.str();
 }
