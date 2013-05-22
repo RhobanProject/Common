@@ -246,7 +246,7 @@ namespace Rhoban
     {
         ui32 length = read_uint();
         cursor += length;
-        value = Buffer::read_array(length, cursor- length);
+        Buffer::read_array(length, cursor- length, value);
     }
 
     ui8 Message::read_ui8(void)

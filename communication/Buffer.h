@@ -106,6 +106,7 @@ namespace Rhoban
               @return the string readed
               */
             vector<ui8> read_array(ui32 siz, ui32 offset);
+            void read_array(ui32 siz, ui32 offset, vector<ui8> & data);
 
             ui32 getSize();
             void setSize(ui32 size);
