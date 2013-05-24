@@ -15,6 +15,7 @@
  */
 #include "ServosConfig.h"
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -27,8 +28,8 @@ string ServosConfig::to_xml() const
 {
 	stringstream ss;
 	ss << "<Servos>";
-	for(uint i = 0; i < servos.size(); i++)
-		ss << "<ServoConfig>" << servos[i].to_xml() << "</ServoConfig>";
+	for(map<string, ServoConfig>::const_iterator pservo = servos.begin(); pservo != servos.end(); pservo++)
+		ss << "<ServoConfig>" << pservo->second.to_xml() << "</ServoConfig>";
 	ss << "</Servos>";
 	return ss.str();
 }
@@ -47,7 +48,7 @@ void ServosConfig::from_xml(TiXmlNode * node)
 	{
 			ServoConfig servo;
 			servo.from_xml(child);
-			servos.push_back(servo);
+			servos[servo.Name] = servo;
 	}
 
 	string serial = to_xml();
@@ -111,14 +112,12 @@ void ServoConfig::from_xml(TiXmlNode * node)
 }
 
 
-ServoConfig ServosConfig::find_servo(string servo_name)
+ServoConfig ServosConfig::find_servo(string servo_name) const
 {
-	for(uint i = 0 ; i< servos.size() ; i++)
-	{
-		CONFIG_DEBUG("Compare " << servo_name << " with " << servos[i].Name);
-		if(servos[i].Name == servo_name)
-			return servos[i];
-	}
-	throw string("No servo named '") + servo_name + "'";
+	map<string, ServoConfig>::const_iterator pservo = servos.find(servo_name);
+	if(pservo == servos.end())
+		throw string("No servo named '") + servo_name + "'";
+	else
+		return pservo->second;
 }
 

@@ -66,9 +66,9 @@ class ServosConfig : public Config
 
         string class_name() const;
 
-        vector<ServoConfig> servos;
+        map<string, ServoConfig> servos;
 
-        ServoConfig find_servo(string servo_name);
+        ServoConfig find_servo(string servo_name) const;
 };
 
 #endif /* SERVOSCONFIG_HPP_ */
