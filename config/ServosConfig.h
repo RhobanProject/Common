@@ -17,6 +17,8 @@
 #ifndef SERVOSCONFIG_HPP_
 #define SERVOSCONFIG_HPP_
 
+#include <map>
+
 #include "Config.h"
 #include "util.h"
 
