@@ -29,9 +29,9 @@
 /*!
  *
  * this static class is used to store and centralize
- * the lowlevel config
- * used by the control layer,
- * and maps sensor devices to module devices
+ * the servos config,
+ * maps sensor devices to module devices,
+ * store the list of moves to load at startup
  */
 
 class MoveSchedulerConfig : public Config
