@@ -54,6 +54,7 @@ public:
   string class_name() const;
 
   static string MovesDirectoryName() { return "Moves"; };
+  static string MovesFileSuffix() { return "move.xml"; };
 
   bool config_loaded;
 };
