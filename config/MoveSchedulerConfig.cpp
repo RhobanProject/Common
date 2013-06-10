@@ -18,6 +18,7 @@
 #include <string>
 #include <file_mngt.h>
 #include "MoveSchedulerConfig.h"
+#include <xml/XMLTools.h>
 
 MoveSchedulerConfig mpconfig;
 
