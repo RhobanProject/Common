@@ -113,6 +113,8 @@ string JoypadSensorParameter::to_xml() const
         vec[i] = zero[i];
     result << "<zero>" << XMLTools::serialize_double_array(vec) << "</zero>";
 
+    XML_WRITE_BOOL(result,Enabled);
+
     return result.str();
 }
 

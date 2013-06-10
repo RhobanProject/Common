@@ -120,7 +120,7 @@ namespace Rhoban
         list<ServerComponentTask *> current_tasks;
 
         /* protects concurrent access to the task list */
-        Mutex tasks_mutex;
+        Rhoban::Mutex tasks_mutex;
 
         /* deletes tasks that have finished */
         void cleanup_tasks();

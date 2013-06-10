@@ -52,6 +52,8 @@ class JoypadSensorParameter : public Config
         double max[JOYPAD_AXIS_NB];
         double zero[JOYPAD_AXIS_NB];
 
+        bool Enabled;
+
         double normalize(int val, uint axis_id);
 
         //loads a configuration file
