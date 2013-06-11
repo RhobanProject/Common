@@ -42,6 +42,7 @@ set(COM_SOURCES
     communication/RemoteClient.cpp
     communication/NetworkComponent.cpp
     communication/BaseConnection.cpp
+    communication/Connections.cpp
     communication/Mailbox.cpp
     communication/Callable.cpp
     )
