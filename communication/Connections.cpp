@@ -25,40 +25,33 @@ namespace Rhoban
         BEGIN_SAFE(mutex)
         if (connections.find(key) != connections.end()) {
             connection = connections[key];
+            if (!connection->isConnected()) {
+                if (!connecting[key]) {
+                    connect = true;
+                    connecting[key] = true;
+                } else {
+                    throw string("Connecting...");
+                }
+            }
         } else {
             connection = new BaseConnection();
             connect = true;
+            connecting[key] = true;
             connections[key] = connection;
         }
         END_SAFE(mutex)
         mutex.unlock();
         
         if (connect) {
-            connection->connectTo(hostname.c_str(), port);
+            try {
+                connection->connectTo(hostname.c_str(), port);
+            } catch (string error) {
+                connecting[key] = false;
+                throw error;
+            }
+            connecting[key] = false;
         }
 
         return connection;
-    }
-
-    void Connections::cleanUp()
-    {
-        map<string, BaseConnection *>::iterator it;
-        vector<string> toDelete;
-
-        mutex.lock();
-        for (it=connections.begin(); it!=connections.end(); it++) {
-            BaseConnection *connection = (*it).second;
-
-            if (!connection->isConnected()) {
-                delete connection;
-
-                toDelete.push_back((*it).first);
-            }
-        }
-
-        for (vector<string>::iterator sit=toDelete.begin(); sit!=toDelete.end(); sit++) {
-            connections.erase(*sit);
-        }
-        mutex.unlock();
     }
 };

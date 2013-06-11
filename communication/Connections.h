@@ -22,14 +22,10 @@ namespace Rhoban
              */
             BaseConnection *getConnection(string hostname, int port);
 
-            /**
-             * Remove the dead connections
-             */
-            void cleanUp();
-
         protected:
             Mutex mutex;
             map<string, BaseConnection*> connections;
+            map<string, bool> connecting;
     };
 }
 
