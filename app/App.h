@@ -16,6 +16,7 @@ namespace Rhoban
     class App
     {
         public:
+            App();
             App(ConfigFile &config_);
             
             /**

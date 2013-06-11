@@ -10,6 +10,10 @@ namespace Rhoban
     {
         config = &config_;
     }
+
+    App::App() : server(NULL), client(NULL), config(NULL)
+    {
+    }
     
     /**
      * Register a component for the application
@@ -28,13 +32,16 @@ namespace Rhoban
      */
     void App::runServer()
     {
+        string name;
         int port;
-        config->read("server", "port", 7777, port);
 
+        config->read("server", "port", 7777, port);
+        config->read("robot", "name", "Rhoban Robot", name);
         config->help();
 
         try {
             server = new Server(&hub);
+            server->setName(name);
             server->run(port);
         } catch (string err) {
             cout << "App error: " << err << endl;

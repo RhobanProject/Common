@@ -34,6 +34,16 @@ namespace Rhoban
     	SERVER_DEBUG("Server registered itself as a component")
     }
 
+    void Server::setName(string name_)
+    {
+        name = name_;
+    }
+
+    string Server::getName()
+    {
+        return name;
+    }
+
     /**
      * Get a client by id
      */
@@ -167,6 +177,9 @@ namespace Rhoban
 
                         break;
                     }
+                case MSG_SERVER_GET_NAME:
+                    msg->append(server->getName());
+                    break;
 
                 default:
                     {

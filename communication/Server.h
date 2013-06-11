@@ -67,10 +67,21 @@ namespace Rhoban
              * Gets a client by ID
              */
             ServerInternalClient *getClient(ui16 id);
+
+            /**
+             * Sets the robot name hosted in this server
+             */
+            void setName(string name);
+
+            /**
+             * Gets the robot name
+             */
+            string getName();
     
             void cleanClient(ServerInternalClient *client);
 
         protected:
+            string name;
             int nextClientId;
     };
 
