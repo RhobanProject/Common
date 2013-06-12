@@ -40,9 +40,9 @@ namespace Rhoban
 
     void BaseConnection::sendMessage(Message *message)
     {
-        mutex.lock();
+        BEGIN_SAFE(mutex)
         transmitAll(message->getRaw(), message->getSize());
-        mutex.unlock();
+        END_SAFE(mutex)
     }
 
     void BaseConnection::getMessage(Message *message)
