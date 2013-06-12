@@ -17,6 +17,7 @@ namespace Rhoban{
 
 #include <cstdlib>
 #include <cstdio>
+#include <threading/Thread.h>
 #include <sockets/TCPClient.h>
 #include "Message.h"
 #include "Mailbox.h"
@@ -37,6 +38,9 @@ namespace Rhoban
             void execute();
 
             bool isConnected();
+
+        protected:
+            Mutex mutex;
     };
 }
 
