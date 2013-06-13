@@ -188,7 +188,12 @@ namespace Rhoban
         sendMessage(message);
 
         if (!entry->sameThreadResponded) {
-            entry->wait(timeout);
+            try {
+                entry->wait(timeout);
+            } catch (string exception) {
+                entry->unlock();
+                throw exception;
+            }
             entry->unlock();
         }
 

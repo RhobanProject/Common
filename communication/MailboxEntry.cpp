@@ -62,7 +62,7 @@ namespace Rhoban
         catch(string exc)
         {
             waiting = false;
-            throw string("Mailbox entry failed to wait condition:\n\t");
+            throw string("Mailbox entry failed to wait condition:\n\t"+exc);
         }
     }
 
