@@ -60,6 +60,11 @@ void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 	else
 		sensors_config.from_xml(sub_node);
 	
+	sub_node = node->FirstChild("ServosScene");
+	if (!sub_node)
+		cout << "No ServosScene node in moveschedulerconfig stream" << endl;
+	else
+		servos_scene = sub_node->FirstChild()->Value();
 	
 	try
 	{
