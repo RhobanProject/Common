@@ -40,6 +40,7 @@ public:
 
   ServosConfig servos_config;
   MoveSchedulerSensorsConfig sensors_config;
+  string servos_scene;
 
   /* moves tha should be automatically loaded at startup */
   vector<string> autoload_moves;
