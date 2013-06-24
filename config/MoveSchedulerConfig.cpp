@@ -59,7 +59,13 @@ void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 		cout << "No SensorsConfig node in moveschedulerconfig stream" << endl;
 	else
 		sensors_config.from_xml(sub_node);
-
+	
+	sub_node = node->FirstChild("ServosScene");
+	if (!sub_node)
+		cout << "No ServosScene node in moveschedulerconfig stream" << endl;
+	else
+		servos_scene = sub_node->FirstChild()->Value();
+	
 	try
 	{
 		XML_READ_STRING_ARRAY(node,autoload_moves)
@@ -79,6 +85,7 @@ string MoveSchedulerConfig::to_xml() const
 	stringstream result;
 	result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
 	result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
+	result << "<ServosScene>" << servos_scene << "</ServosScene>";
 	XML_WRITE_STRING_ARRAY(result, autoload_moves)
 	return result.str();
 }

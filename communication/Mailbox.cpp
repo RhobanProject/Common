@@ -166,14 +166,20 @@ namespace Rhoban
 
     void Mailbox::garbageCollector()
     {
-        for(map<ui32, MailboxEntry *>::iterator it=entries.begin(); it!=entries.end(); ++it)
-        {
-            MailboxEntry * entry = it->second;
-            if(time(NULL) - entry->getCreationDate() > GARBAGETIMER)
-            {
-                entries.erase(entry->getUid());
-                delete entry;
+        vector<int> toDelete;
+
+        for(map<ui32, MailboxEntry *>::iterator it=entries.begin(); it!=entries.end(); ++it) {
+            MailboxEntry *entry = it->second;
+            if(time(NULL) - entry->getCreationDate() > GARBAGETIMER) {
+                toDelete.push_back(entry->getUid());
             }
+        }
+
+        for (vector<int>::iterator it=toDelete.begin(); it!=toDelete.end(); it++) {
+            int uid = *it;
+            MailboxEntry *entry = entries[uid];
+            entries.erase(uid);
+            delete entry;
         }
     }
 
@@ -188,7 +194,12 @@ namespace Rhoban
         sendMessage(message);
 
         if (!entry->sameThreadResponded) {
-            entry->wait(timeout);
+            try {
+                entry->wait(timeout);
+            } catch (string exception) {
+                entry->unlock();
+                throw exception;
+            }
             entry->unlock();
         }
 
