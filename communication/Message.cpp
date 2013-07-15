@@ -328,11 +328,6 @@ namespace Rhoban
         cursor = MSG_HEADER_SIZE;
     }
 
-    void Message::init_cursor()
-    {
-        cursor = MSG_HEADER_SIZE;
-    }
-
     void Message::write_header(){
     	length = size - MSG_HEADER_SIZE;
     	Header::write_header(buffer);

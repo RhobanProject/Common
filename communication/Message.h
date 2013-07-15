@@ -63,7 +63,7 @@ namespace Rhoban
      * Initialise le message
      */
     void init();
-    void init_cursor();
+    void init_cursor(){ cursor = 0; }
 
     /**
      * Ecris les en-tÃªtes dans le buffer
@@ -97,7 +97,7 @@ namespace Rhoban
     string read_string(void);
     void read(string &value);
 
-    /* Lit un caractère */
+    /* Lit un caractï¿½re */
     ui8 read_ui8(void);
     void read(ui8 &value);
 

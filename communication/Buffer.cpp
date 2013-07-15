@@ -47,6 +47,7 @@ Buffer & Buffer::operator=(const Buffer& o)
 		alloc(size);
 		memcpy(buffer, o.buffer, size);
 	}
+	return *this;
 }
 
 Buffer::Buffer(char * buf, ui32 siz): buffer(buf), size(0), buffer_size(siz), owned(false)
