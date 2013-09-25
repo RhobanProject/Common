@@ -12,7 +12,9 @@
 #include <cerrno>
 #include <ctime>
 #include <string>
+#ifndef MSVC
 #include <unistd.h>
+#endif
 #include <iostream>
 #include "Message.h"
 #include "Header.h"
@@ -131,7 +133,7 @@ namespace Rhoban
 #define _APPEND_VECTOR(TYPE) \
     void Message::append(const vector< TYPE > &values) \
     { \
-        int length = values.size(); \
+        size_t length = values.size(); \
         append((ui32) length); \
         for (int i = 0; i < length; i++) { \
             append(values[i]); \

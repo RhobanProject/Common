@@ -23,6 +23,14 @@ if (RHOBANMATH)
     set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
 endif (RHOBANMATH)
 
+if(MSVC)
+	add_definitions(-D_USE_MATH_DEFINES)
+	add_definitions(-DMSVC)
+	add_definitions(-D_WINSOCKAPI_)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (MSVC)
+
+
 option(SDK
     "Compiles the SDK" OFF)
 

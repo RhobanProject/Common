@@ -47,9 +47,9 @@ namespace Rhoban
 
             Buffer & operator=(const Buffer& o);
 
-            Buffer(char * buf, ui32 siz);
+            Buffer(char * buf, size_t siz);
 
-            void alloc(ui32 new_size);
+            void alloc(size_t new_size);
 
             virtual ~Buffer();
 
@@ -57,13 +57,13 @@ namespace Rhoban
              * assigns a new char * to the buffer
              * no copy is performed, the pointer is used as the pointer's buffer
              */
-            void assign(char * data, ui32 data_siz, ui32 buffer_siz);
+            void assign(char * data, size_t data_siz, size_t buffer_siz);
 
             /*!
              * write data in the buffer
              * a copy is performed
              */
-            void write(const char * data, ui32 siz);
+            void write(const char * data, size_t siz);
             void write(string str);
 
             /*!
@@ -108,16 +108,16 @@ namespace Rhoban
             vector<ui8> read_array(ui32 siz, ui32 offset);
             void read_array(ui32 siz, ui32 offset, vector<ui8> & data);
 
-            ui32 getSize();
-            void setSize(ui32 size);
+            size_t getSize();
+            void setSize(size_t size);
             char *getBuffer();
 
         protected:
             //size of the data stored in the buffer
-            ui32 size;
+            size_t size;
 
             //total length of the buffer, in bytes
-            ui32 buffer_size;
+            size_t buffer_size;
 
             //remembers whether the char * was created by the buffer itself
             //or came from elsewhere.
@@ -128,7 +128,7 @@ namespace Rhoban
              * append data to the buffer
              * a copy is performed
              */
-            void append_to_buffer(const char * data, ui32 siz);
+            void append_to_buffer(const char * data, size_t siz);
     };
 }
 

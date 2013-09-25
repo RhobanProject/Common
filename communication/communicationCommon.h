@@ -13,7 +13,10 @@
 #include <sys/types.h>
 
 #ifdef _WIN32
+#ifndef MSVC
 #include <Winsock.h>
+#else
+#endif
 #else
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -27,7 +30,9 @@
 #define SOCKET int
 #endif
 
+#ifndef MSVC
 #include <unistd.h>
+#endif
 
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;

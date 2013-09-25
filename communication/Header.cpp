@@ -12,7 +12,9 @@
 #include <cerrno>
 #include <ctime>
 #include <string>
+#ifndef MSVC
 #include <unistd.h>
+#endif
 #include <iostream>
 
 #include "Header.h"

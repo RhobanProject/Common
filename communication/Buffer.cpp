@@ -50,7 +50,7 @@ Buffer & Buffer::operator=(const Buffer& o)
 	return *this;
 }
 
-Buffer::Buffer(char * buf, ui32 siz): buffer(buf), size(0), buffer_size(siz), owned(false)
+Buffer::Buffer(char * buf, size_t siz): buffer(buf), size(0), buffer_size(siz), owned(false)
 {
 }
 
@@ -63,7 +63,7 @@ Buffer::~Buffer()
 	}
 }
 
-void Buffer::alloc(ui32 new_size)
+void Buffer::alloc(size_t new_size)
 {
 	if(new_size <= buffer_size)
 		return ;
@@ -93,7 +93,7 @@ void Buffer::alloc(ui32 new_size)
 }
 
 
-void Buffer::assign(char * data, ui32 data_siz, ui32 buffer_siz)
+void Buffer::assign(char * data, size_t data_siz, size_t buffer_siz)
 {
 	if(buffer && owned)
 		free(buffer);
@@ -121,8 +121,8 @@ int Buffer::read_int(ui32 offset)
 
 bool Buffer::read_bool(ui32 offset)
 {
-	if(offset + sizeof(char) <=size)
-		return buffer[offset];
+	if( (offset + sizeof(char)) <=size)
+		return (buffer[offset] != 0);
 	else
 		throw string("buffer too small to read bool at this offset");
 }
@@ -135,14 +135,14 @@ float Buffer::read_float(ui32 offset)
 		throw string("buffer too small to read float at this offset");
 }
 
-void Buffer::write(const char * data, ui32 siz)
+void Buffer::write(const char * data, size_t siz)
 {
 	alloc(siz);
 	memcpy(buffer,data,siz);
 	size=siz;
 }
 
-void Buffer::append_to_buffer(const char * data, ui32 siz)
+void Buffer::append_to_buffer(const char * data, size_t siz)
 {
 	alloc(size+siz);
 	memcpy(buffer+size,data,siz);
@@ -186,12 +186,12 @@ vector<ui8> Buffer::read_array(ui32 siz, ui32 offset)
 	return res;
 }
 
-ui32 Buffer::getSize()
+size_t Buffer::getSize()
 {
 	return size;
 }
 
-void Buffer::setSize(ui32 size)
+void Buffer::setSize(size_t size)
 {
 	this->size = size;
 }

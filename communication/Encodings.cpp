@@ -10,7 +10,9 @@
 #include <iostream>
 #include <stdio.h>
 #ifdef WIN32
-#include <winsock2.h>
+#ifndef MSVC
+#include <windows.h>
+#endif
 #else
 #include <arpa/inet.h>
 #endif

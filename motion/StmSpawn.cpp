@@ -57,7 +57,7 @@ bool StmSpawner::check_stmloader_already_exists()
                                 } else {
 					throw string("StmSpawner found stmloader but got wrong answer");
                                 }
-				return answer;
+				return (answer != NULL);
 			}
 		}
 		catch(string exc)
