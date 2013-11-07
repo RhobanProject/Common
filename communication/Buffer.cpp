@@ -36,6 +36,8 @@ Buffer::Buffer(): buffer(0), size(0), buffer_size(0), owned(true)
 Buffer::Buffer(const Buffer& o) : buffer(NULL), size(o.size), buffer_size(o.buffer_size), owned(true)
 {
 	buffer = (char *) malloc(buffer_size);
+	if (buffer == NULL)
+		throw string("Buffer:Constructor failed, Out of memory");
 	memcpy(buffer,o.buffer,buffer_size);
 }
 
