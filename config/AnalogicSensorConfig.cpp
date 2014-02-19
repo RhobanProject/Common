@@ -88,7 +88,11 @@ string AnalogicSensorParameter::to_xml() const
     return result.str();
 }
 
-double AnalogicSensorParameter::normalize(uint val)
+double AnalogicSensorParameter::normalize(double val)
 {
-    return norm_coef * ((int) val - zero ) ;
+    if (max == min == 0) {
+        return val;
+    } else {
+        return norm_coef * ((int) val - zero ) ;
+    }
 }
