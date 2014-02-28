@@ -1,4 +1,4 @@
-#include <timing/sys_wait_ms.h>
+#include <timing/sleep.h>
 #include "App.h"
 
 namespace Rhoban
