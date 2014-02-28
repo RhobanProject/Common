@@ -71,7 +71,7 @@ namespace Rhoban
             } catch (string err) {
                 cout << "App error: " << err << endl;
             }
-            sys_wait_ms_ms(500);
+            ms_sleep(500);
 
             stop();
         }

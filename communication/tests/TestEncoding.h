@@ -85,7 +85,7 @@ class TestEncoding : public TestCase
         {
             char buffer[4] = {0x3F, 0x9D, 0x70, 0xA4};
 
-            assertEqualsDelta(Encodings::decode_float(buffer), (float)1.23, 0.00001);
+            assertEqualsDelta((float)Encodings::decode_float(buffer), (float)1.23, (float)0.00001);
         }
 
     protected:

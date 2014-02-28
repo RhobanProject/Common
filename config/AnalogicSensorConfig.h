@@ -52,7 +52,7 @@ class AnalogicSensorParameter : public Config
         double max;
         double zero;
 
-        double normalize(uint val);
+        double normalize(double val);
 
         void from_xml(TiXmlNode * node);
         string to_xml() const;
