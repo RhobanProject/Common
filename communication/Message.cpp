@@ -135,7 +135,7 @@ namespace Rhoban
     { \
         size_t length = values.size(); \
         append((ui32) length); \
-        for (int i = 0; i < length; i++) { \
+	for (size_t i = 0; i < length; i++) {	\
             append(values[i]); \
         } \
     } 

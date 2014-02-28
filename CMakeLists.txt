@@ -124,5 +124,26 @@ set (APP_SOURCES
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES} ${APP_SOURCES})
-add_library (RhobanCommon ${ALL_SOURCES})
+
+# ADD HEADERS FILES 
+foreach (SOURCE ${ALL_SOURCES})
+	set (FILENAME_PREFIX)
+	set (FILENAME_PATH)
+	GET_FILENAME_COMPONENT(FILENAME_PREFIX ${SOURCE} NAME_WE)
+	GET_FILENAME_COMPONENT(FILENAME_PATH ${SOURCE} PATH)
+		
+	set (FILENAME ${FILENAME_PATH}/${FILENAME_PREFIX})
+	
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+#		message("Adding header " ${FILENAME}.h)
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.h")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+#		message("Adding header " ${FILENAME}.hpp)
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.hpp")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+endforeach (SOURCE)
+
+
+add_library (RhobanCommon ${ALL_SOURCES} ${ALL_HEADERS})
 target_link_libraries (RhobanCommon ${EXTRA_LIBS})

@@ -1,4 +1,4 @@
-#include <timing/sleep.h>
+#include <timing/sys_wait_ms.h>
 #include "App.h"
 
 namespace Rhoban
@@ -40,9 +40,9 @@ namespace Rhoban
         config->help();
 
         try {
-            server = new Server(&hub);
-            server->setName(name);
-            server->run(port);
+			server = new Server(&hub);
+			server->setName(name);
+			server->run(port);
         } catch (string err) {
             cout << "App error: " << err << endl;
         }
@@ -71,7 +71,7 @@ namespace Rhoban
             } catch (string err) {
                 cout << "App error: " << err << endl;
             }
-            sleep_ms(500);
+            sys_wait_ms_ms(500);
 
             stop();
         }

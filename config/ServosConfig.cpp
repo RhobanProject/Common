@@ -91,8 +91,8 @@ void ServoConfig::from_xml(TiXmlNode * node)
 	MaxAngle = XMLTools::get_double_element(node,"MaxAngle");
 	MaxSpeed = XMLTools::get_int_element(node,"MaxSpeed");
 	MaxTorque = XMLTools::get_int_element(node,"MaxTorque");
-	Bounce = XMLTools::get_int_element(node,"Bounce");
-	Punch = XMLTools::get_int_element(node,"Punch");
+	Bounce = (float) XMLTools::get_int_element(node,"Bounce");
+	Punch = (float) XMLTools::get_int_element(node, "Punch");
 	SmoothFactor = XMLTools::get_double_element(node,"SmoothFactor");
 
 	try

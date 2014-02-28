@@ -30,7 +30,7 @@ using namespace std;
 /**
  * Taille maximale d'un message
  */
-#define MSG_MAX_SIZE 2000000
+#define MSG_MAX_SIZE 20000000
 
 namespace Rhoban
 {
