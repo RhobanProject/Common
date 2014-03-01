@@ -100,7 +100,7 @@ namespace Rhoban
         virtual Message * process(Message * msg_in, Message * msg_out, bool sync = false, int timeout = 0)=0;
 
         /*
-         * Asynchronous processing of the message using a new thread
+         * AsynRhoban::chronous processing of the message using a new thread
          */
         virtual Message * processAsync(Message *msg_in);
 
@@ -131,7 +131,7 @@ namespace Rhoban
     };
 
     /*
-     * This creates a parallel task to process a message and sends the answer in an asynchronous way
+     * This creates a parallel task to process a message and sends the answer in an asynRhoban::chronous way
      */
     class ServerComponentTask :  public Thread
     {
