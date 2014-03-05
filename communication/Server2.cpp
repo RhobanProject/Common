@@ -17,8 +17,9 @@ void Rhoban::Server2::cleanup()
 	removeAllComponents();
 }
 
+#ifdef  WIN32
 list<Rhoban::Server2 *> Rhoban::Server2::servers;
-
+#endif
 
 Rhoban::Server2::Server2(int port)
 : port(port)
@@ -26,14 +27,16 @@ Rhoban::Server2::Server2(int port)
 
 #ifdef WIN32
 	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
-#endif
 	servers.push_back(this);
+#endif
 	start();
 }
 
 Rhoban::Server2::~Server2()
 {
+#ifdef WIN32
 	servers.remove(this);
+#endif
 }
 
 void Rhoban::Server2::execute()
@@ -80,11 +83,10 @@ void Rhoban::Server2::execute()
 			zmq_msg_init(&zmsg);
 
 			//cout << "Waiting for message " << ++message_nb << endl;
-			int ok = zmq_recv(socket, &zmsg, 0);
+		int ok = zmq_recv(socket, &zmsg, 0);
 
 			if (ok == -1)
 			{
-				cout << "Failed to recv message. ";
 				switch (errno)
 				{
 				case EAGAIN: cout << "EAGAIN " << endl; break;
@@ -100,7 +102,7 @@ void Rhoban::Server2::execute()
 			else
 			{
 				int size = zmq_msg_size(&zmsg);
-				//cout << "Received " << size << " bytes" << endl;
+//				cout << "Received " << size << " bytes" << endl;
 
 				request.clear();
 				Message * local_answer = NULL;
