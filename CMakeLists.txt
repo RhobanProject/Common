@@ -59,6 +59,8 @@ set(COM_SOURCES
     communication/Message.cpp
     communication/ServerComponent.cpp
     communication/Server.cpp
+    communication/Server2.cpp
+    communication/ServerHub.cpp
     communication/RemoteClient.cpp
     communication/NetworkComponent.cpp
     communication/BaseConnection.cpp
