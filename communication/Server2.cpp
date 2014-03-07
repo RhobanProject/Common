@@ -2,7 +2,7 @@
 #include "Message.h"
 #include <ticks.h>
 
-#include <zhelpers2.2.h>
+#include <zhelpers.h>
 
 
 #ifdef WIN32
@@ -83,21 +83,22 @@ void Rhoban::Server2::execute()
 			zmq_msg_init(&zmsg);
 
 			//cout << "Waiting for message " << ++message_nb << endl;
-		int ok = zmq_recv(socket, &zmsg, 0);
+		int ok = zmq_recvmsg(socket, &zmsg, 0);
 
 			if (ok == -1)
 			{
+				string err;
 				switch (errno)
 				{
-				case EAGAIN: cout << "EAGAIN " << endl; break;
-				case EFSM: cout << "EFSM " << endl; break;
-				case ETERM: cout << "ETERM " << endl; break;
-				case ENOTSOCK: cout << "ENOTSOCK " << endl; break;
-				case EINTR: cout << "EINTR " << endl; break;
-				case EFAULT: cout << "EFAULT " << endl; break;
-				default: cout << "Unknown error" << endl; break;
+				case EAGAIN: err = "EAGAIN " ; break;
+				case EFSM: err = "EFSM "; break;
+				case ETERM: err = "ETERM "; break;
+				case ENOTSOCK: err = "ENOTSOCK "; break;
+				case EINTR: err = "EINTR "; break;
+				case EFAULT: err = "EFAULT "; break;
+				default: err = "Unknown error"; break;
 				}
-				syst_wait_ms(500);
+				throw runtime_error("Failed to recv message: " + err);
 			}
 			else
 			{
@@ -135,14 +136,14 @@ void Rhoban::Server2::execute()
 
 					zmq_msg_init_size(&data_msg, length);
 					memcpy(zmq_msg_data(&data_msg), local_answer->getRaw() + MSG_HEADER_SIZE, length);
-					if (zmq_send(socket, &header_msg, ZMQ_SNDMORE) == -1)
+					if (zmq_sendmsg(socket, &header_msg, ZMQ_SNDMORE) == -1)
 						throw std::runtime_error("Failed to send header through zmq socket");
-					if (zmq_send(socket, &data_msg, 0) == -1)
+					if (zmq_sendmsg(socket, &data_msg, 0) == -1)
 						throw std::runtime_error("Failed to send answer data through zmq socket");
 				}
 				else
 				{
-					if (zmq_send(socket, &empty_msg, 0) == -1)
+					if (zmq_sendmsg(socket, &empty_msg, 0) == -1)
 						throw std::runtime_error("Failed to send empty message through zmq socket");
 				}
 			}
@@ -152,7 +153,7 @@ void Rhoban::Server2::execute()
 		catch (std::exception exc)
 		{
 			cout << exc.what() << endl;
-			syst_wait_ms(100);
+			syst_wait_ms(500);
 		}
 
 	}
