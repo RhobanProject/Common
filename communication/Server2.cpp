@@ -103,7 +103,7 @@ void Rhoban::Server2::execute()
 			else
 			{
 				int size = zmq_msg_size(&zmsg);
-//				cout << "Received " << size << " bytes" << endl;
+				cout << "Received " << size << " bytes" << endl;
 
 				request.clear();
 				Message * local_answer = NULL;
@@ -128,7 +128,7 @@ void Rhoban::Server2::execute()
 				{
 					local_answer->write_header();
 					int length = local_answer->getLength();
-					//cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
+					cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
 
 
 					zmq_msg_init_size(&header_msg, MSG_HEADER_SIZE);
@@ -152,7 +152,7 @@ void Rhoban::Server2::execute()
 		}
 		catch (std::exception exc)
 		{
-			cout << exc.what() << endl;
+			cout << "ZMQ Server is dead :" << endl << exc.what() << endl;
 			syst_wait_ms(500);
 		}
 

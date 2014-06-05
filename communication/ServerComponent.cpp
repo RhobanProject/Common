@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <timing/TickMachine.h>
-
 #include "ServerComponent.h"
 
 ServerComponentTask::ServerComponentTask(ServerComponent * component, Message *msg_in, Message *msg_out):
@@ -114,7 +113,26 @@ bool ServerComponent::respondTo(ui16 id)
 
 Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 {
-	return doCall(msg_in, msg_out, false, 0);
+	try
+	{
+		msg_out = doCall(msg_in, msg_out, false, 0);
+	}
+	catch (const exception & e)
+	{
+		msg_out->command = 1;
+		msg_out->append(string(e.what()));
+	}
+	catch (const string & e)
+	{
+		msg_out->command = 1;
+		msg_out->append(e);
+	}
+	catch (...)
+	{
+		msg_out->command = 1;
+		msg_out->append("Unkown exception");
+	}
+	return msg_out;
 }
 
 Message *ServerComponent::callSync(Message *msg_in, Message *msg_out, int timeout)
