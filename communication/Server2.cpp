@@ -82,7 +82,7 @@ void Rhoban::Server2::execute()
 			zmq_msg_t zmsg;
 			zmq_msg_init(&zmsg);
 
-			//cout << "Waiting for message " << ++message_nb << endl;
+			cout << "Waiting for message " << ++message_nb << endl;
 		int ok = zmq_recvmsg(socket, &zmsg, 0);
 
 			if (ok == -1)
@@ -103,7 +103,7 @@ void Rhoban::Server2::execute()
 			else
 			{
 				int size = zmq_msg_size(&zmsg);
-//				cout << "Received " << size << " bytes" << endl;
+				cout << "Received " << size << " bytes" << endl;
 
 				request.clear();
 				Message * local_answer = NULL;
@@ -118,17 +118,20 @@ void Rhoban::Server2::execute()
 					answer.destination = request.source;
 					answer.source = request.destination;
 					answer.uid = request.uid;
+					cout << "Computing answer..." << endl;
 					local_answer = call(&request, &answer);
+					cout << "...done." << endl;
 				}
 				else
 				{
+					cout << "Error, message too short" << endl;
 					local_answer = &length_error_message;
 				}
 				if (local_answer != NULL)
 				{
 					local_answer->write_header();
 					int length = local_answer->getLength();
-					//cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
+					cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
 
 
 					zmq_msg_init_size(&header_msg, MSG_HEADER_SIZE);
@@ -150,11 +153,22 @@ void Rhoban::Server2::execute()
 
 			zmq_msg_close(&zmsg);
 		}
-		catch (std::exception exc)
+		catch (const std::exception & exc)
 		{
-			cout << exc.what() << endl;
+			cout << "Caught exception in zmq server2" << string(exc.what()) << endl;
 			syst_wait_ms(500);
 		}
+		catch(const string & exc)
+		{
+			cout << "Caught exception in zmq server2" << exc << endl;
+			syst_wait_ms(500);
+		}
+		catch(...)
+		{
+			cout << "Caught unknown exception in zmq server2" << endl;
+			syst_wait_ms(500);
+		}
+
 
 	}
 
