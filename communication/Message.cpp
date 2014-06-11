@@ -27,7 +27,8 @@ namespace Rhoban
     Message::Message() : Header(), Buffer()
     {
         Buffer::alloc(MSG_MIN_SIZE);
-        Message::init();
+		size = MSG_HEADER_SIZE;
+		cursor = MSG_HEADER_SIZE;
     }
 
     Message::Message(const Message & o) : Header(o), Buffer(o), cursor(o.cursor)
@@ -324,11 +325,6 @@ namespace Rhoban
     READ_ARRAY(double, read_double);
     READ_ARRAY(bool, read_bool);
 
-    void Message::init()
-    {
-        size = MSG_HEADER_SIZE;
-        cursor = MSG_HEADER_SIZE;
-    }
 
     void Message::write_header(){
     	length = size - MSG_HEADER_SIZE;
@@ -340,7 +336,8 @@ namespace Rhoban
         Header::clear();
         Buffer::clear();
 
-        init();
+		size = MSG_HEADER_SIZE;
+		cursor = MSG_HEADER_SIZE;
     }
 
     char* Message::getRaw()

@@ -146,6 +146,7 @@ foreach (SOURCE ${ALL_SOURCES})
 	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
 endforeach (SOURCE)
 
+set (ALL_HEADERS ${ALL_HEADERS} "communication/rhobanProtocol.h")
 
 add_library (RhobanCommon ${ALL_SOURCES} ${ALL_HEADERS})
 target_link_libraries (RhobanCommon ${EXTRA_LIBS})

@@ -53,6 +53,10 @@ void Rhoban::Server2::execute()
 	char address[256];
 	sprintf(address, "tcp://*:%d", port);
 
+	int hwm = 20;
+	zmq_setsockopt(socket, ZMQ_RCVHWM, &hwm,sizeof hwm);
+	zmq_setsockopt(socket, ZMQ_SNDHWM, &hwm, sizeof hwm);
+
 	cout << "Binding REP Socket to address " << address << endl;
 	zmq_bind(socket, address);
 
@@ -63,15 +67,13 @@ void Rhoban::Server2::execute()
 	length_error_message.destination = MSG_TYPE_ERROR;
 	length_error_message.command = MSG_ERROR_COMMAND;
 
+	Message empty_message;
+
 	zmq_msg_t header_msg;
 	zmq_msg_init(&header_msg);
 
 	zmq_msg_t data_msg;
 	zmq_msg_init(&data_msg);
-
-	zmq_msg_t empty_msg;
-	zmq_msg_init(&empty_msg);
-	zmq_msg_init_size(&empty_msg, 0);
 
 	int message_nb = 0;
 
@@ -82,7 +84,7 @@ void Rhoban::Server2::execute()
 			zmq_msg_t zmsg;
 			zmq_msg_init(&zmsg);
 
-			cout << "Waiting for message " << ++message_nb << endl;
+			//cout << "Waiting for message " << ++message_nb << endl;
 		int ok = zmq_recvmsg(socket, &zmsg, 0);
 
 			if (ok == -1)
@@ -103,7 +105,7 @@ void Rhoban::Server2::execute()
 			else
 			{
 				int size = zmq_msg_size(&zmsg);
-				cout << "Received " << size << " bytes" << endl;
+				//cout << "Received " << size << " bytes" << endl;
 
 				request.clear();
 				Message * local_answer = NULL;
@@ -118,37 +120,36 @@ void Rhoban::Server2::execute()
 					answer.destination = request.source;
 					answer.source = request.destination;
 					answer.uid = request.uid;
-					cout << "Computing answer..." << endl;
+					//cout << "Computing answer..." << endl;
 					local_answer = call(&request, &answer);
-					cout << "...done." << endl;
+					if (local_answer == NULL)
+					{
+						empty_message.command = request.command;
+						empty_message.source = request.destination;
+						empty_message.destination = request.source;
+						local_answer = &empty_message;
+					}
+					//cout << "...done." << endl;
 				}
 				else
 				{
 					cout << "Error, message too short" << endl;
 					local_answer = &length_error_message;
 				}
-				if (local_answer != NULL)
-				{
-					local_answer->write_header();
-					int length = local_answer->getLength();
-					cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
+				local_answer->write_header();
+				int length = local_answer->getLength();
+				//cout << "Sending answer with content length " << length << " and total size " << local_answer->getSize() << endl;
 
 
-					zmq_msg_init_size(&header_msg, MSG_HEADER_SIZE);
-					memcpy(zmq_msg_data(&header_msg), local_answer->getRaw(), MSG_HEADER_SIZE);
+				zmq_msg_init_size(&header_msg, MSG_HEADER_SIZE);
+				memcpy(zmq_msg_data(&header_msg), local_answer->getRaw(), MSG_HEADER_SIZE);
 
-					zmq_msg_init_size(&data_msg, length);
-					memcpy(zmq_msg_data(&data_msg), local_answer->getRaw() + MSG_HEADER_SIZE, length);
-					if (zmq_sendmsg(socket, &header_msg, ZMQ_SNDMORE) == -1)
-						throw std::runtime_error("Failed to send header through zmq socket");
-					if (zmq_sendmsg(socket, &data_msg, 0) == -1)
-						throw std::runtime_error("Failed to send answer data through zmq socket");
-				}
-				else
-				{
-					if (zmq_sendmsg(socket, &empty_msg, 0) == -1)
-						throw std::runtime_error("Failed to send empty message through zmq socket");
-				}
+				zmq_msg_init_size(&data_msg, length);
+				memcpy(zmq_msg_data(&data_msg), local_answer->getRaw() + MSG_HEADER_SIZE, length);
+				if (zmq_sendmsg(socket, &header_msg, ZMQ_SNDMORE) == -1)
+					throw std::runtime_error("Failed to send header through zmq socket");
+				if (zmq_sendmsg(socket, &data_msg, 0) == -1)
+					throw std::runtime_error("Failed to send answer data through zmq socket");
 			}
 
 			zmq_msg_close(&zmsg);

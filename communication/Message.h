@@ -59,11 +59,6 @@ namespace Rhoban
      */
     void clear();
 
-    /**
-     * Initialise le message
-     */
-    void init();
-    void init_cursor(){ cursor = 0; }
 
     /**
      * Ecris les en-têtes dans le buffer
