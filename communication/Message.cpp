@@ -340,6 +340,11 @@ namespace Rhoban
 		cursor = MSG_HEADER_SIZE;
     }
 
+	void Message::init()
+	{
+		size = MSG_HEADER_SIZE;
+		cursor = MSG_HEADER_SIZE;
+	}
     char* Message::getRaw()
     {
         write_header();
