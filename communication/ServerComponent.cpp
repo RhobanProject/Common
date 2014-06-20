@@ -88,7 +88,7 @@ Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, i
 			}
 			else
 			{
-				Message * answer = process(msg_in, msg_out, sync, timeout);
+				Message * answer = process(msg_in, msg_out, true, timeout);
 				if (answer)
 					answer->write_header();
 				return answer;

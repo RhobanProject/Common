@@ -140,6 +140,7 @@ namespace Rhoban
     {
         BEGIN_SAFE(process)
             entries[entry->getUid()]= entry;
+
         garbageCounter++;
         if(garbageCounter >= GARBAGECHECKRATE)
         {
@@ -192,6 +193,7 @@ namespace Rhoban
 
         entry->lock();
         sendMessage(message);
+		
 
         if (!entry->sameThreadResponded) {
             try {

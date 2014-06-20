@@ -11,25 +11,46 @@
 
 
 
-void Rhoban::Server2::cleanup()
-{
-	/* delete all components */
-	removeAllComponents();
-}
-
 #ifdef  WIN32
 list<Rhoban::Server2 *> Rhoban::Server2::servers;
 #endif
 
-Rhoban::Server2::Server2(int port)
-: port(port)
+/* Waits until server stops */
+void Rhoban::Server2::wait()
 {
+	Thread::wait();
+}
 
+void Rhoban::Server2::shutdown()
+{
+	Thread::kill();
+}
+
+/* Runs the server on the given port, if not started yet */
+void Rhoban::Server2::run(int port, string name)
+{
+	if (Thread::thread_state == Thread::ThreadState::Unborn)
+	{
+		this->port = port;
+		this->name = name;
+		start();
+		wait_started();
+	}
+}
+
+Rhoban::Server2::Server2() : hub(NULL)
+{
 #ifdef WIN32
-	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
+//	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
 	servers.push_back(this);
 #endif
-	start();
+
+}
+
+Rhoban::Server2::Server2(ServerHub * hub) : hub(hub)
+{
+	if (hub == NULL)
+		throw new std::runtime_error("Cannnot create server with null hub");
 }
 
 Rhoban::Server2::~Server2()
@@ -121,7 +142,7 @@ void Rhoban::Server2::execute()
 					answer.source = request.destination;
 					answer.uid = request.uid;
 					//cout << "Computing answer..." << endl;
-					local_answer = call(&request, &answer);
+					local_answer = hub->call(&request, &answer);
 					if (local_answer == NULL)
 					{
 						empty_message.command = request.command;

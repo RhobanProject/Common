@@ -46,6 +46,13 @@ endif (MSVC)
 option(SDK
     "Compiles the SDK" OFF)
 
+option(SERVER_USES_ZMQ
+	"Rhoban Server uses Zmq" OFF)
+
+if(SERVER_USES_ZMQ)
+    add_definitions(-DSERVER_USES_ZMQ)
+endif(SERVER_USES_ZMQ)
+
 # Adding dependency with RhobanUtils
 include_directories ("${RHOBAN_UTILS_DIRECTORY}" "${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} RhobanUtils)

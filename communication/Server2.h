@@ -26,20 +26,32 @@ namespace Rhoban
 {
 
 
-class Server2 : public ServerHub, protected Thread
+class Server2 : protected Thread
 {
 public:
-	Server2(int port = 7777);
+
+	/* Constructor of a server. To sart the server use run.*/
+	Server2(ServerHub * hub);
 
 	~Server2();
 
-	virtual void execute();
+	/* Waits until server stops */
+	void wait();
 
-	virtual void cleanup();
+	/* kills server*/
+	void shutdown();
 
-	void wait(){ Thread::wait(); };
+	/* Runs the server on the given port with given name , if not started yet.
+	Returns once the server has been created and started. */
+	void run(int port, string name = "RhobanServer");
 
 protected:
+
+	Server2();
+
+	ServerHub * hub;
+
+	virtual void execute();
 
 #ifdef WIN32
 	static BOOL CtrlHandler(DWORD fdwCtrlType);
@@ -47,7 +59,7 @@ protected:
 #endif
 
 	int port;
-
+	string name;
 };
 
 

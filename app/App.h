@@ -2,6 +2,7 @@
 #define _RHOBAN_APP_H
 
 #include <configfile/ConfigFile.h>
+#include <communication/Server2.h>
 #include <communication/Server.h>
 #include <communication/ServerComponent.h>
 #include <communication/RemoteClient.h>
@@ -42,12 +43,15 @@ namespace Rhoban
              */
             void stop();
 
-            ServerHub hub;
         protected:
             ConfigFile *config;
 
-            Server *server;
-            RemoteClient *client;
+            Server2 * zmq_server;
+			Server * server;
+
+			ServerHub hub;
+			ServerHub zmq_hub;
+			RemoteClient *client;
     };
 }
 

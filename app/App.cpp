@@ -3,52 +3,60 @@
 
 namespace Rhoban
 {
-    /**
-     * Creating an app
-     */
-    App::App(ConfigFile &config_) : server(NULL), client(NULL)
-    {
-        config = &config_;
-    }
+	/**
+	 * Creating an app
+	 */
+	App::App(ConfigFile &config_) : client(NULL)
+	{
+		config = &config_;
+	}
 
-    App::App() : server(NULL), client(NULL), config(NULL)
-    {
-    }
-    
-    /**
-     * Register a component for the application
-     */
-    void App::registerComponent(ServerComponent *component)
-    {
-        hub.registerComponent(component);
+	App::App() : server(NULL), client(NULL), config(NULL), zmq_server(NULL)
+	{
+	}
 
-        if (config) {
-            component->loadConfig(*config);
-        }
-    }
+	/**
+	 * Register a component for the application
+	 */
+	void App::registerComponent(ServerComponent *component)
+	{
+		hub.registerComponent(component);
+		if (config) {
+			component->loadConfig(*config);
+		}
+	}
 
-    /**
-     * Runs the server
-     */
-    void App::runServer()
-    {
-        string name;
-        int port;
+	/**
+	 * Runs the server
+	 */
+	void App::runServer()
+	{
+		string name;
+		int port;
 
-        config->read("server", "port", 7777, port);
-        config->read("robot", "name", "Rhoban Robot", name);
-        config->help();
+		config->read("server", "port", 7777, port);
+		config->read("robot", "name", "Rhoban Robot", name);
+		config->help();
 
-        try {
+		try {
+
+			zmq_server = new Server2(&hub);
+			zmq_server->run(port + 1, name);
+
 			server = new Server(&hub);
 			server->setName(name);
 			server->run(port);
-        } catch (string err) {
-            cout << "App error: " << err << endl;
-        }
 
-        stop();
-    }
+			zmq_server->wait();
+
+		}
+		catch (string err) {
+			cout << "App error: " << err << endl;
+		}
+
+		stop();
+	}
+
 
     /**
      * Runs as a standalone client
@@ -82,13 +90,15 @@ namespace Rhoban
      */
     void App::stop()
     {
-        if (server) {
+		zmq_server->shutdown();
+
+		if (server) {
             server->shutdown();
             delete server;
             server = NULL;
         }
 
-        if (client) {
+		if (client) {
             client->stop();
             delete client;
             client = NULL;

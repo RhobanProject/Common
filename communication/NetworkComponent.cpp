@@ -15,7 +15,7 @@ namespace Rhoban
             this->BaseConnection::sendMessage(msg_in);
             return NULL;
         } else {
-        	*msg_out = this->BaseConnection::sendMessageReceive(msg_in, timeout);
+        	*msg_out = this->BaseConnection::sendMessageReceive(msg_in, 1000);
         	return msg_out;
         }
     }
