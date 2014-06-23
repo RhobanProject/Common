@@ -29,13 +29,10 @@ void Rhoban::Server2::shutdown()
 /* Runs the server on the given port, if not started yet */
 void Rhoban::Server2::run(int port, string name)
 {
-	if (Thread::thread_state == Thread::ThreadState::Unborn)
-	{
 		this->port = port;
 		this->name = name;
 		start();
 		wait_started();
-	}
 }
 
 Rhoban::Server2::Server2() : hub(NULL)
