@@ -171,6 +171,7 @@ namespace Rhoban
                         client->addId(type);
                         server->launcher->registerComponent(type, client);
 
+				
                         msg->destination = type;
                         msg->append(string("Registered component "));
                         SERVER_MSG("Registered new component " << type);
@@ -201,7 +202,7 @@ namespace Rhoban
     /**
      * Creating a server client
      */
-    ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : NetworkComponent(hub_), clientId(clientId_)
+	ServerInternalClient::ServerInternalClient(Callable *hub_, int clientId_) : NetworkComponent(hub_), clientId(clientId_)
     {
         SERVER_DEBUG("Threaded client "<< (intptr_t) this << " created ");
     }
@@ -211,7 +212,7 @@ namespace Rhoban
         return !dead;
     }
 
-    ServerInternalClient::ServerInternalClient() : NetworkComponent(NULL)
+	ServerInternalClient::ServerInternalClient() : NetworkComponent(NULL)
     {
         SERVER_CAUTION("The internal client should ne be instanciated without parameters");
     }

@@ -18,6 +18,8 @@
 #include <timing/TickMachine.h>
 #include "ServerComponent.h"
 
+#include "rhobanProtocol.h"
+
 ServerComponentTask::ServerComponentTask(ServerComponent * component, Message *msg_in, Message *msg_out):
 component(component), cleanup_msg_out(false)
 {
@@ -119,17 +121,22 @@ Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 	}
 	catch (const exception & e)
 	{
-		msg_out->command = 1;
+		msg_out->command = MSG_ERROR_COMMAND;
+		msg_out->append(string(e.what()));
+	}
+	catch (const runtime_error & e)
+	{
+		msg_out->command = MSG_ERROR_COMMAND;
 		msg_out->append(string(e.what()));
 	}
 	catch (const string & e)
 	{
-		msg_out->command = 1;
+		msg_out->command = MSG_ERROR_COMMAND;
 		msg_out->append(e);
 	}
 	catch (...)
 	{
-		msg_out->command = 1;
+		msg_out->command = MSG_ERROR_COMMAND;
 		msg_out->append("Unkown exception");
 	}
 	return msg_out;

@@ -7,18 +7,57 @@ namespace Rhoban
     {
         setHub(hub_);
         headerBuffer.alloc(MSG_HEADER_SIZE);
+		TCPClientBase::connected = true;
+
     }
 
     Message *NetworkComponent::process(Message * msg_in, Message * msg_out, bool sync, int timeout)
     {
-        if (!sync) {
-            this->BaseConnection::sendMessage(msg_in);
-            return NULL;
-        } else {
-        	*msg_out = this->BaseConnection::sendMessageReceive(msg_in, 1000);
-        	return msg_out;
-        }
-    }
+		if ( !BaseConnection::isConnected() )
+		{
+			stringstream ss;
+		
+
+			ss << "Cannot process cmd " << msg_in->command;
+			if (msg_in->destination < RHOBAN_MESSAGE_DESTINATIONS_NB)
+				ss << " network component " << RHOBAN_MESSAGE_DESTINATIONS[msg_in->destination] << " disconnected.";
+			else
+				ss << " network component " << msg_in->destination << " disconnected.";
+			//stop();
+			throw std::runtime_error(ss.str());
+		}
+
+		try
+		{
+			if (!sync) {
+				this->BaseConnection::sendMessage(msg_in);
+				return NULL;
+			}
+			else {
+				*msg_out = this->BaseConnection::sendMessageReceive(msg_in, 1000);
+				return msg_out;
+			}
+		}
+		catch (const string & exc)
+		{
+			
+			connected = false;
+			stop();
+			throw "NetworkComponent disconnecting: " + exc;
+		}
+		catch (const std::exception & exc)
+		{
+			connected = false;
+			stop();
+			throw std::runtime_error("NetworkComponent disconnecting: '" + string(exc.what()) + "'");
+		}
+		catch (...)
+		{
+			connected = false;
+			stop();
+			throw std::runtime_error("NetworkComponent disconnecting, unknown exception");
+		}
+	}
             
     void NetworkComponent::processAnswer(Message *msg_in)
     {
@@ -113,7 +152,20 @@ namespace Rhoban
             msg_out->command = MSG_ERROR_COMMAND;
             msg_out->append(smsg.str());
             this->BaseConnection::sendMessage(msg_out);
-        } catch (...)
+        }
+		catch (const exception & e)
+		{
+			ostringstream smsg;
+			smsg << "Failed to process message " << msg->uid << ": " << e.what();
+			SERVER_DEBUG(smsg.str());
+
+			msg_out->destination = msg->source;
+			msg_out->source = msg->destination;
+			msg_out->command = MSG_ERROR_COMMAND;
+			msg_out->append(smsg.str());
+			this->BaseConnection::sendMessage(msg_out);
+		}
+		catch (...)
         {
             ostringstream smsg;
             smsg << "Exception with message destination " << msg->destination << " command "
