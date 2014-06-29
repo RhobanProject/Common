@@ -64,9 +64,6 @@ set(COM_SOURCES
     communication/Header.cpp
     communication/MailboxEntry.cpp
     communication/Message.cpp
-    communication/ServerComponent.cpp
-    communication/Server.cpp
-    communication/Server2.cpp
     communication/ServerHub.cpp
     communication/RemoteClient.cpp
     communication/NetworkComponent.cpp
@@ -74,7 +71,18 @@ set(COM_SOURCES
     communication/Connections.cpp
     communication/Mailbox.cpp
     communication/Callable.cpp
+    communication/ServerComponent.cpp
+    communication/Server.cpp
     )
+
+if(SERVER_USES_ZMQ)
+
+	set(COM_SOURCES
+    communication/Server2.cpp
+	"${COM_SOURCES}"
+	)
+
+endif(SERVER_USES_ZMQ)
 
 if(SDK)
     set(GENERATE_DIR "${PROJECT_BINARY_DIR}/communication")

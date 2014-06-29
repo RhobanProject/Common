@@ -36,7 +36,9 @@ namespace  Rhoban
              * and the same msg out is used again and again
              */
 
-            virtual Message *call(Message *msg_in, Message *msg_out) = 0;
+			virtual Message *call(Message *msg_in, Message *msg_out) {
+				return callSync(msg_in, msg_out);
+			};
 
             /*!
              * This method ensure that the result will be returned in msg_out

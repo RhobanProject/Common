@@ -23,7 +23,7 @@ namespace Rhoban
             /**
              * Register a component for the application
              */
-            void registerComponent(ServerComponent *component);
+            void registerComponent(ui16 type, Callable *component);
 
             /**
              * Runs the server

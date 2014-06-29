@@ -18,11 +18,13 @@ namespace Rhoban
 	/**
 	 * Register a component for the application
 	 */
-	void App::registerComponent(ServerComponent *component)
+	void App::registerComponent(ui16 type, Callable *component)
 	{
-		hub.registerComponent(component);
+		hub.registerComponent(type, component);
 		if (config) {
-			component->loadConfig(*config);
+			ServerComponent * c = dynamic_cast<ServerComponent *>(component);
+			if (c)
+				c->loadConfig(*config);
 		}
 	}
 

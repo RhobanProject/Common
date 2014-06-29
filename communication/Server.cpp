@@ -30,7 +30,7 @@ namespace Rhoban
     Server::Server(ServerHub *launcher_) : launcher(launcher_), nextClientId(1000)
     {
     	SERVER_DEBUG("Server registering itself as a component")
-        launcher->registerComponent(new CoreServerComponent(this));
+        launcher->registerComponent(MSG_TYPE_SERVER, new CoreServerComponent(this));
     	SERVER_DEBUG("Server registered itself as a component")
     }
 
@@ -80,7 +80,7 @@ namespace Rhoban
     	SERVER_DEBUG("Server created client");
 
         // Registering the client as a component
-        launcher->registerComponent(client);
+        launcher->registerComponent(client->DestinationID(), client);
 
         return client;
     }
@@ -142,7 +142,7 @@ namespace Rhoban
                 case MSG_SERVER_REGISTER_COMPONENT:
                     {
                         ui16 type = msg_in->read_uint();
-                        ServerComponent *component = server->launcher->getComponent(type);
+                        Callable *component = server->launcher->getComponent(type);
                         ServerInternalClient *client = server->getClient(msg_in->source);
 
                         if (!client) {

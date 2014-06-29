@@ -23,19 +23,16 @@ namespace Rhoban
         ServerHub *serverHub = dynamic_cast<ServerHub*>(this->NetworkComponent::hub);
 
         if (serverHub) {
-            vector<ServerComponent *> components = serverHub->getComponents();
-            vector<ServerComponent *>::iterator it;
-
-            for (it = components.begin(); it != components.end(); it++) {
-                ServerComponent *component = (*it);
+			vector<ui16> components = serverHub->getComponents();
+			
+			for (vector<ui16>::iterator it = components.begin(); it != components.end(); it++) {
                 message->clear();
                 message->uid = 0;
                 message->destination = MSG_TYPE_SERVER;
                 message->command = MSG_SERVER_REGISTER_COMPONENT;
-                message->append((ui32)component->DestinationID());
-
+                message->append(*it);
                 this->BaseConnection::sendMessage(message);
-                SERVER_MSG("Registering remote component " << component->DestinationID());
+				SERVER_MSG("Registering remote component " << *it);
             }
         }
     }

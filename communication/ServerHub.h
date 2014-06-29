@@ -44,24 +44,21 @@ namespace Rhoban
 		virtual ~ServerHub();
 
 		/**
-		* Registering a component to the server
+		* Registering a component by giving the type,
+		replaces the already existing component with same type if any
 		*/
 		void registerComponent(ServerComponent *component);
-
-		/**
-		* Registering a component by giving the id
-		*/
-		void registerComponent(ui16 type, ServerComponent *component);
+		void registerComponent(ui16 type, Callable *component);
 
 		/**
 		* Removing a component
 		*/
-		void removeComponent(ServerComponent *component);
+		void removeComponent(Callable *component);
 
 		/**
 		* Retreive a component
 		*/
-		ServerComponent *getComponent(ui16 type);
+		Callable *getComponent(ui16 type);
 
 		/*
 		* Whether a component has been registered
@@ -86,14 +83,14 @@ namespace Rhoban
 		Message *callSync(Message * msg_in, Message * msg_out, int timeout);
 
 		/**
-		* Returns the components
+		* Returns known components types
 		*/
-		vector<ServerComponent *> getComponents();
+		vector<ui16> getComponents();
 
 		/**
 		* Component to use when no other one exists
 		*/
-		ServerComponent *fallbackComponent;
+		Callable *fallbackComponent;
 
 	protected:
 		/**

@@ -38,7 +38,7 @@ namespace Rhoban
 
 	Message* ServerHub::doCall(Message* msg_in, Message * msg_out, bool sync, int timeout)
 	{
-		ServerComponent *component;
+		Callable *component;
 		ui16 comp_nb = msg_in->destination;
 
 		component = getComponent(comp_nb);
@@ -73,31 +73,22 @@ namespace Rhoban
 		return answer;
 	}
 
-	/**
-	* Registering a new component
-	*/
-	void ServerHub::registerComponent(ServerComponent *component)
-	{
-		BEGIN_SAFE(components_mutex);
-		if (component->DestinationID() < RHOBAN_MESSAGE_DESTINATIONS_NB)
-			SERVER_MSG("Registering component " << RHOBAN_MESSAGE_DESTINATIONS[component->DestinationID()])
-		else
-		SERVER_MSG("Registering component " << component->DestinationID());
-		components[component->DestinationID()] = component;
-		mutexes[component->DestinationID()] = new Mutex();
-		component->setHub(this);
-		END_SAFE(components_mutex);
-	}
-
+	
 	/**
 	* Registering a new component, specifying the type
 	*/
-	void ServerHub::registerComponent(ui16 type, ServerComponent *component)
+	void ServerHub::registerComponent(ServerComponent *component)
 	{
+		registerComponent(component->DestinationID(), component);
+		component->setHub(this);
+	}
+
+	void ServerHub::registerComponent(ui16 type, Callable *component)
+	{
+		removeComponent(type);
 		BEGIN_SAFE(components_mutex);
 		components[type] = component;
 		mutexes[type] = new Mutex();
-		component->setHub(this);
 		if (type == 0)
 			fallbackComponent = component;
 		END_SAFE(components_mutex);
@@ -106,15 +97,14 @@ namespace Rhoban
 	/**
 	* Registering a new internal component
 	*/
-	ServerComponent *ServerHub::getComponent(ui16 type)
+	Callable *ServerHub::getComponent(ui16 type)
 	{
-		ServerComponent * comp = NULL;
+		Callable * comp = NULL;
 		BEGIN_SAFE(components_mutex);
 		map<ui16, Callable *>::iterator it = components.find(type);
 
-		if (it != components.end()) {
-			comp = dynamic_cast<ServerComponent *>((*it).second);
-		}
+		if (it != components.end())
+			comp = it->second;
 		END_SAFE(components_mutex);
 
 		if (comp != NULL)
@@ -130,7 +120,12 @@ namespace Rhoban
 	{
 		SERVER_MSG("Unregistering component " << type);
 		BEGIN_SAFE(components_mutex);
-		components.erase(type);
+		map<ui16, Callable *>::iterator it = components.find(type);
+		if (it != components.end() && it->first != MSG_TYPE_SERVER) {
+			delete it->second;
+			components.erase(it);
+		}
+
 		mutexes.erase(type);
 		END_SAFE(components_mutex);
 	}
@@ -151,16 +146,14 @@ namespace Rhoban
 	/**
 	* Remove a component
 	*/
-	void ServerHub::removeComponent(ServerComponent *component)
+	void ServerHub::removeComponent(Callable *component)
 	{
 		vector<ui16> types;
 		map<ui16, Callable*>::iterator it;
 
 		BEGIN_SAFE(components_mutex);
 		for (it = components.begin(); it != components.end(); it++) {
-			ServerComponent *comp = dynamic_cast<ServerComponent*>((*it).second);
-
-			if (comp == component) {
+			if (component == it->second) {
 				types.push_back((*it).first);
 			}
 		}
@@ -176,22 +169,15 @@ namespace Rhoban
 	/**
 	* Returns the registered components
 	*/
-	vector<ServerComponent *> ServerHub::getComponents()
+	vector<ui16> ServerHub::getComponents()
 	{
-		vector<ServerComponent *> componentsVector;
-		map<ui16, Callable *>::iterator it;
-
+		vector<ui16> result;
 		BEGIN_SAFE(components_mutex);
-		for (it = components.begin(); it != components.end(); it++) {
-			ServerComponent *component = dynamic_cast<ServerComponent *>((*it).second);
-
-			if (component) {
-				componentsVector.push_back(component);
-			}
-		}
+		for (map<ui16, Callable*>::iterator it = components.begin(); it != components.end(); it++)
+			result.push_back(it->first);
 		END_SAFE(components_mutex);
 
-		return componentsVector;
+		return result;
 	}
 
 }

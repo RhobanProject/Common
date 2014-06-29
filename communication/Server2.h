@@ -26,7 +26,7 @@ namespace Rhoban
 {
 
 
-class Server2 : protected Thread
+class Server2 : public Callable, protected Thread
 {
 public:
 
@@ -45,6 +45,16 @@ public:
 	Returns once the server has been created and started. */
 	void run(int port, string name = "RhobanServer");
 
+
+		/**
+		* Handles incoming messages whose target is the server
+		* itself, like ping, component tregistration, etc...
+		* */
+		virtual Message *callSync(Message *msg_in, Message *msg_out, int timeout = 1000);
+
+		const ui16 virtual DestinationID() const { return MSG_TYPE_SERVER; }
+
+
 protected:
 
 	Server2();
@@ -60,6 +70,7 @@ protected:
 
 	int port;
 	string name;
+
 };
 
 

@@ -4,6 +4,7 @@
 
 #include <zhelpers.h>
 
+#include <xml/XMLTools.h>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -48,6 +49,7 @@ Rhoban::Server2::Server2(ServerHub * hub) : hub(hub)
 {
 	if (hub == NULL)
 		throw new std::runtime_error("Cannnot create server with null hub");
+	hub->registerComponent(MSG_TYPE_SERVER, this);
 }
 
 Rhoban::Server2::~Server2()
@@ -197,6 +199,66 @@ void Rhoban::Server2::execute()
 	zmq_msg_close(&data_msg);
 	cout << "Server closed" << endl;
 
+}
+
+Message *Server2::callSync(Message *msg_in, Message *msg, int timeout)
+{
+	SERVER_DEBUG("Server core component processing message");
+	switch (msg_in->command)
+	{
+	case MSG_SERVER_GET_VERSION:
+	{
+								   //TODO get a real version number
+								   msg->source = MSG_TYPE_SERVER;
+								   msg->destination = msg_in->source;
+								   msg->command = MSG_SERVER_GET_VERSION;
+								   msg->append("RhobanServer 2.0");
+								   msg->append("Server based on zmq sockets");
+								   break;
+	}
+	case MSG_SERVER_ECHO:
+	{
+							try
+							{
+								msg->source = MSG_TYPE_SERVER;
+								msg->destination = msg_in->source;
+								msg->command = MSG_SERVER_ECHO;
+								msg->append(msg_in->read_string());
+								msg->append(msg_in->read_string());
+							}
+							catch (string exc)
+							{
+								cout << "Exception when echoing " << exc << endl;
+								msg->append(exc);
+								msg->append("");
+							}
+
+							return msg;
+							break;
+	}
+	case MSG_SERVER_XML_TO_FILE:
+	{
+								   string filename = msg_in->read_string();
+								   string stream = msg_in->read_string();
+								   SERVER_MSG("Server writing stream " << endl << stream << endl
+									   << " to file " << filename);
+								   XMLTools::stream_to_file(filename, stream);
+								   msg->append(string("Xml stream wrote to file ") + filename);
+								   break;
+	}
+
+	case MSG_SERVER_REGISTER_COMPONENT:
+	{
+										  throw runtime_error("Msg server register component unimplemented in zmq");
+	}
+	case MSG_SERVER_GET_NAME:
+		msg->append(name);
+		break;
+
+	default:
+		break;
+	}
+	return msg;
 }
 
 #ifdef WIN32
