@@ -44,6 +44,33 @@ namespace Rhoban
         return name;
     }
 
+	void Server::registerComponent(ui16 type, ui16 source)
+	{
+		Callable *component = launcher->getComponent(type);
+
+		if (component != NULL)
+		{
+			ServerInternalClient *oldClient = dynamic_cast<ServerInternalClient*>(component);
+
+			if (!oldClient) { // If the component is not a client, we can't remplace it
+				string err = "Can't replace the component " + my_itoa(type);
+				SERVER_CAUTION(err);
+				throw err;
+			}
+			else { // Removing the client from the hub
+				SERVER_MSG("Component " << type << " is already connected, removing it to replace by a new client");
+				launcher->removeComponent(type);
+				oldClient->removeId(type);
+			}
+//			delete component;
+			//delete will be done by server on next accept
+		}
+
+		ServerInternalClient * client = getClient(source);
+		client->addId(type);
+		launcher->registerComponent(type, client);
+	}
+
     /**
      * Get a client by id
      */
@@ -142,34 +169,11 @@ namespace Rhoban
                 case MSG_SERVER_REGISTER_COMPONENT:
                     {
                         ui16 type = msg_in->read_uint();
-                        Callable *component = server->launcher->getComponent(type);
-                        ServerInternalClient *client = server->getClient(msg_in->source);
-
-                        if (!client) {
-                            string err = "Can't find the client " + msg_in->source;
-                            SERVER_CAUTION(err);
-                            throw err;
-                        }
-
-                        if (component != NULL) {
-                            ServerInternalClient *oldClient = dynamic_cast<ServerInternalClient*>(component);
-
-                            if (!oldClient) { // If the component is not a client, we can't remplace it
-                                string err = "Can't replace the component " + my_itoa(type);
-                                SERVER_CAUTION(err);
-                                throw err;
-                            } else { // Removing the client from the hub
-                                SERVER_MSG("Component " << type << " is already connected, removing it to replace by a new client");
-                                server->launcher->removeComponent(type);
-                                oldClient->removeId(type);
-                            }
-                        }
 
                         // Registering a component 
                         //SERVER_MSG("Registering new component " << type);
 
-                        client->addId(type);
-                        server->launcher->registerComponent(type, client);
+                        server->registerComponent(type, msg_in->source);
 
 				
                         msg->destination = type;
@@ -225,13 +229,17 @@ namespace Rhoban
             
     void ServerInternalClient::addId(ui16 id)
     {
+		BEGIN_SAFE(mutex)
         ids.insert(id);
-    }
+		END_SAFE(mutex)
+	}
 
     void ServerInternalClient::removeId(ui16 id)
     {
-        ids.erase(id);
-    }
+		BEGIN_SAFE(mutex)
+		ids.erase(id);
+		END_SAFE(mutex)
+	}
 
     void ServerInternalClient::execute()
     {
@@ -245,7 +253,11 @@ namespace Rhoban
 
     bool ServerInternalClient::respondTo(ui16 type)
     {
-        return type==clientId || (ids.find(type) != ids.end());
+		bool ok = false;
+		BEGIN_SAFE(mutex)
+			ok = ids.find(type) != ids.end();
+		END_SAFE(mutex)
+        return type==clientId || ok;
     }
 
 }

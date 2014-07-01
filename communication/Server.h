@@ -56,6 +56,8 @@ namespace Rhoban
              */
             ServerInternalClient *getClient(ui16 id);
 
+			void registerComponent(ui16 type, ui16 source);
+
             /**
              * Sets the robot name hosted in this server
              */
@@ -100,6 +102,7 @@ namespace Rhoban
         public:
             ServerInternalClient(Callable *hub, int clientId);
             ServerInternalClient();
+			~ServerInternalClient(){};
 
             void execute();
             void loop();
@@ -121,6 +124,8 @@ namespace Rhoban
         protected:
             set<ui16> ids;
             int clientId;
+
+			Rhoban::Mutex mutex;
     };
 
 }

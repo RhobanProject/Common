@@ -94,6 +94,8 @@ namespace Rhoban
 		END_SAFE(components_mutex);
 	}
 
+	
+
 	/**
 	* Registering a new internal component
 	*/
@@ -103,6 +105,7 @@ namespace Rhoban
 		BEGIN_SAFE(components_mutex);
 		map<ui16, Callable *>::iterator it = components.find(type);
 
+		
 		if (it != components.end())
 			comp = it->second;
 		END_SAFE(components_mutex);
@@ -118,11 +121,11 @@ namespace Rhoban
 	*/
 	void ServerHub::removeComponent(ui16 type)
 	{
-		SERVER_MSG("Unregistering component " << type);
 		BEGIN_SAFE(components_mutex);
 		map<ui16, Callable *>::iterator it = components.find(type);
 		if (it != components.end() && it->first != MSG_TYPE_SERVER) {
-			delete it->second;
+			//delete it->second;
+			SERVER_MSG("Unregistering component " << type);
 			components.erase(it);
 		}
 
