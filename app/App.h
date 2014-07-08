@@ -24,7 +24,7 @@ namespace Rhoban
              * Register a component for the application
              */
             void registerComponent(ui16 type, Callable *component);
-			void registerComponent(ServerComponent *component){ registerComponent(component->DestinationID(), component); };
+			void registerComponent(ServerComponent *component){ registerComponent(component->DestinationID(), component); component->hub = &hub; };
 
             /**
              * Runs the server
@@ -51,7 +51,6 @@ namespace Rhoban
 			Server * server;
 
 			ServerHub hub;
-			ServerHub zmq_hub;
 			RemoteClient *client;
     };
 }
