@@ -90,7 +90,7 @@ string AnalogicSensorParameter::to_xml() const
 
 double AnalogicSensorParameter::normalize(double val)
 {
-    if (max == min == 0) {
+    if (fabs(max)<0.01 && fabs(min)<0.01) {
         return val;
     } else {
         return norm_coef * ((int) val - zero ) ;
