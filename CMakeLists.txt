@@ -73,6 +73,7 @@ set(COM_SOURCES
     communication/Callable.cpp
     communication/ServerComponent.cpp
     communication/Server.cpp
+    communication/ZmqContext.cpp
     )
 
 if(SERVER_USES_ZMQ)

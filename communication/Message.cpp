@@ -148,7 +148,16 @@ namespace Rhoban
     _APPEND_VECTOR(vector< vector< vector < TYPE > > >)
 
 
-    APPEND_VECTOR(ui8);
+	void Message::append(const vector< ui8 > &values)
+	{ 
+	size_t length = values.size(); 
+	append((ui32)length); 
+	append_to_buffer(values, values.size());
+	}
+
+	_APPEND_VECTOR(vector< ui8 >);
+	_APPEND_VECTOR(vector< vector< ui8 > >);
+	_APPEND_VECTOR(vector< vector< vector < ui8 > > >);
     APPEND_VECTOR(string);
     APPEND_VECTOR(ui32);
     APPEND_VECTOR(int);

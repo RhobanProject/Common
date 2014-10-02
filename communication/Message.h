@@ -186,8 +186,9 @@ namespace Rhoban
     _APPEND_VECTOR_HEADER(vector< vector< TYPE > >) \
     _APPEND_VECTOR_HEADER(vector < vector< vector< TYPE > > >)
 
-    APPEND_VECTOR_HEADER(ui8);
-    APPEND_VECTOR_HEADER(string);
+
+	APPEND_VECTOR_HEADER(ui8);
+	APPEND_VECTOR_HEADER(string);
     APPEND_VECTOR_HEADER(ui32);
     APPEND_VECTOR_HEADER(int);
     APPEND_VECTOR_HEADER(double);

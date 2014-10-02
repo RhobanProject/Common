@@ -144,6 +144,13 @@ void Buffer::write(const char * data, size_t siz)
 	size=siz;
 }
 
+void Buffer::append_to_buffer(const vector<ui8> & data, size_t siz)
+{
+	alloc(size + siz);
+	std::copy(data.begin(), data.end(), buffer + size);
+	size += siz;
+}
+
 void Buffer::append_to_buffer(const char * data, size_t siz)
 {
 	alloc(size+siz);
