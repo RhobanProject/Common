@@ -129,7 +129,8 @@ namespace Rhoban
              * a copy is performed
              */
             void append_to_buffer(const char * data, size_t siz);
-    };
+			void append_to_buffer(const vector<ui8> & data, size_t siz);
+	};
 }
 
 #endif /* BUFFER_H_ */

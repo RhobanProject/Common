@@ -6,6 +6,8 @@
 
 #include <xml/XMLTools.h>
 
+#include "ZmqContext.h"
+
 #ifdef WIN32
 #include <Windows.h>
 #endif
@@ -63,8 +65,8 @@ void Rhoban::Server2::execute()
 {
 
 	/* starts server */
-	void *context = zmq_init(1);
-
+	void *context = get_zmq_context();
+	
 	int major, minor, patch;
 	zmq_version(&major, &minor, &patch);
 	printf("0MQ version is %d.%d.%d\n", major, minor, patch);
