@@ -119,12 +119,12 @@ Message *ServerComponent::call(Message *msg_in, Message *msg_out)
 	{
 		msg_out = doCall(msg_in, msg_out, false, 0);
 	}
-	catch (const exception & e)
+	catch (const runtime_error & e)
 	{
 		msg_out->command = MSG_ERROR_COMMAND;
 		msg_out->append(string(e.what()));
 	}
-	catch (const runtime_error & e)
+	catch (const exception & e)
 	{
 		msg_out->command = MSG_ERROR_COMMAND;
 		msg_out->append(string(e.what()));

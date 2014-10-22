@@ -6,7 +6,7 @@
 
 #include <xml/XMLTools.h>
 
-#include "ZmqContext.h"
+#include <zmq/ZMQContext.h>
 
 #ifdef WIN32
 #include <Windows.h>
