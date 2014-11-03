@@ -60,7 +60,6 @@ set (EXTRA_LIBS ${EXTRA_LIBS} RhobanUtils)
 # Communication
 set(COM_SOURCES
     communication/Buffer.cpp
-    communication/Encodings.cpp
     communication/Header.cpp
     communication/MailboxEntry.cpp
     communication/Message.cpp
