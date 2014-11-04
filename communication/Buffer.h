@@ -21,7 +21,7 @@
 #include <memory.h>
 #include <string>
 #include "types.h"
-#include "Encodings.h"
+#include "encodings.h"
 
 using namespace std;
 
