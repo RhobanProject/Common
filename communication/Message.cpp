@@ -90,27 +90,27 @@ namespace Rhoban
     void Message::append(ui32 value)
     {
         alloc(size + sizeof(ui32));
-        Encodings::encode_uint(value, buffer + size);
+        encode_uint(value, buffer + size);
         size += sizeof(ui32);
     }
 
     void Message::append(int value)
     {
         alloc(size + sizeof(ui32));
-        Encodings::encode_int(value, buffer + size);
+        encode_int(value, buffer + size);
         size += sizeof(ui32);
     }
 
     void Message::append(float value)
     {
         alloc(size + sizeof(ui32));
-        Encodings::encode_float(value,buffer + size);
+        encode_float(value,buffer + size);
         size += sizeof(ui32);
     }
     void Message::append(double value)
     {
         alloc(size + sizeof(ui32));
-        Encodings::encode_double(value, buffer + size);
+        encode_double(value, buffer + size);
         size += sizeof(ui32);
     }
 

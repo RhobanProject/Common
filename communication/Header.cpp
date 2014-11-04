@@ -38,11 +38,11 @@ namespace Rhoban
 
     void Header::read_header(const char * raw_header)
     {
-        uid = Encodings::decode_uint(raw_header + uid_offset); // Unique message id
-        source = Encodings::decode_ushort(raw_header + source_offset);; // Destination of message
-        destination = Encodings::decode_ushort(raw_header + destination_offset);; // Destination of message
-        command = Encodings::decode_uint(raw_header + command_offset); // Command of message
-        length = Encodings::decode_uint(raw_header + length_offset); // Content length of the message
+        uid = decode_uint(raw_header + uid_offset); // Unique message id
+        source = decode_ushort(raw_header + source_offset);; // Destination of message
+        destination = decode_ushort(raw_header + destination_offset);; // Destination of message
+        command = decode_uint(raw_header + command_offset); // Command of message
+        length = decode_uint(raw_header + length_offset); // Content length of the message
 
         answer = (command & ANSWER_BIT)!=0;
         command &= ~ANSWER_BIT;
@@ -56,11 +56,11 @@ namespace Rhoban
             acommand |= ANSWER_BIT;
         }
 
-        Encodings::encode_uint(uid, (char*) raw_header + uid_offset);
-        Encodings::encode_ushort(source, (char*) raw_header + source_offset);
-        Encodings::encode_ushort(destination, (char*) raw_header + destination_offset);
-        Encodings::encode_uint(acommand, (char*) raw_header + command_offset);
-        Encodings::encode_uint(length, (char*) raw_header + length_offset);
+        encode_uint(uid, (char*) raw_header + uid_offset);
+        encode_ushort(source, (char*) raw_header + source_offset);
+        encode_ushort(destination, (char*) raw_header + destination_offset);
+        encode_uint(acommand, (char*) raw_header + command_offset);
+        encode_uint(length, (char*) raw_header + length_offset);
     }
 
     void Header::clear()

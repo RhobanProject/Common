@@ -19,7 +19,7 @@
 #include <sstream>
 
 #include "Buffer.h"
-#include "Encodings.h"
+#include "encodings.h"
 #include "Message.h"
 
 #include "util.h"
@@ -108,7 +108,7 @@ void Buffer::assign(char * data, size_t data_siz, size_t buffer_siz)
 ui32 Buffer::read_uint(ui32 offset)
 {
 	if(offset + sizeof(ui32) <= size)
-		return Encodings::decode_uint((const char *) buffer+offset);
+		return decode_uint((const char *) buffer+offset);
 	else
 		throw string("buffer too small to read uint at this offset");
 }
@@ -116,7 +116,7 @@ ui32 Buffer::read_uint(ui32 offset)
 int Buffer::read_int(ui32 offset)
 {
 	if(offset + sizeof(int) <=size)
-		return Encodings::decode_int((const char *) buffer+offset);
+		return decode_int((const char *) buffer+offset);
 	else
 		throw string("buffer too small to read int at this offset");
 }
@@ -132,7 +132,7 @@ bool Buffer::read_bool(ui32 offset)
 float Buffer::read_float(ui32 offset)
 {
 	if(offset + sizeof(int) <=size)
-		return Encodings::decode_float(buffer+offset);
+		return decode_float(buffer+offset);
 	else
 		throw string("buffer too small to read float at this offset");
 }
