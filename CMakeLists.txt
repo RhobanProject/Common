@@ -42,12 +42,26 @@ if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif (MSVC)
 
+#Check for c++11 support
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
+    endif ()
+else ()
+    message(FATAL_ERROR "Your C++ compiler is not g++ (unknown support for C++11)")
+endif ()
+
+#Enable C++11
+set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} -std=c++11")
 
 option(SDK
     "Compiles the SDK" OFF)
 
 option(SERVER_USES_ZMQ
-	"Rhoban Server uses Zmq" OFF)
+	"Rhoban Server uses Zmq" ON)
 
 if(SERVER_USES_ZMQ)
     add_definitions(-DSERVER_USES_ZMQ)
