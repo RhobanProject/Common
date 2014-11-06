@@ -24,7 +24,11 @@ namespace Rhoban
              * Register a component for the application
              */
             void registerComponent(ui16 type, Callable *component);
-			void registerComponent(ServerComponent *component){ registerComponent(component->DestinationID(), component); component->hub = &hub; };
+            void registerComponent(ServerComponent *component)
+            {
+              registerComponent(component->DestinationID(), component);
+              component->setHub(&hub);
+            };
 
             /**
              * Runs the server
