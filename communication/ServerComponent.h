@@ -79,7 +79,7 @@ namespace Rhoban
         Message *callSync(Message *msg_in, Message *msg_out, int timeout);
 
         /* sets the hub used to connect to other components */
-        void setHub(Callable * hub);
+        virtual void setHub(Callable * hub);
 
 
         /**
