@@ -13,12 +13,12 @@
 
 void Config::from_xml(TiXmlNode * node)
 {
-  throw string("Config: from_xml() is not implemented");
+  throw std::runtime_error("Config: from_xml() is not implemented");
 }
 
 string Config::to_xml() const
 {
-  throw string("Config: to_xml() is not implemented");
+  throw std::runtime_error("Config: to_xml() is not implemented");
 }
 
 void Config::load_config(AdapterLowLevel *adapter)

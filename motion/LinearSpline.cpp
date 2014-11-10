@@ -57,7 +57,7 @@ void LinearSplineSequence::exportToRawData(	vector<float> & result, bool use_tan
 void LinearSpline::importRawData(vector < vector<float> > raw_data)
 {
     if(sequences.size() != raw_data.size())
-        throw string("Sequence number and raw data size do not match for spline "+ name);
+        throw std::runtime_error("Sequence number and raw data size do not match for spline "+ name);
     for(uint i = 0; i < sequences.size(); i++)
     {
         LinearSplineSequence * ss = &sequences[i];

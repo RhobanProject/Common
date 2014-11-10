@@ -120,7 +120,7 @@ namespace Rhoban
     void NetworkComponent::processMessage(Message *msg)
     {
         if (!msg) {
-            throw string("Cannot process null message");
+            throw std::runtime_error("Cannot process null message");
         }
 
         Message * msg_out = getOutMessage(msg->destination);
@@ -142,9 +142,9 @@ namespace Rhoban
                     SERVER_DEBUG("NetworkComponent ("<<this<<") --> message l" << answer->length << " s"<< answer->source <<" t"<< answer->destination << " st"<< answer->command << "("<<answer->uid<<") --> remote ");
                 this->BaseConnection::sendMessage(answer);
             }
-        } catch (string & exc) {
+        } catch (std::runtime_error & exc) {
             ostringstream smsg;
-            smsg << "Failed to process message " << msg->uid << ": " << exc;
+            smsg << "Failed to process message " << msg->uid << ": " << exc.what();
             SERVER_DEBUG(smsg.str());
 
             msg_out->destination = msg->source;

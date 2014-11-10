@@ -52,8 +52,8 @@ namespace Rhoban
 			zmq_server->wait();
 
 		}
-		catch (string err) {
-			cout << "App error: " << err << endl;
+		catch (const std::runtime_error err) {
+			cout << "App error: " << err.what() << endl;
 		}
 
 		stop();
@@ -78,8 +78,8 @@ namespace Rhoban
                 client->connectTo(host.c_str(), port, false);
                 client->registerComponents();
                 client->execute();
-            } catch (string err) {
-                cout << "App error: " << err << endl;
+            } catch (const std::runtime_error & err) {
+                cout << "App error: " << err.what() << endl;
             }
             ms_sleep(500);
 

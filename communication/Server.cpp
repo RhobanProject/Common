@@ -145,10 +145,10 @@ namespace Rhoban
                             msg->append(msg_in->read_string());
                             msg->append(msg_in->read_string());
                         }
-                        catch(string exc)
+                        catch (const std::runtime_error & exc)
                         {
-                            cout << "Exception when echoing " << exc << endl;
-                            msg->append(exc);
+                            cout << "Exception when echoing " << exc.what() << endl;
+                            msg->append(exc.what());
                             msg->append("");
                         }
 
@@ -192,13 +192,13 @@ namespace Rhoban
                     }
             }
         }
-        catch (string str)
+        catch (const std::runtime_error & exc)
         {
-            throw string("Failed to call server: " + str);
+            throw std::runtime_error("Failed to call server: " + string(exc.what()));
         }
         catch (...)
         {
-            throw string("failed to call server.");
+            throw std::runtime_error("failed to call server.");
         }
         return msg;
     }

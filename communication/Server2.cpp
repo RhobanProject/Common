@@ -228,10 +228,10 @@ Message *Server2::callSync(Message *msg_in, Message *msg, int timeout)
 								msg->append(msg_in->read_string());
 								msg->append(msg_in->read_string());
 							}
-							catch (string exc)
+							catch (const std::runtime_error & exc)
 							{
-								cout << "Exception when echoing " << exc << endl;
-								msg->append(exc);
+								cout << "Exception when echoing " << exc.what() << endl;
+								msg->append(exc.what());
 								msg->append("");
 							}
 

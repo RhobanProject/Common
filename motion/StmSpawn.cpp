@@ -47,7 +47,7 @@ bool StmSpawner::check_stmloader_already_exists()
 			Message * answer = hub->callSync(&msg_in, &msg_out, 1000);
 			if(answer == NULL)
 			{
-				throw string("no answer");
+				throw std::runtime_error("no answer");
 			}
 			else
 			{
@@ -55,14 +55,14 @@ bool StmSpawner::check_stmloader_already_exists()
 				if(ok) {
 					STM_DEBUG("StmSpawner found stmloader");
                                 } else {
-					throw string("StmSpawner found stmloader but got wrong answer");
+					throw std::runtime_error("StmSpawner found stmloader but got wrong answer");
                                 }
 				return (answer != NULL);
 			}
 		}
-		catch(string exc)
+		catch (const std::runtime_error & exc)
 		{
-			STM_DEBUG("StmSpawner failed to ping stmloader (" << exc << " ) "<< max_tries +1 << " tries to go before spawning process...");
+			STM_DEBUG("StmSpawner failed to ping stmloader (" << exc.what() << " ) "<< max_tries +1 << " tries to go before spawning process...");
 		}
 	}
 	return false;
@@ -109,7 +109,7 @@ void StmSpawner::launch_stmloader()
 		switch(int pid=fork())
 		{
 		case -1:
-			throw string("Error while forking");
+			throw std::runtime_error("Error while forking");
 		case 0:
 			execl("/usr/bin/python3", "python3", path_to_py_server.c_str(),
 				"-s", "localhost",

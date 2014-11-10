@@ -198,7 +198,7 @@ namespace Rhoban
         if (!entry->sameThreadResponded) {
             try {
                 entry->wait(timeout);
-            } catch (string exception) {
+            } catch (const std::runtime_error & exception) {
                 entry->unlock();
                 throw exception;
             }
@@ -206,7 +206,7 @@ namespace Rhoban
         }
 
         if (!entry->hasResponse) {
-            throw string("Unable to get a response for the message");
+            throw std::runtime_error("Unable to get a response for the message");
         }
 
         Message retval = entry->getResponse();
@@ -216,9 +216,9 @@ namespace Rhoban
         if(retval.command == MSG_ERROR_COMMAND) {
             ui32 dest = message->destination;
             if(dest < RHOBAN_MESSAGE_DESTINATIONS_NB)
-            	throw string("Error from ") + RHOBAN_MESSAGE_DESTINATIONS[dest] + " : " + retval.read_string();
+            	throw std::runtime_error("Error from " + string(RHOBAN_MESSAGE_DESTINATIONS[dest]) + " : " + retval.read_string());
             else
-            	throw string("Error message : ") + retval.read_string();
+            	throw std::runtime_error("Error message : " + retval.read_string());
         } else {
             return retval;
         }

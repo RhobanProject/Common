@@ -37,7 +37,7 @@ Buffer::Buffer(const Buffer& o) : buffer(NULL), size(o.size), buffer_size(o.buff
 {
 	buffer = (char *) malloc(buffer_size);
 	if (buffer == NULL)
-		throw string("Buffer:Constructor failed, Out of memory");
+		throw std::runtime_error("Buffer:Constructor failed, Out of memory");
 	memcpy(buffer,o.buffer,buffer_size);
 }
 
@@ -73,7 +73,7 @@ void Buffer::alloc(size_t new_size)
 	{
 		ostringstream os;
 		os << new_size;
-		throw string("Message too large "+os.str());
+		throw std::runtime_error("Message too large "+os.str());
 	}
 	if(!buffer || !owned)
 	{
@@ -110,7 +110,7 @@ ui32 Buffer::read_uint(ui32 offset)
 	if(offset + sizeof(ui32) <= size)
 		return decode_uint((const char *) buffer+offset);
 	else
-		throw string("buffer too small to read uint at this offset");
+		throw std::runtime_error("buffer too small to read uint at this offset");
 }
 
 int Buffer::read_int(ui32 offset)
@@ -118,7 +118,7 @@ int Buffer::read_int(ui32 offset)
 	if(offset + sizeof(int) <=size)
 		return decode_int((const char *) buffer+offset);
 	else
-		throw string("buffer too small to read int at this offset");
+		throw std::runtime_error("buffer too small to read int at this offset");
 }
 
 bool Buffer::read_bool(ui32 offset)
@@ -126,7 +126,7 @@ bool Buffer::read_bool(ui32 offset)
 	if( (offset + sizeof(char)) <=size)
 		return (buffer[offset] != 0);
 	else
-		throw string("buffer too small to read bool at this offset");
+		throw std::runtime_error("buffer too small to read bool at this offset");
 }
 
 float Buffer::read_float(ui32 offset)
@@ -134,7 +134,7 @@ float Buffer::read_float(ui32 offset)
 	if(offset + sizeof(int) <=size)
 		return decode_float(buffer+offset);
 	else
-		throw string("buffer too small to read float at this offset");
+		throw std::runtime_error("buffer too small to read float at this offset");
 }
 
 void Buffer::write(const char * data, size_t siz)
@@ -173,7 +173,7 @@ string Buffer::read_string(ui32 siz, ui32 offset)
 	if(offset+siz<= size)
 		return string(buffer + offset,siz);
 	else
-		throw string("Buffer too small ") + my_itoa(size) + " " + string("to read such a string of size ") + my_itoa(siz) + string("offfset ") + my_itoa(offset);
+		throw std::runtime_error("Buffer too small " + my_itoa(size) + " " + string("to read such a string of size ") + my_itoa(siz) + string("offset ") + my_itoa(offset));
 }
 
 void Buffer::read_array(ui32 siz, ui32 offset, vector<ui8> & data)
@@ -185,7 +185,7 @@ void Buffer::read_array(ui32 siz, ui32 offset, vector<ui8> & data)
 			data[i] = buffer[offset+i];
 	}
 	else
-		throw string("Buffer too small to read such a string");
+		throw std::runtime_error("Buffer too small to read such a string");
 }
 
 vector<ui8> Buffer::read_array(ui32 siz, ui32 offset)

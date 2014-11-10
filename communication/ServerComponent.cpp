@@ -104,7 +104,7 @@ Message *ServerComponent::doCall(Message *msg_in, Message *msg_out, bool sync, i
 			return hub->call(msg_in, msg_out);
 		}
 	} else {
-		throw string("Cannot route message to destination ") + my_itoa(msg_in->destination);
+		throw std::runtime_error("Cannot route message to destination " + my_itoa(msg_in->destination));
 	}
 };
 
@@ -160,9 +160,9 @@ void ServerComponent::delete_tasks()
 			{
 				delete *ptask;
 			}
-			catch(string exc)
+			catch (const std::runtime_error & exc)
 			{
-				errors += "Failed to terminate task: " + exc + "\n";
+				errors += "Failed to terminate task: " + string(exc.what()) + "\n";
 			}
 		}
 	current_tasks.clear();

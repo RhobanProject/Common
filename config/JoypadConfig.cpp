@@ -121,7 +121,7 @@ string JoypadSensorParameter::to_xml() const
 double JoypadSensorParameter::normalize(int val, uint axis_id)
 {
     if(axis_id >= JOYPAD_AXIS_NB)
-        throw string("JoypadSensorParameter: normalize: axis_id too large");
+        throw std::runtime_error("JoypadSensorParameter: normalize: axis_id too large");
 
     return norm_coef[axis_id] * (val - zero[axis_id] ) ;
 }

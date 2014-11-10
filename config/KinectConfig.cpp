@@ -126,7 +126,7 @@ string KinectSensorParameter::to_xml() const
 double KinectSensorParameter::normalize(float val, uint axis_id)
 {
     if(axis_id >= KINECT_JOINTS_NB)
-        throw string("KinectSensorParameter: normalize: axis_id too large");
+        throw std::runtime_error("KinectSensorParameter: normalize: axis_id too large");
     //return norm_coef[axis_id] * (val - zero[axis_id] ) ;
     //cout << "Kinect angle " << val << " (zero " << zero[axis_id] << ") for axis "<< axis_id << endl;
     return val  - zero[axis_id];

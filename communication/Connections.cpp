@@ -30,7 +30,7 @@ namespace Rhoban
                     connect = true;
                     connecting[key] = true;
                 } else {
-                    throw string("Connecting...");
+                    throw std::runtime_error("Connecting...");
                 }
             }
         } else {
@@ -45,7 +45,7 @@ namespace Rhoban
         if (connect) {
             try {
                 connection->connectTo(hostname.c_str(), port);
-            } catch (string error) {
+            } catch (const std::runtime_error error) {
                 connecting[key] = false;
                 throw error;
             }

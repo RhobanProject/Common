@@ -59,10 +59,10 @@ namespace Rhoban
             Condition::wait(timeout);
             waiting = false;
         }
-        catch(string exc)
+        catch (const std::runtime_error & exc)
         {
             waiting = false;
-            throw string("Mailbox entry failed to wait condition:\n\t"+exc);
+            throw std::runtime_error("Mailbox entry failed to wait condition:\n\t"+string(exc.what()));
         }
     }
 

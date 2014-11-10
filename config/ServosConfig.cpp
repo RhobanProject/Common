@@ -40,7 +40,7 @@ void ServosConfig::from_xml(TiXmlNode * node)
 	TiXmlNode * servos_node = node->FirstChild( "Servos" );
 
 	if(!servos_node)
-		throw string("No servos node in servos config");
+		throw std::runtime_error("No servos node in servos config");
 
 	servos.clear();
 
@@ -116,7 +116,7 @@ ServoConfig ServosConfig::find_servo(string servo_name) const
 {
 	map<string, ServoConfig>::const_iterator pservo = servos.find(servo_name);
 	if(pservo == servos.end())
-		throw string("No servo named '") + servo_name + "'";
+		throw std::runtime_error("No servo named '" + servo_name + "'");
 	else
 		return pservo->second;
 }

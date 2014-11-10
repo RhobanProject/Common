@@ -73,9 +73,9 @@ void MoveSchedulerConfig::from_xml(TiXmlNode * node)
 	{
 		XML_READ_STRING_ARRAY(node,autoload_moves)
 	}
-	catch(string & exc)
+	catch (const std::runtime_error & exc)
 	{
-		cout << "Failed to read autoload moves list: \t\n" << exc << endl;
+		cout << "Failed to read autoload moves list: \t\n" << exc.what() << endl;
 	}
 
 	config_loaded = true;

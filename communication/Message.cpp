@@ -12,6 +12,7 @@
 #include <cerrno>
 #include <ctime>
 #include <string>
+#include <stdexcept>
 #ifndef MSVC
 #include <unistd.h>
 #endif
@@ -275,7 +276,7 @@ namespace Rhoban
     		value = buffer[cursor++];
     	}
     	    else
-    	      throw string("Buffer too small to read such a string");
+    	      throw std::runtime_error("Buffer too small to read such a string");
     }
 
     vector<ui8> Message::read_array(void)
