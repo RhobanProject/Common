@@ -104,7 +104,7 @@ if(SDK)
 
     set(COM_SOURCES ${COM_SOURCES}
         communication/CommandsStore.cpp
-        communication/tests/allTests.cpp
+        #communication/tests/allTests.cpp
         "${GENERATE_DIR}/MessageBuilder.cpp"
         "${GENERATE_DIR}/Connection.cpp"
         )
