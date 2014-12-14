@@ -43,6 +43,7 @@ if(MSVC)
 endif (MSVC)
 
 #Check for c++11 support
+if(NOT MSVC)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -56,6 +57,7 @@ endif ()
 #Enable C++11
 set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
 
 option(SDK
     "Compiles the SDK" OFF)
