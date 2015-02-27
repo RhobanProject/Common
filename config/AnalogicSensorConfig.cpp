@@ -8,6 +8,7 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <sstream>
+#include <cmath>
 
 #include "AnalogicSensorConfig.h"
 
