@@ -108,6 +108,11 @@ static const char * RHOBAN_MESSAGE_DESTINATIONS[RHOBAN_MESSAGE_DESTINATIONS_NB] 
 //#define MSG_LL_LOAD_LOCAL_CONFIG 71
 #define MSG_LL_GET_CONFIG 70
 #define MSG_LL_CONFIG_IS_LOADED 71
+
+#define MSG_LL_LOGGING_START            100
+#define MSG_LL_LOGGING_START_DURATION   101
+#define MSG_LL_LOGGING_STOP             102
+
 /**************************************
  * MOVE SCHEDULER
  */
