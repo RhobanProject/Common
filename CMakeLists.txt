@@ -8,6 +8,15 @@ set(RHOBAN_UTILS_DIRECTORY
     "${BASE}/Utils"
     CACHE STRING "RhobanUtils directory")
 
+option(COMMON_USE_CONFIG
+    "Enables Config support in RhobanCommon" ON)
+
+option(COMMON_USE_MOTION
+    "Enables Motion support in RhobanCommon" ON)
+
+option(COMMON_USE_COM
+    "Enables Com support in RhobanCommon" ON)
+
 option(RHOBANMATH
     "Enables RhobanMath support" OFF)
 
@@ -43,6 +52,7 @@ if(MSVC)
 endif (MSVC)
 
 #Check for c++11 support
+if(NOT MSVC)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -56,6 +66,7 @@ endif ()
 #Enable C++11
 set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
 
 option(SDK
     "Compiles the SDK" OFF)
@@ -153,7 +164,19 @@ set (APP_SOURCES
     )
 
 include_directories ("${PROJECT_SOURCE_DIR}")
-set (ALL_SOURCES ${CONFIG_SOURCES} ${COM_SOURCES} ${MOTION_SOURCES} ${APP_SOURCES})
+set (ALL_SOURCES ${APP_SOURCES})
+
+if(COMMON_USE_CONFIG)
+	set (ALL_SOURCES ${CONFIG_SOURCES} ${ALL_SOURCES})
+endif()
+
+if(COMMON_USE_MOTION)
+	set (ALL_SOURCES ${MOTION_SOURCES} ${ALL_SOURCES})
+endif()
+
+if(COMMON_USE_COM)
+	set (ALL_SOURCES ${COM_SOURCES} ${ALL_SOURCES})
+endif()
 
 # ADD HEADERS FILES 
 foreach (SOURCE ${ALL_SOURCES})
