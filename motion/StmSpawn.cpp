@@ -134,7 +134,8 @@ void StmSpawner::launch_stmloader()
 
 void StmSpawner::step()
 {
-	if(!check_stmloader_already_exists()) {
+	BEGIN_SAFE(mutex)
+	if(!check_stmloader_already_exists())
 	    launch_stmloader();
-        }
+	END_SAFE(mutex)
 }

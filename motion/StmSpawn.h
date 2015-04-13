@@ -45,6 +45,8 @@ private:
 	string path_to_command_store;
 	string python_cmd;
 	ServerHub * hub;
+
+	Mutex mutex;
 };
 
 #endif /* STMSPAWN_H_ */
