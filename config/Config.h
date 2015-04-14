@@ -16,7 +16,7 @@
 #include <xml/XMLTools.h>
 #include <logging/log.h>
 
-class AdapterLowLevel;
+class LowLevel;
 
 /**
  * Log level
@@ -55,7 +55,7 @@ public:
   /**
    * Loads the configuration
    */
-  virtual void load_config(AdapterLowLevel *);
+  virtual void load_config(LowLevel *);
 };
 
 #endif // CONFIG_H_
