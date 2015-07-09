@@ -74,7 +74,13 @@ void AnalogicSensorParameter::from_xml(TiXmlNode * node)
     min = XMLTools::get_double_element(node,"min");
     max = XMLTools::get_double_element(node,"max");
     zero = XMLTools::get_double_element(node,"zero");
-    norm_coef = 1.0 / ((int) max - (int) min);
+    int iMax = (int)max;
+    int iMin = (int)min;
+    if (iMax != iMin) {
+        norm_coef = 1.0 / (iMax-iMin);
+    } else {
+        norm_coef = 0.0;
+    }
 }
 
 string AnalogicSensorParameter::to_xml() const
