@@ -89,8 +89,14 @@ void JoypadSensorParameter::from_xml(TiXmlNode * node)
     for(uint i = 0; (i< JOYPAD_AXIS_NB) && (i< bound.size()); i++)
         zero[i] = bound[i];
 
-    for(uint i = 0; (i< JOYPAD_AXIS_NB) && (i< bound.size()); i++)
-        norm_coef[i] = 2.0 / (max[i] - min[i]);
+    for(uint i = 0; (i< JOYPAD_AXIS_NB) && (i< bound.size()); i++) {
+        float div = (max[i]-min[i]);
+        if (div == 0) {
+            norm_coef[i] = 0.0;
+        } else {
+            norm_coef[i] = 2.0 / (max[i] - min[i]);
+        }
+    }
 #endif
 }
 
