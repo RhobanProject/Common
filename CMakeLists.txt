@@ -86,14 +86,14 @@ set(COM_SOURCES
     communication/Server.cpp
     )
 
-if(SERVER_USES_ZMQ)
+#if(SERVER_USES_ZMQ)
 
-	set(COM_SOURCES
-    communication/Server2.cpp
-	"${COM_SOURCES}"
-	)
+        set(COM_SOURCES
+        communication/Server2.cpp
+        "${COM_SOURCES}"
+        )
 
-endif(SERVER_USES_ZMQ)
+    #endif(SERVER_USES_ZMQ)
 
 if(SDK)
     set(GENERATE_DIR "${PROJECT_BINARY_DIR}/communication")

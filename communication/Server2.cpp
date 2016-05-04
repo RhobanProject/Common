@@ -65,7 +65,8 @@ void Rhoban::Server2::execute()
 {
 
 	/* starts server */
-	void *context = get_zmq_context();
+	void *context = NULL;
+	//void *context = get_zmq_context();
 	
 	int major, minor, patch;
 	zmq_version(&major, &minor, &patch);
