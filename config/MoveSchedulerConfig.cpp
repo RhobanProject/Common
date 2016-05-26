@@ -89,6 +89,6 @@ string MoveSchedulerConfig::to_xml() const
 	result << "<ServosConfig>" << servos_config.to_xml() << "</ServosConfig>";
 	result << "<SensorsConfig>" << sensors_config.to_xml() << "</SensorsConfig>";
 	result << "<ServosScene>" << servos_scene << "</ServosScene>";
-	XML_WRITE_STRING_ARRAY(result, autoload_moves)
+	//	XML_WRITE_STRING_ARRAY(result, autoload_moves)
 	return result.str();
 }
